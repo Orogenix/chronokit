@@ -297,3 +297,23 @@ extension DateTime: TimeProtocol {
         withLocal { $0.with(nanosecond: nanosecond) }
     }
 }
+
+// MARK: - Subsecond Rounding
+
+extension DateTime: SubsecondRoundable {
+    @inlinable
+    public func roundSubseconds(_ digits: Int) -> Self {
+        Self(
+            instant: instant.roundSubseconds(digits),
+            timezone: timezone
+        )
+    }
+
+    @inlinable
+    public func truncateSubseconds(_ digits: Int) -> Self {
+        Self(
+            instant: instant.truncateSubseconds(digits),
+            timezone: timezone
+        )
+    }
+}
