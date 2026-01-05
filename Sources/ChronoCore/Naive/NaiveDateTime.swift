@@ -456,3 +456,23 @@ public extension NaiveDateTime {
         )
     }
 }
+
+// MARK: - Date Time Conversion
+
+public extension NaiveDateTime {
+    @inlinable
+    var dateTimeUTC: DateTime<FixedOffset> {
+        instantUTC.dateTime(in: .utc)
+    }
+
+    @inlinable
+    func dateTime<TZ: TimeZoneProtocol>(timezone: TZ) -> DateTime<TZ>? {
+        guard let instant = instant(in: timezone) else { return nil }
+        return instant.dateTime(in: timezone)
+    }
+
+    @inlinable
+    func dateTime(offset: FixedOffset) -> DateTime<FixedOffset> {
+        instant(offset: offset).dateTime(in: offset)
+    }
+}
