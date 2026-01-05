@@ -158,3 +158,29 @@ public extension DateTime {
         lhs = lhs - rhs
     }
 }
+
+// MARK: - Naive Conversion
+
+extension DateTime {
+    /// The 'Wall Clock' view of the time.
+    /// This applies the timezone offset to the stored UTC time.
+    @inlinable
+    public var naive: NaiveDateTime {
+        instant.naiveDateTime(in: timezone)
+    }
+
+    @usableFromInline
+    func withLocal(
+        resolving policy: DSTResolutionPolicy = .preferEarlier,
+        _ transform: (NaiveDateTime) -> NaiveDateTime?
+    ) -> Self? {
+        guard let newNaive = transform(naive),
+              let newInstant = newNaive.instant(
+                  in: timezone,
+                  resolving: policy
+              )
+        else { return nil }
+
+        return Self(instant: newInstant, timezone: timezone)
+    }
+}
