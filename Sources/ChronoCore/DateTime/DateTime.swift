@@ -46,6 +46,15 @@ public extension DateTime where TZ == SystemTimeZone {
     static func now() -> Self {
         Self(instant: .now(), timezone: SystemTimeZone())
     }
+
+    @inlinable
+    func fixedOffset() -> DateTime<FixedOffset> {
+        let currentOffset = timezone.offset(for: instant)
+        return DateTime<FixedOffset>(
+            instant: instant,
+            timezone: FixedOffset(currentOffset)
+        )
+    }
 }
 
 public extension DateTime where TZ == FixedOffset {
