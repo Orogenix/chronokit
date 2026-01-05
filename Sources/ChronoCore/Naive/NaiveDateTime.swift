@@ -47,6 +47,14 @@ extension NaiveDateTime: Comparable {
 public extension NaiveDateTime {
     static let min: Self = .init(date: .min, time: .min)
     static let max: Self = .init(date: .max, time: .max)
+
+    static func now(in timezone: some TimeZoneProtocol) -> Self {
+        Instant.now().naiveDateTime(in: timezone)
+    }
+
+    static func now() -> Self {
+        now(in: SystemTimeZone())
+    }
 }
 
 // MARK: - Arithmetic
