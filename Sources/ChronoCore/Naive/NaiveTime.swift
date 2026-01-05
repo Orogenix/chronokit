@@ -145,3 +145,39 @@ extension NaiveTime: TimeProtocol {
         Self(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
     }
 }
+
+extension NaiveTime: SubsecondRoundable {
+    @inlinable
+    public func roundSubseconds(_ digits: Int) -> NaiveTime {
+        if digits >= 9 { return self }
+
+        let span = NanosecondMath.span(forDigits: digits)
+        let nanos = nanosecondsSinceMidnight
+
+        let deltaDown = floorMod(nanos, span)
+        if deltaDown == 0 { return self }
+
+        let deltaUp = span - deltaDown
+
+        let finalNanos: Int64 = if deltaUp <= deltaDown {
+            floorMod(nanos + deltaUp, NanoSeconds.perDay64)
+        } else {
+            nanos - deltaDown
+        }
+
+        return Self(nanosecondsSinceMidnight: finalNanos)
+    }
+
+    @inlinable
+    public func truncateSubseconds(_ digits: Int) -> Self {
+        if digits >= 9 { return self }
+
+        let span = NanosecondMath.span(forDigits: digits)
+        let nanos = nanosecondsSinceMidnight
+
+        let deltaDown = floorMod(nanos, span)
+        if deltaDown == 0 { return self }
+
+        return Self(nanosecondsSinceMidnight: nanos - deltaDown)
+    }
+}
