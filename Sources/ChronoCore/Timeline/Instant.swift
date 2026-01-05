@@ -220,3 +220,35 @@ extension Instant: DurationRoundable {
         return advanced(bySeconds: 0, nanoseconds: span - deltaDown)
     }
 }
+
+// MARK: - Naive Conversion
+
+public extension Instant {
+    @inlinable
+    func naiveDateTime(in timezone: some TimeZoneProtocol) -> NaiveDateTime {
+        let offset = timezone.offset(for: self)
+
+        let totalSecs = seconds + offset.seconds
+        let totalNanos = Int64(nanoseconds) + Int64(offset.nanoseconds)
+
+        let extraSecs = floorDiv(totalNanos, NanoSeconds.perSecond64)
+        let finalNanos = floorMod(totalNanos, NanoSeconds.perSecond64)
+
+        let localSeconds = totalSecs + extraSecs
+
+        let days = floorDiv(localSeconds, Seconds.perDay64)
+        let secondsOfDay = floorMod(localSeconds, Seconds.perDay64)
+
+        let nanosSinceMidnight = secondsOfDay * NanoSeconds.perSecond64 + finalNanos
+
+        return NaiveDateTime(
+            date: NaiveDate(daysSinceEpoch: days),
+            time: NaiveTime(nanosecondsSinceMidnight: nanosSinceMidnight)
+        )
+    }
+
+    @inlinable
+    func naiveDateTimeUTC() -> NaiveDateTime {
+        naiveDateTime(in: FixedOffset.utc)
+    }
+}
