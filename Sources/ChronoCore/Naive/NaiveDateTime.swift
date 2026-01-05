@@ -288,3 +288,70 @@ extension NaiveDateTime: TimeProtocol {
         return Self(date: date, time: newTime)
     }
 }
+
+// MARK: - Rounding Helpers
+
+extension NaiveDateTime {
+    @usableFromInline
+    func timestampNanosecondsChecked() -> Int64? {
+        let (daysStamp, daysOverflow) = date
+            .daysSinceEpoch
+            .multipliedReportingOverflow(by: NanoSeconds.perDay64)
+        if daysOverflow { return nil }
+
+        let (stamp, stampOverflow) = daysStamp
+            .addingReportingOverflow(time.nanosecondsSinceMidnight)
+        if stampOverflow { return nil }
+
+        return stamp
+    }
+
+    @usableFromInline
+    static func fromTimestampNanoseconds(_ stamp: Int64) -> Self {
+        let days = floorDiv(stamp, NanoSeconds.perDay64)
+        let nanos = floorMod(stamp, NanoSeconds.perDay64)
+
+        return Self(
+            date: NaiveDate(daysSinceEpoch: days),
+            time: NaiveTime(nanosecondsSinceMidnight: nanos)
+        )
+    }
+}
+
+// MARK: - Subsecond Rounding
+
+extension NaiveDateTime: SubsecondRoundable {
+    @inlinable
+    public func roundSubseconds(_ digits: Int) -> Self {
+        if digits >= 9 { return self }
+
+        let span = NanosecondMath.span(forDigits: digits)
+        guard let stamp = timestampNanosecondsChecked() else { return self }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        let deltaUp = span - deltaDown
+
+        let rounded = deltaUp <= deltaDown
+            ? stamp + deltaUp
+            : stamp - deltaDown
+
+        return Self.fromTimestampNanoseconds(rounded)
+    }
+
+    @inlinable
+    public func truncateSubseconds(_ digits: Int) -> Self {
+        if digits >= 9 { return self }
+
+        let span = NanosecondMath.span(forDigits: digits)
+        guard let stamp = timestampNanosecondsChecked() else { return self }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        let truncated = stamp - deltaDown
+
+        return Self.fromTimestampNanoseconds(truncated)
+    }
+}
