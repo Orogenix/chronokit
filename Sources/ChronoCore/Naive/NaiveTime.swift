@@ -66,6 +66,14 @@ public extension NaiveTime {
     static let min: Self = .init(nanosecondsSinceMidnight: 0)
     static let max: Self = .init(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
     static let midnight: Self = .min
+
+    static func now(in timezone: some TimeZoneProtocol) -> Self {
+        NaiveDateTime.now(in: timezone).time
+    }
+
+    static func now() -> Self {
+        now(in: SystemTimeZone())
+    }
 }
 
 // MARK: - Arithmetic
