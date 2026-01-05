@@ -240,3 +240,51 @@ extension NaiveDateTime: DateProtocol {
         return Self(date: newDate, time: time)
     }
 }
+
+// MARK: - Time Protocol
+
+extension NaiveDateTime: TimeProtocol {
+    @inlinable
+    public var hour: Int {
+        time.hour
+    }
+
+    @inlinable
+    public var minute: Int {
+        time.minute
+    }
+
+    @inlinable
+    public var second: Int {
+        time.second
+    }
+
+    @inlinable
+    public var nanosecond: Int {
+        time.nanosecond
+    }
+
+    @inlinable
+    public func with(hour: Int) -> Self? {
+        guard let newTime = time.with(hour: hour) else { return nil }
+        return Self(date: date, time: newTime)
+    }
+
+    @inlinable
+    public func with(minute: Int) -> Self? {
+        guard let newTime = time.with(minute: minute) else { return nil }
+        return Self(date: date, time: newTime)
+    }
+
+    @inlinable
+    public func with(second: Int) -> Self? {
+        guard let newTime = time.with(second: second) else { return nil }
+        return Self(date: date, time: newTime)
+    }
+
+    @inlinable
+    public func with(nanosecond: Int) -> Self? {
+        guard let newTime = time.with(nanosecond: nanosecond) else { return nil }
+        return Self(date: date, time: newTime)
+    }
+}
