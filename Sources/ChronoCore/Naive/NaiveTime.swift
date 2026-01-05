@@ -123,3 +123,25 @@ public extension NaiveTime {
         lhs = lhs - rhs
     }
 }
+
+extension NaiveTime: TimeProtocol {
+    @inlinable
+    public func with(hour: Int) -> Self? {
+        Self(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
+    }
+
+    @inlinable
+    public func with(minute: Int) -> Self? {
+        Self(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
+    }
+
+    @inlinable
+    public func with(second: Int) -> Self? {
+        Self(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
+    }
+
+    @inlinable
+    public func with(nanosecond: Int) -> Self? {
+        Self(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
+    }
+}
