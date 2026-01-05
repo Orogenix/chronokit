@@ -136,3 +136,39 @@ public extension Instant {
         lhs = lhs - rhs
     }
 }
+
+// MARK: - Subsecond Rounding
+
+extension Instant: SubsecondRoundable {
+    @inlinable
+    public func roundSubseconds(_ digits: Int) -> Self {
+        if digits >= 9 { return self }
+
+        let span = NanosecondMath.span(forDigits: digits)
+        let nanos = Int64(nanoseconds)
+
+        let deltaDown = floorMod(nanos, span)
+        if deltaDown == 0 { return self }
+
+        let deltaUp = span - deltaDown
+
+        if deltaUp <= deltaDown {
+            return advanced(bySeconds: 0, nanoseconds: deltaUp)
+        } else {
+            return advanced(bySeconds: 0, nanoseconds: -deltaDown)
+        }
+    }
+
+    @inlinable
+    public func truncateSubseconds(_ digits: Int) -> Self {
+        if digits >= 9 { return self }
+
+        let span = NanosecondMath.span(forDigits: digits)
+        let nanos = Int64(nanoseconds)
+
+        let deltaDown = floorMod(nanos, span)
+        if deltaDown == 0 { return self }
+
+        return advanced(bySeconds: 0, nanoseconds: -deltaDown)
+    }
+}
