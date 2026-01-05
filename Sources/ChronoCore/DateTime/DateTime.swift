@@ -253,3 +253,47 @@ extension DateTime: DateProtocol {
         withLocal { $0.with(ordinalZeroBased: value) }
     }
 }
+
+// MARK: - Time Protocol
+
+extension DateTime: TimeProtocol {
+    @inlinable
+    public var hour: Int {
+        naive.time.hour
+    }
+
+    @inlinable
+    public var minute: Int {
+        naive.time.minute
+    }
+
+    @inlinable
+    public var second: Int {
+        naive.time.second
+    }
+
+    @inlinable
+    public var nanosecond: Int {
+        naive.time.nanosecond
+    }
+
+    @inlinable
+    public func with(hour: Int) -> Self? {
+        withLocal { $0.with(hour: hour) }
+    }
+
+    @inlinable
+    public func with(minute: Int) -> Self? {
+        withLocal { $0.with(minute: minute) }
+    }
+
+    @inlinable
+    public func with(second: Int) -> Self? {
+        withLocal { $0.with(second: second) }
+    }
+
+    @inlinable
+    public func with(nanosecond: Int) -> Self? {
+        withLocal { $0.with(nanosecond: nanosecond) }
+    }
+}
