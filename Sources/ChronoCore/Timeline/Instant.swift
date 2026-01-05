@@ -172,3 +172,51 @@ extension Instant: SubsecondRoundable {
         return advanced(bySeconds: 0, nanoseconds: -deltaDown)
     }
 }
+
+// MARK: - Duration Rounding
+
+extension Instant: DurationRoundable {
+    public typealias RoundingError = TimeRoundingError
+
+    @inlinable
+    public func round(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        guard let span = quantum.timestampNanosecondsChecked else { throw .quantumExceedsLimit }
+        guard span > 0 else { throw .invalidQuantum }
+        guard let stamp = timestampNanosecondsChecked else { throw .timestampExceedsLimit }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        let deltaUp = span - deltaDown
+
+        if deltaUp <= deltaDown {
+            return advanced(bySeconds: 0, nanoseconds: deltaUp)
+        } else {
+            return advanced(bySeconds: 0, nanoseconds: -deltaDown)
+        }
+    }
+
+    @inlinable
+    public func truncate(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        guard let span = quantum.timestampNanosecondsChecked else { throw .quantumExceedsLimit }
+        guard span > 0 else { throw .invalidQuantum }
+        guard let stamp = timestampNanosecondsChecked else { throw .timestampExceedsLimit }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        return advanced(bySeconds: 0, nanoseconds: -deltaDown)
+    }
+
+    @inlinable
+    public func roundUp(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        guard let span = quantum.timestampNanosecondsChecked else { throw .quantumExceedsLimit }
+        guard span > 0 else { throw .invalidQuantum }
+        guard let stamp = timestampNanosecondsChecked else { throw .timestampExceedsLimit }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        return advanced(bySeconds: 0, nanoseconds: span - deltaDown)
+    }
+}
