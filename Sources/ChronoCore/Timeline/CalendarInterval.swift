@@ -1,5 +1,7 @@
 import ChronoMath
 
+public typealias Period = CalendarInterval
+
 public struct CalendarInterval: Equatable, Hashable, Sendable {
     public var month: Int32
     public var day: Int32
