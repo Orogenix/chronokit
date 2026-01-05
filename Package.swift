@@ -12,6 +12,10 @@ let package = Package(
             name: "ChronoFormat",
             targets: ["ChronoFormat"]
         ),
+        .library(
+            name: "ChronoParse",
+            targets: ["ChronoParse"]
+        ),
     ],
     targets: [
         .target(
@@ -31,6 +35,12 @@ let package = Package(
             path: "Sources/ChronoMath",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+        .target(
+            name: "ChronoParse",
+            dependencies: ["ChronoCore", "ChronoMath"],
+            path: "Sources/ChronoParse",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
         .testTarget(
             name: "ChronoCoreTests",
             dependencies: ["ChronoCore"],
@@ -45,6 +55,11 @@ let package = Package(
             name: "ChronoMathTests",
             dependencies: ["ChronoMath"],
             path: "Tests/ChronoMathTests"
+        ),
+        .testTarget(
+            name: "ChronoParseTests",
+            dependencies: ["ChronoParse"],
+            path: "Tests/ChronoParseTests"
         ),
     ]
 )
