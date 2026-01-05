@@ -252,3 +252,17 @@ public extension Instant {
         naiveDateTime(in: FixedOffset.utc)
     }
 }
+
+// MARK: - Date Time Conversion
+
+public extension Instant {
+    @inlinable
+    func dateTime<TZ: TimeZoneProtocol>(in timezone: TZ) -> DateTime<TZ> {
+        DateTime(instant: self, timezone: timezone)
+    }
+
+    @inlinable
+    func dateTimeUTC() -> DateTime<FixedOffset> {
+        dateTime(in: FixedOffset.utc)
+    }
+}
