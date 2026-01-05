@@ -317,3 +317,33 @@ extension DateTime: SubsecondRoundable {
         )
     }
 }
+
+// MARK: - Duration Rounding
+
+extension DateTime: DurationRoundable {
+    public typealias RoundingError = TimeRoundingError
+
+    @inlinable
+    public func round(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        try Self(
+            instant: instant.round(byQuantum: quantum),
+            timezone: timezone
+        )
+    }
+
+    @inlinable
+    public func truncate(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        try Self(
+            instant: instant.truncate(byQuantum: quantum),
+            timezone: timezone
+        )
+    }
+
+    @inlinable
+    public func roundUp(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        try Self(
+            instant: instant.roundUp(byQuantum: quantum),
+            timezone: timezone
+        )
+    }
+}
