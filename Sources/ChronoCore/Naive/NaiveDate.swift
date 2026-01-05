@@ -195,3 +195,32 @@ extension NaiveDate: DateProtocol {
         with(ordinal: value + 1)
     }
 }
+
+public extension NaiveDate {
+    @inlinable
+    func at(_ time: NaiveTime) -> NaiveDateTime {
+        NaiveDateTime(date: self, time: time)
+    }
+
+    @inlinable
+    func at(nanosecondsSinceMidnight second: Int64) -> NaiveDateTime {
+        NaiveDateTime(
+            date: self,
+            time: NaiveTime(nanosecondsSinceMidnight: second)
+        )
+    }
+
+    @inlinable
+    func at(hour: Int, minute: Int, second: Int, nanosecond: Int = 0) -> NaiveDateTime? {
+        guard let time = NaiveTime(
+            hour: hour,
+            minute: minute,
+            second: second,
+            nanosecond: nanosecond
+        ) else { return nil }
+        return NaiveDateTime(
+            date: self,
+            time: time
+        )
+    }
+}
