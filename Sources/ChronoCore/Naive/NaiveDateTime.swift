@@ -163,3 +163,80 @@ public extension NaiveDateTime {
         lhs = lhs - rhs
     }
 }
+
+// MARK: - Date Protocol
+
+extension NaiveDateTime: DateProtocol {
+    @inlinable
+    public var year: Int32 {
+        date.year
+    }
+
+    @inlinable
+    public var month: Int {
+        date.month
+    }
+
+    @inlinable
+    public var day: Int {
+        date.day
+    }
+
+    @inlinable
+    public var ordinal: Int {
+        date.ordinal
+    }
+
+    @inlinable
+    public var weekday: Int {
+        date.weekday
+    }
+
+    @inlinable
+    public func with(year: Int32) -> Self? {
+        guard let newDate = date.with(year: year) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(month: Int) -> Self? {
+        guard let newDate = date.with(month: month) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(monthZeroBased value: Int) -> Self? {
+        guard let newDate = date.with(monthZeroBased: value) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(monthSymbol value: Month) -> Self? {
+        guard let newDate = date.with(monthSymbol: value) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(day: Int) -> Self? {
+        guard let newDate = date.with(day: day) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(dayZeroBased value: Int) -> Self? {
+        guard let newDate = date.with(dayZeroBased: value) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(ordinal: Int) -> Self? {
+        guard let newDate = date.with(ordinal: ordinal) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+
+    @inlinable
+    public func with(ordinalZeroBased value: Int) -> Self? {
+        guard let newDate = date.with(ordinalZeroBased: value) else { return nil }
+        return Self(date: newDate, time: time)
+    }
+}
