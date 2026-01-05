@@ -181,3 +181,36 @@ extension NaiveTime: SubsecondRoundable {
         return Self(nanosecondsSinceMidnight: nanos - deltaDown)
     }
 }
+
+public extension NaiveTime {
+    @inlinable
+    func on(_ date: NaiveDate) -> NaiveDateTime {
+        NaiveDateTime(date: date, time: self)
+    }
+
+    @inlinable
+    func on(daysSinceEpoch days: Int64) -> NaiveDateTime {
+        NaiveDateTime(
+            date: NaiveDate(daysSinceEpoch: days),
+            time: self,
+        )
+    }
+
+    @inlinable
+    func on(year: Int32, month: UInt8, day: UInt8) -> NaiveDateTime? {
+        guard let date = NaiveDate(year: year, month: month, day: day) else { return nil }
+        return NaiveDateTime(
+            date: date,
+            time: self,
+        )
+    }
+
+    @inlinable
+    func on(year: Int32, month: Int, day: Int) -> NaiveDateTime? {
+        guard let date = NaiveDate(year: year, month: month, day: day) else { return nil }
+        return NaiveDateTime(
+            date: date,
+            time: self,
+        )
+    }
+}
