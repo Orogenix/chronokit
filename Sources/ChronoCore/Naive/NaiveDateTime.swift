@@ -355,3 +355,55 @@ extension NaiveDateTime: SubsecondRoundable {
         return Self.fromTimestampNanoseconds(truncated)
     }
 }
+
+// MARK: - Duration Rounding
+
+extension NaiveDateTime: DurationRoundable {
+    public typealias RoundingError = TimeRoundingError
+
+    @inlinable
+    public func round(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        guard let span = quantum.timestampNanosecondsChecked else { throw .quantumExceedsLimit }
+        guard span > 0 else { throw .invalidQuantum }
+        guard let stamp = timestampNanosecondsChecked() else { throw .timestampExceedsLimit }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        let deltaUp = span - deltaDown
+
+        let rounded = deltaUp <= deltaDown
+            ? stamp + deltaUp
+            : stamp - deltaDown
+
+        return Self.fromTimestampNanoseconds(rounded)
+    }
+
+    @inlinable
+    public func truncate(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        guard let span = quantum.timestampNanosecondsChecked else { throw .quantumExceedsLimit }
+        guard span > 0 else { throw .invalidQuantum }
+        guard let stamp = timestampNanosecondsChecked() else { throw .timestampExceedsLimit }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        let truncated = stamp - deltaDown
+
+        return Self.fromTimestampNanoseconds(truncated)
+    }
+
+    @inlinable
+    public func roundUp(byQuantum quantum: Duration) throws(RoundingError) -> Self {
+        guard let span = quantum.timestampNanosecondsChecked else { throw .quantumExceedsLimit }
+        guard span > 0 else { throw .invalidQuantum }
+        guard let stamp = timestampNanosecondsChecked() else { throw .timestampExceedsLimit }
+
+        let deltaDown = floorMod(stamp, span)
+        if deltaDown == 0 { return self }
+
+        let roundedUp = stamp + (span - deltaDown)
+
+        return Self.fromTimestampNanoseconds(roundedUp)
+    }
+}
