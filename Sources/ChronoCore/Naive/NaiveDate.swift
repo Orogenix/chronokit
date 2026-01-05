@@ -60,6 +60,14 @@ public extension NaiveDate {
     static let max: Self = .init(daysSinceEpoch: CalendarConstants.maxInputDay)
     static let unixEpoch: Self = .init(daysSinceEpoch: 0)
 
+    static func now(in timezone: some TimeZoneProtocol) -> Self {
+        NaiveDateTime.now(in: timezone).date
+    }
+
+    static func now() -> Self {
+        now(in: SystemTimeZone())
+    }
+
     @usableFromInline
     internal var jan1: Int64 {
         daysFromCivil(year: Int64(year), month: 1, day: 1)
