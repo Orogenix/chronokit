@@ -140,3 +140,58 @@ public extension NaiveDate {
         lhs = lhs - rhs
     }
 }
+
+extension NaiveDate: DateProtocol {
+    @inlinable
+    public var ordinal: Int {
+        Int(daysSinceEpoch - jan1 + 1)
+    }
+
+    @inlinable
+    public var weekday: Int {
+        ChronoMath.weekday(from: daysSinceEpoch)
+    }
+
+    @inlinable
+    public func with(year: Int32) -> Self? {
+        Self(year: year, month: month, day: day)
+    }
+
+    @inlinable
+    public func with(month: Int) -> Self? {
+        Self(year: year, month: month, day: day)
+    }
+
+    @inlinable
+    public func with(monthZeroBased value: Int) -> Self? {
+        Self(year: year, month: value + 1, day: day)
+    }
+
+    @inlinable
+    public func with(monthSymbol value: Month) -> Self? {
+        Self(year: year, month: value.rawValue, day: day)
+    }
+
+    @inlinable
+    public func with(day: Int) -> Self? {
+        Self(year: year, month: month, day: day)
+    }
+
+    @inlinable
+    public func with(dayZeroBased value: Int) -> Self? {
+        Self(year: year, month: month, day: value + 1)
+    }
+
+    @inlinable
+    public func with(ordinal: Int) -> Self? {
+        guard ordinal >= 1, ordinal <= (isLeapYear ? 366 : 365)
+        else { return nil }
+
+        return Self(daysSinceEpoch: jan1 + Int64(ordinal - 1))
+    }
+
+    @inlinable
+    public func with(ordinalZeroBased value: Int) -> Self? {
+        with(ordinal: value + 1)
+    }
+}
