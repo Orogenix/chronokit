@@ -20,6 +20,11 @@ public struct Instant: Equatable, Hashable, Sendable {
 
 public extension Instant {
     static let zero: Self = .init(seconds: 0, nanoseconds: 0)
+
+    @inlinable
+    static func now() -> Self {
+        SystemClock.shared.now()
+    }
 }
 
 // MARK: - Comparability
