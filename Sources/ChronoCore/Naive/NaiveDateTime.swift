@@ -407,3 +407,52 @@ extension NaiveDateTime: DurationRoundable {
         return Self.fromTimestampNanoseconds(roundedUp)
     }
 }
+
+// MARK: - Instant Conversion
+
+public extension NaiveDateTime {
+    @inlinable
+    var instantUTC: Instant {
+        instant(offset: .utc)
+    }
+
+    @inlinable
+    func instant(
+        in timezone: some TimeZoneProtocol,
+        resolving policy: DSTResolutionPolicy = .preferEarlier
+    ) -> Instant? {
+        guard let offset = timezone
+            .offset(for: self)
+            .resolve(using: policy)
+        else { return nil }
+
+        let daysInSecs = date.daysSinceEpoch * Seconds.perDay64
+
+        let rawSecs = daysInSecs - offset.seconds
+        let rawNanos = time.nanosecondsSinceMidnight - Int64(offset.nanoseconds)
+
+        let extraSecs = floorDiv(rawNanos, NanoSeconds.perSecond64)
+        let normalizedNanos = floorMod(rawNanos, NanoSeconds.perSecond64)
+
+        return Instant(
+            seconds: rawSecs + extraSecs,
+            nanoseconds: Int32(normalizedNanos)
+        )
+    }
+
+    @inlinable
+    func instant(offset: FixedOffset) -> Instant {
+        let daysInSecs = date.daysSinceEpoch * Seconds.perDay64
+
+        let rawSecs = daysInSecs - offset.duration.seconds
+        let rawNanos = time.nanosecondsSinceMidnight - Int64(offset.duration.nanoseconds)
+
+        let extraSecs = floorDiv(rawNanos, NanoSeconds.perSecond64)
+        let finalNanos = floorMod(rawNanos, NanoSeconds.perSecond64)
+
+        return Instant(
+            seconds: rawSecs + extraSecs,
+            nanoseconds: Int32(finalNanos)
+        )
+    }
+}
