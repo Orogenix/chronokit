@@ -16,6 +16,11 @@ let package = Package(
             path: "Sources/ChronoCore",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+        .target(
+            name: "ChronoMath",
+            path: "Sources/ChronoMath",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
         .testTarget(
             name: "ChronoCoreTests",
             dependencies: ["ChronoCore"],
