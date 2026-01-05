@@ -39,6 +39,34 @@ public struct DateTime<TZ: TimeZoneProtocol>: Sendable {
     }
 }
 
+// MARK: - Constructors
+
+public extension DateTime where TZ == SystemTimeZone {
+    @inlinable
+    static func now() -> Self {
+        Self(instant: .now(), timezone: SystemTimeZone())
+    }
+}
+
+public extension DateTime where TZ == FixedOffset {
+    @inlinable
+    static func now(in timezone: FixedOffset = .utc) -> Self {
+        Self(instant: .now(), timezone: timezone)
+    }
+
+    @inlinable
+    static var nowUTC: Self {
+        now(in: .utc)
+    }
+}
+
+public extension DateTime {
+    @inlinable
+    static func now(in timezone: TZ) -> Self {
+        Self(instant: .now(), timezone: timezone)
+    }
+}
+
 // MARK: - Core Accessors
 
 public extension DateTime {
