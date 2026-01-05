@@ -184,3 +184,72 @@ extension DateTime {
         return Self(instant: newInstant, timezone: timezone)
     }
 }
+
+// MARK: - Date Protocol
+
+extension DateTime: DateProtocol {
+    @inlinable
+    public var year: Int32 {
+        naive.date.year
+    }
+
+    @inlinable
+    public var month: Int {
+        naive.date.month
+    }
+
+    @inlinable
+    public var day: Int {
+        naive.date.day
+    }
+
+    @inlinable
+    public var ordinal: Int {
+        naive.date.ordinal
+    }
+
+    @inlinable
+    public var weekday: Int {
+        naive.date.weekday
+    }
+
+    @inlinable
+    public func with(year: Int32) -> Self? {
+        withLocal { $0.with(year: year) }
+    }
+
+    @inlinable
+    public func with(month: Int) -> Self? {
+        withLocal { $0.with(month: month) }
+    }
+
+    @inlinable
+    public func with(monthZeroBased value: Int) -> Self? {
+        withLocal { $0.with(monthZeroBased: value) }
+    }
+
+    @inlinable
+    public func with(monthSymbol value: Month) -> DateTime<TZ>? {
+        withLocal { $0.with(monthSymbol: value) }
+    }
+
+    @inlinable
+    public func with(day: Int) -> Self? {
+        withLocal { $0.with(day: day) }
+    }
+
+    @inlinable
+    public func with(dayZeroBased value: Int) -> Self? {
+        withLocal { $0.with(dayZeroBased: value) }
+    }
+
+    @inlinable
+    public func with(ordinal: Int) -> Self? {
+        withLocal { $0.with(ordinal: ordinal) }
+    }
+
+    @inlinable
+    public func with(ordinalZeroBased value: Int) -> Self? {
+        withLocal { $0.with(ordinalZeroBased: value) }
+    }
+}
