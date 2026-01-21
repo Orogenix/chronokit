@@ -6,6 +6,8 @@ extension ChronoParser {
         from raw: UnsafeRawBufferPointer,
         separator: UInt8
     ) -> RawDateTimeParts? {
+        guard raw.count >= 10 else { return nil }
+
         var parts = RawDateTimeParts()
 
         guard
@@ -22,10 +24,14 @@ extension ChronoParser {
         parts.month = month
         parts.day = day
 
-        guard raw.count > 10 else { return parts }
+        if raw.count == 10 { return parts }
 
         guard
-            raw[10] == separator,
+            raw.count >= 19,
+            raw[10] == separator
+        else { return nil }
+
+        guard
             let hour = FixedReader.read2(from: raw, at: 11),
             raw[13] == ASCII.colon,
             let minute = FixedReader.read2(from: raw, at: 14),
@@ -68,6 +74,14 @@ extension ChronoParser {
 
         return string.utf8.withContiguousStorageIfAvailable { buffer in
             parseParts(from: UnsafeRawBufferPointer(buffer), separator: separator)
-        } ?? nil
+        } ?? {
+            var utf8 = [UInt8]()
+            utf8.reserveCapacity(string.utf8.count)
+            utf8.append(contentsOf: string.utf8)
+
+            return utf8.withUnsafeBytes {
+                parseParts(from: $0, separator: separator)
+            }
+        }()
     }
 }
