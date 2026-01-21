@@ -5,6 +5,10 @@ let package = Package(
     name: "chronokit",
     products: [
         .library(
+            name: "ChronoKit",
+            targets: ["ChronoKit"]
+        ),
+        .library(
             name: "ChronoCore",
             targets: ["ChronoCore"]
         ),
@@ -28,6 +32,12 @@ let package = Package(
             name: "ChronoFormat",
             dependencies: ["ChronoCore", "ChronoMath"],
             path: "Sources/ChronoFormat",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .target(
+            name: "ChronoKit",
+            dependencies: ["ChronoCore", "ChronoFormat", "ChronoMath", "ChronoParse"],
+            path: "Sources/ChronoKit",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .target(
