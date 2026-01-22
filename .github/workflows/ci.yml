@@ -30,15 +30,6 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          components: rustfmt, clippy
-
-      - name: Install Tarpaulin
-        run: cargo install cargo-tarpaulin --version 0.35.0 --force || true
-
       - name: Cache SwiftPM
         uses: actions/cache@v4
         with:
