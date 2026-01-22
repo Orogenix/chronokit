@@ -18,7 +18,7 @@ public struct NaiveDateTime: Equatable, Hashable, Sendable {
         hour: Int = 0,
         minute: Int = 0,
         second: Int = 0,
-        nanosecond: Int = 0
+        nanosecond: Int = 0,
     ) {
         guard let date = NaiveDate(year: year, month: month, day: day),
               let time = NaiveTime(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
@@ -76,7 +76,7 @@ public extension NaiveDateTime {
 
         return Self(
             date: date.advanced(byDays: extraDaysFromNanos + extraDaysFromSecs + finalDayDelta),
-            time: NaiveTime(nanosecondsSinceMidnight: finalNanos)
+            time: NaiveTime(nanosecondsSinceMidnight: finalNanos),
         )
     }
 
@@ -84,7 +84,7 @@ public extension NaiveDateTime {
     func advanced(by duration: Duration) -> Self {
         advanced(
             bySeconds: duration.seconds,
-            nanoseconds: Int64(duration.nanoseconds)
+            nanoseconds: Int64(duration.nanoseconds),
         )
     }
 }
@@ -144,7 +144,7 @@ public extension NaiveDateTime {
 
         return Duration(
             seconds: totalSec + extraSec,
-            nanoseconds: normalizedNanos
+            nanoseconds: normalizedNanos,
         )
     }
 
@@ -152,13 +152,13 @@ public extension NaiveDateTime {
     static func - (lhs: Self, rhs: Duration) -> Self {
         lhs.advanced(
             bySeconds: -rhs.seconds,
-            nanoseconds: -Int64(rhs.nanoseconds)
+            nanoseconds: -Int64(rhs.nanoseconds),
         )
     }
 
     @inlinable
     static func - (lhs: Self, rhs: CalendarInterval) -> Self {
-        return lhs + -rhs
+        lhs + -rhs
     }
 
     @inlinable
@@ -321,7 +321,7 @@ extension NaiveDateTime {
 
         return Self(
             date: NaiveDate(daysSinceEpoch: days),
-            time: NaiveTime(nanosecondsSinceMidnight: nanos)
+            time: NaiveTime(nanosecondsSinceMidnight: nanos),
         )
     }
 }
@@ -427,7 +427,7 @@ public extension NaiveDateTime {
     @inlinable
     func instant(
         in timezone: some TimeZoneProtocol,
-        resolving policy: DSTResolutionPolicy = .preferEarlier
+        resolving policy: DSTResolutionPolicy = .preferEarlier,
     ) -> Instant? {
         guard let offset = timezone
             .offset(for: self)
@@ -444,7 +444,7 @@ public extension NaiveDateTime {
 
         return Instant(
             seconds: rawSecs + extraSecs,
-            nanoseconds: Int32(normalizedNanos)
+            nanoseconds: Int32(normalizedNanos),
         )
     }
 
@@ -460,7 +460,7 @@ public extension NaiveDateTime {
 
         return Instant(
             seconds: rawSecs + extraSecs,
-            nanoseconds: Int32(finalNanos)
+            nanoseconds: Int32(finalNanos),
         )
     }
 }

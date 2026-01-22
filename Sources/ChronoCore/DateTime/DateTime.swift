@@ -20,7 +20,7 @@ public struct DateTime<TZ: TimeZoneProtocol>: Sendable {
         minute: Int = 0,
         second: Int = 0,
         nanosecond: Int = 0,
-        timezone: TZ
+        timezone: TZ,
     ) {
         guard
             let naiveLocal = NaiveDateTime(
@@ -30,7 +30,7 @@ public struct DateTime<TZ: TimeZoneProtocol>: Sendable {
                 hour: hour,
                 minute: minute,
                 second: second,
-                nanosecond: nanosecond
+                nanosecond: nanosecond,
             ),
             let utcInstant = naiveLocal.instant(in: timezone)
         else { return nil }
@@ -52,7 +52,7 @@ public extension DateTime where TZ == SystemTimeZone {
         let currentOffset = timezone.offset(for: instant)
         return DateTime<FixedOffset>(
             instant: instant,
-            timezone: FixedOffset(currentOffset)
+            timezone: FixedOffset(currentOffset),
         )
     }
 }
@@ -141,7 +141,7 @@ public extension DateTime {
     func advanced(bySeconds seconds: Int64, nanoseconds: Int64 = 0) -> Self {
         Self(
             instant: instant.advanced(bySeconds: seconds, nanoseconds: nanoseconds),
-            timezone: timezone
+            timezone: timezone,
         )
     }
 
@@ -149,7 +149,7 @@ public extension DateTime {
     func advanced(by duration: Duration) -> Self {
         advanced(
             bySeconds: duration.seconds,
-            nanoseconds: Int64(duration.nanoseconds)
+            nanoseconds: Int64(duration.nanoseconds),
         )
     }
 }
@@ -186,7 +186,7 @@ public extension DateTime {
     static func - (lhs: Self, rhs: Duration) -> Self {
         lhs.advanced(
             bySeconds: -rhs.seconds,
-            nanoseconds: -Int64(rhs.nanoseconds)
+            nanoseconds: -Int64(rhs.nanoseconds),
         )
     }
 
@@ -209,12 +209,12 @@ extension DateTime {
     @usableFromInline
     func withLocal(
         resolving policy: DSTResolutionPolicy = .preferEarlier,
-        _ transform: (NaiveDateTime) -> NaiveDateTime?
+        _ transform: (NaiveDateTime) -> NaiveDateTime?,
     ) -> Self? {
         guard let newNaive = transform(naive),
               let newInstant = newNaive.instant(
                   in: timezone,
-                  resolving: policy
+                  resolving: policy,
               )
         else { return nil }
 
@@ -342,7 +342,7 @@ extension DateTime: SubsecondRoundable {
     public func roundSubseconds(_ digits: Int) -> Self {
         Self(
             instant: instant.roundSubseconds(digits),
-            timezone: timezone
+            timezone: timezone,
         )
     }
 
@@ -350,7 +350,7 @@ extension DateTime: SubsecondRoundable {
     public func truncateSubseconds(_ digits: Int) -> Self {
         Self(
             instant: instant.truncateSubseconds(digits),
-            timezone: timezone
+            timezone: timezone,
         )
     }
 }
@@ -364,7 +364,7 @@ extension DateTime: DurationRoundable {
     public func round(byQuantum quantum: Duration) throws(RoundingError) -> Self {
         try Self(
             instant: instant.round(byQuantum: quantum),
-            timezone: timezone
+            timezone: timezone,
         )
     }
 
@@ -372,7 +372,7 @@ extension DateTime: DurationRoundable {
     public func truncate(byQuantum quantum: Duration) throws(RoundingError) -> Self {
         try Self(
             instant: instant.truncate(byQuantum: quantum),
-            timezone: timezone
+            timezone: timezone,
         )
     }
 
@@ -380,7 +380,7 @@ extension DateTime: DurationRoundable {
     public func roundUp(byQuantum quantum: Duration) throws(RoundingError) -> Self {
         try Self(
             instant: instant.roundUp(byQuantum: quantum),
-            timezone: timezone
+            timezone: timezone,
         )
     }
 }

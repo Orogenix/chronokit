@@ -9,7 +9,7 @@ enum FixedWriter {
     static func write2(
         _ value: some BinaryInteger,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         guard offset + 1 < buffer.count else { return 0 }
         let val = Int(value)
@@ -24,7 +24,7 @@ enum FixedWriter {
     static func write4(
         _ value: some BinaryInteger,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         guard offset + 3 < buffer.count else { return 0 }
         let val = Int(value)
@@ -42,7 +42,7 @@ enum FixedWriter {
         _ value: some BinaryInteger,
         digits: Int,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         guard digits >= 0,
               digits <= 9,
@@ -66,7 +66,7 @@ enum FixedWriter {
     static func writeOffset(
         _ value: some BinaryInteger,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         guard offset + 5 < buffer.count else { return 0 }
 
@@ -90,7 +90,7 @@ enum FixedWriter {
     static func writeVarInt(
         _ value: some BinaryInteger,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         var val = Int(value)
         if val == 0 {
@@ -137,7 +137,7 @@ enum FixedWriter {
     static func writeChar(
         _ char: UInt8,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         guard offset < buffer.count else { return 0 }
         buffer[offset] = char

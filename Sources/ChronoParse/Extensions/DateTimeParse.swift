@@ -11,7 +11,7 @@ public extension NaiveDateTime {
             hour: parts.hour,
             minute: parts.minute,
             second: parts.second,
-            nanosecond: Int(parts.nanosecond)
+            nanosecond: Int(parts.nanosecond),
         )
     }
 }
@@ -29,7 +29,7 @@ public extension DateTime where TZ == FixedOffset {
             minute: parts.minute,
             second: parts.second,
             nanosecond: Int(parts.nanosecond),
-            timezone: FixedOffset(.seconds(offset))
+            timezone: FixedOffset(.seconds(offset)),
         )
     }
 }

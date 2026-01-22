@@ -11,7 +11,7 @@ public struct ChronoFormatter: Equatable, Hashable, Sendable {
         case iso8601(
             digits: Int = 0,
             includeOffset: Bool = false,
-            useZulu: Bool = false
+            useZulu: Bool = false,
         )
     }
 
@@ -26,7 +26,7 @@ public extension ChronoFormatter {
     static func iso8601(
         digits: Int = 0,
         includeOffset: Bool = false,
-        useZulu: Bool = false
+        useZulu: Bool = false,
     ) -> Self {
         Self(strategy: .iso8601(digits: digits, includeOffset: includeOffset, useZulu: useZulu))
     }

@@ -68,7 +68,7 @@ public extension CalendarInterval {
 
 extension CalendarInterval: CustomStringConvertible {
     public var description: String {
-        return withUnsafeTemporaryAllocation(of: UInt8.self, capacity: 64) { buffer in
+        withUnsafeTemporaryAllocation(of: UInt8.self, capacity: 64) { buffer in
             let length = iso8601(to: UnsafeMutableRawBufferPointer(buffer))
             return String(decoding: buffer[..<length], as: UTF8.self)
         }

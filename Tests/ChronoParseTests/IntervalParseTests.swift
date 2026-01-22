@@ -1,5 +1,6 @@
-@testable import ChronoKit
+import ChronoCore
 import ChronoMath
+@testable import ChronoParse
 import Testing
 
 @Suite("Calendar Interval Parse Tests")

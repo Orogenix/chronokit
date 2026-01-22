@@ -21,7 +21,7 @@ struct DateTimeFormatTests {
         let dt = DateTime(
             year: 2025, month: 12, day: 29,
             hour: 16, minute: 0, second: 0, nanosecond: 0,
-            timezone: tz
+            timezone: tz,
         )!
 
         let result = dt.string(with: formatter)
@@ -34,12 +34,12 @@ struct DateTimeFormatTests {
         let dt = DateTime(
             year: 2025, month: 12, day: 29,
             hour: 10, minute: 0, second: 0, nanosecond: 0,
-            timezone: tz
+            timezone: tz,
         )!
 
         #expect(
             dt.string() == "2025-12-29T10:00:00",
-            "Default formatter is .iso8601(), which has includeOffset: false"
+            "Default formatter is .iso8601(), which has includeOffset: false",
         )
     }
 
@@ -50,7 +50,7 @@ struct DateTimeFormatTests {
             year: 2025, month: 12, day: 29,
             hour: 12, minute: 0, second: 0,
             nanosecond: 500_000_000,
-            timezone: tz
+            timezone: tz,
         )!
 
         let formatter = ChronoFormatter.iso8601(digits: 3, includeOffset: true)
@@ -83,7 +83,7 @@ struct DateTimeFormatTests {
     func paddingCheck() {
         let dt = NaiveDateTime(
             date: .init(year: 8, month: 3, day: 9)!,
-            time: .init(hour: 4, minute: 5, second: 6, nanosecond: 7)!
+            time: .init(hour: 4, minute: 5, second: 6, nanosecond: 7)!,
         )
 
         // Verifies write4, write2, and writeFraction (9 digits) padding

@@ -8,7 +8,7 @@ public extension NaiveTime {
             hour: parts.hour,
             minute: parts.minute,
             second: parts.second,
-            nanosecond: Int(parts.nanosecond)
+            nanosecond: Int(parts.nanosecond),
         )
     }
 }

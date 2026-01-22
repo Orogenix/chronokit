@@ -52,7 +52,7 @@ struct NaiveDateTests {
     func invalidYMDInitialization(year: Int32, month: UInt8, day: UInt8) {
         #expect(
             NaiveDate(year: year, month: month, day: day) != nil,
-            "Dates should be valid"
+            "Dates should be valid",
         )
     }
 
@@ -261,7 +261,7 @@ extension NaiveDateTests {
     func chainedMutations() {
         var dt = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 0, minute: 0, second: 0)!
+            time: NaiveTime(hour: 0, minute: 0, second: 0)!,
         )
 
         dt += CalendarInterval.days(1)
@@ -357,7 +357,7 @@ extension NaiveDateTests {
         addD: Int32,
         expY: Int32,
         expM: Int,
-        expD: Int
+        expD: Int,
     ) {
         let date = NaiveDate(year: y, month: m, day: d)!
         let interval = CalendarInterval(month: addM, day: addD)
@@ -385,7 +385,7 @@ extension NaiveDateTests {
         d: Int,
         addM: Int32,
         expM: Int,
-        expD: Int
+        expD: Int,
     ) {
         let date = NaiveDate(year: y, month: m, day: d)!
         let interval = CalendarInterval.months(addM)
@@ -411,7 +411,7 @@ extension NaiveDateTests {
         addD: Int32,
         expY: Int32,
         expM: Int,
-        expD: Int
+        expD: Int,
     ) {
         let date = NaiveDate(year: y, month: m, day: d)!
         let interval = CalendarInterval.days(addD)
@@ -442,7 +442,7 @@ extension NaiveDateTests {
         // Start at 2025-01-31 23:00
         var dt = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 31)!,
-            time: NaiveTime(hour: 23, minute: 0, second: 0)!
+            time: NaiveTime(hour: 23, minute: 0, second: 0)!,
         )
 
         // Add 1 month and 2 hours
@@ -528,7 +528,7 @@ extension NaiveDateTests {
         // Start at 2025-03-01 01:00
         var dt = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 3, day: 1)!,
-            time: NaiveTime(hour: 1, minute: 0, second: 0)!
+            time: NaiveTime(hour: 1, minute: 0, second: 0)!,
         )
 
         // Subtract 1 month and 2 hours

@@ -33,7 +33,7 @@ extension RawIntervalParts {
     mutating func sumChecked(year: Int64) -> Bool {
         let (month, mulOverflow) = year.multipliedReportingOverflow(by: 12)
         let (total, sumOverflow) = self.month.addingReportingOverflow(month)
-        guard !mulOverflow && !sumOverflow else { return false }
+        guard !mulOverflow, !sumOverflow else { return false }
         self.month = total
         return true
     }
@@ -61,7 +61,7 @@ extension RawIntervalParts {
     mutating func sumChecked(hour: Int64) -> Bool {
         let (nanos, mulOverflow) = hour.multipliedReportingOverflow(by: NanoSeconds.perHour64)
         let (total, sumOverflow) = nanosecond.addingReportingOverflow(nanos)
-        guard !mulOverflow && !sumOverflow else { return false }
+        guard !mulOverflow, !sumOverflow else { return false }
         nanosecond = total
         return true
     }
@@ -71,7 +71,7 @@ extension RawIntervalParts {
     mutating func sumChecked(minute: Int64) -> Bool {
         let (nanos, mulOverflow) = minute.multipliedReportingOverflow(by: NanoSeconds.perMinute64)
         let (total, sumOverflow) = nanosecond.addingReportingOverflow(nanos)
-        guard !mulOverflow && !sumOverflow else { return false }
+        guard !mulOverflow, !sumOverflow else { return false }
         nanosecond = total
         return true
     }
@@ -81,7 +81,7 @@ extension RawIntervalParts {
     mutating func sumChecked(second: Int64) -> Bool {
         let (nanos, mulOverflow) = second.multipliedReportingOverflow(by: NanoSeconds.perSecond64)
         let (total, sumOverflow) = nanosecond.addingReportingOverflow(nanos)
-        guard !mulOverflow && !sumOverflow else { return false }
+        guard !mulOverflow, !sumOverflow else { return false }
         nanosecond = total
         return true
     }

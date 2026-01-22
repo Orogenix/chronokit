@@ -134,7 +134,7 @@ extension CalendarInterval {
         self.init(
             month: Int32(parts.month),
             day: Int32(parts.day),
-            nanosecond: parts.nanosecond
+            nanosecond: parts.nanosecond,
         )
     }
 }

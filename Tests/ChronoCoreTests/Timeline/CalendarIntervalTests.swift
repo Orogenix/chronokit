@@ -1,4 +1,4 @@
-@testable import ChronoKit
+@testable import ChronoCore
 import Testing
 
 @Suite("Calendar Interval Tests")

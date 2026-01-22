@@ -6,19 +6,19 @@ let package = Package(
     products: [
         .library(
             name: "ChronoKit",
-            targets: ["ChronoKit"]
+            targets: ["ChronoKit"],
         ),
         .library(
             name: "ChronoCore",
-            targets: ["ChronoCore"]
+            targets: ["ChronoCore"],
         ),
         .library(
             name: "ChronoFormat",
-            targets: ["ChronoFormat"]
+            targets: ["ChronoFormat"],
         ),
         .library(
             name: "ChronoParse",
-            targets: ["ChronoParse"]
+            targets: ["ChronoParse"],
         ),
     ],
     targets: [
@@ -26,50 +26,50 @@ let package = Package(
             name: "ChronoCore",
             dependencies: ["ChronoMath"],
             path: "Sources/ChronoCore",
-            swiftSettings: [.swiftLanguageMode(.v6)]
+            swiftSettings: [.swiftLanguageMode(.v6)],
         ),
         .target(
             name: "ChronoFormat",
             dependencies: ["ChronoCore", "ChronoMath"],
             path: "Sources/ChronoFormat",
-            swiftSettings: [.swiftLanguageMode(.v6)]
+            swiftSettings: [.swiftLanguageMode(.v6)],
         ),
         .target(
             name: "ChronoKit",
             dependencies: ["ChronoCore", "ChronoFormat", "ChronoMath", "ChronoParse"],
             path: "Sources/ChronoKit",
-            swiftSettings: [.swiftLanguageMode(.v6)]
+            swiftSettings: [.swiftLanguageMode(.v6)],
         ),
         .target(
             name: "ChronoMath",
             path: "Sources/ChronoMath",
-            swiftSettings: [.swiftLanguageMode(.v6)]
+            swiftSettings: [.swiftLanguageMode(.v6)],
         ),
         .target(
             name: "ChronoParse",
             dependencies: ["ChronoCore", "ChronoMath"],
             path: "Sources/ChronoParse",
-            swiftSettings: [.swiftLanguageMode(.v6)]
+            swiftSettings: [.swiftLanguageMode(.v6)],
         ),
         .testTarget(
             name: "ChronoCoreTests",
             dependencies: ["ChronoCore"],
-            path: "Tests/ChronoCoreTests"
+            path: "Tests/ChronoCoreTests",
         ),
         .testTarget(
             name: "ChronoFormatTests",
             dependencies: ["ChronoFormat"],
-            path: "Tests/ChronoFormatTests"
+            path: "Tests/ChronoFormatTests",
         ),
         .testTarget(
             name: "ChronoMathTests",
             dependencies: ["ChronoMath"],
-            path: "Tests/ChronoMathTests"
+            path: "Tests/ChronoMathTests",
         ),
         .testTarget(
             name: "ChronoParseTests",
             dependencies: ["ChronoParse"],
-            path: "Tests/ChronoParseTests"
+            path: "Tests/ChronoParseTests",
         ),
-    ]
+    ],
 )

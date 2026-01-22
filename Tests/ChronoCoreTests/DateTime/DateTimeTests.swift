@@ -647,7 +647,7 @@ extension DateTimeTests {
             hour: hour,
             minute: minute,
             second: second,
-            timezone: utc
+            timezone: utc,
         )!
 
         #expect(dt.secondsFromMidnight == expectedSeconds)
@@ -724,7 +724,7 @@ extension DateTimeTests {
         let utc: FixedOffset = .utc
         let dt = DateTime(
             instant: Instant(seconds: 1000, nanoseconds: Int32(nanoseconds)),
-            timezone: utc
+            timezone: utc,
         )
 
         let result = dt.truncateSubseconds(digits)
@@ -743,7 +743,7 @@ extension DateTimeTests {
         let utc: FixedOffset = .utc
         let dt = DateTime(
             instant: Instant(seconds: 1000, nanoseconds: Int32(nanoseconds)),
-            timezone: utc
+            timezone: utc,
         )
 
         let result = dt.roundSubseconds(digits)
@@ -763,7 +763,7 @@ extension DateTimeTests {
         let dt = DateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 0, nanosecond: 750_000_000,
-            timezone: timezone
+            timezone: timezone,
         )!
 
         let rounded = dt.roundSubseconds(0)
