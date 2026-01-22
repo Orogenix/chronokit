@@ -1,5 +1,6 @@
-@testable import ChronoKit
+import ChronoCore
 import ChronoMath
+@testable import ChronoParse
 import Testing
 
 @Suite("Calendar Interval Parse Tests")
@@ -20,7 +21,7 @@ struct CalendarIntervalParseTests {
         month: Int32 = 0,
         day: Int32 = 0,
         nanosecond: Int64 = 0,
-        sourceLocation: SourceLocation = #_sourceLocation,
+        sourceLocation: SourceLocation = #_sourceLocation
     ) {
         guard let interval = parse(string) else {
             #expect(Bool(false), "Failed to parse '\(string)'", sourceLocation: sourceLocation)
@@ -55,7 +56,7 @@ struct CalendarIntervalParseTests {
             day: 3,
             nanosecond: 4 * NanoSeconds.perHour64
                 + 5 * NanoSeconds.perMinute64
-                + 6 * NanoSeconds.perSecond64,
+                + 6 * NanoSeconds.perSecond64
         )
     }
 
@@ -63,17 +64,17 @@ struct CalendarIntervalParseTests {
     func parseFractionalSeconds() {
         expect(
             "PT1.5S",
-            nanosecond: NanoSeconds.perSecond64 + 500_000_000,
+            nanosecond: NanoSeconds.perSecond64 + 500_000_000
         )
 
         expect(
             "PT0.000000001S",
-            nanosecond: 1,
+            nanosecond: 1
         )
 
         expect(
             "PT10.123456789S",
-            nanosecond: 10 * NanoSeconds.perSecond64 + 123_456_789,
+            nanosecond: 10 * NanoSeconds.perSecond64 + 123_456_789
         )
     }
 
@@ -99,7 +100,7 @@ struct CalendarIntervalParseTests {
             "-P1Y2M3DT4H",
             month: -(12 + 2),
             day: -3,
-            nanosecond: -4 * NanoSeconds.perHour64,
+            nanosecond: -4 * NanoSeconds.perHour64
         )
     }
 

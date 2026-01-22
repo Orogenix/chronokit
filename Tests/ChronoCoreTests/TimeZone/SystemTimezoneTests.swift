@@ -1,4 +1,4 @@
-@testable import ChronoKit
+@testable import ChronoCore
 import Testing
 
 @Suite("System Time Zone Tests")
@@ -33,7 +33,7 @@ struct SystemTimeZoneTests {
         // Use a known 'safe' date (not near DST changes)
         let local = NaiveDateTime(
             date: .init(year: 2026, month: 6, day: 1)!,
-            time: .init(hour: 12, minute: 0, second: 0)!,
+            time: .init(hour: 12, minute: 0, second: 0)!
         )
 
         let result = tz.offset(for: local)
