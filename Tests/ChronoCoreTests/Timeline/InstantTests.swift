@@ -545,7 +545,7 @@ extension InstantTests {
         offset: Int,
         expectedDay: Int,
         expectedHour: Int,
-        expectedMinute: Int
+        expectedMinute: Int,
     ) {
         let instant = Instant(seconds: seconds, nanoseconds: 0)
         let tz = MockTimeZone(offset: offset)
@@ -570,7 +570,7 @@ extension InstantTests {
         expY: Int32,
         expM: Int,
         expD: Int,
-        expH: Int
+        expH: Int,
     ) {
         let instant = Instant(seconds: seconds, nanoseconds: 0)
         let tz = MockTimeZone(offset: offset)

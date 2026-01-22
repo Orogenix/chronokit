@@ -33,7 +33,7 @@ struct CalendarIntervalTests {
 
     @Test(
         "CalendarIntervalTests: Positive nanosecond overflow into days",
-        arguments: positiveUnderflowCases
+        arguments: positiveUnderflowCases,
     )
     func positiveOverflow(ns: Int64, expectedDays: Int32, expectedNanos: Int64) {
         let interval = CalendarInterval(month: 0, day: 0, nanosecond: ns)
@@ -44,7 +44,7 @@ struct CalendarIntervalTests {
 
     @Test(
         "CalendarIntervalTests: Negative nanosecond underflow (The floorDiv/floorMod Test)",
-        arguments: negativeUnderflowCases
+        arguments: negativeUnderflowCases,
     )
     func negativeUnderflow(ns: Int64, expectedDays: Int32, expectedNanos: Int64) {
         let interval = CalendarInterval(month: 0, day: 0, nanosecond: ns)

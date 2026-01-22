@@ -21,7 +21,7 @@ struct NaiveDateTimeParseTests {
         day: Int,
         hour: Int,
         min: Int,
-        sec: Int
+        sec: Int,
     ) {
         let ndt = NaiveDateTime(input, with: ChronoParser(strategy: strategy))
 

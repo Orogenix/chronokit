@@ -36,7 +36,7 @@ struct NaiveDateTimeTests {
         hour: Int,
         minute: Int,
         second: Int,
-        nanosecond: Int
+        nanosecond: Int,
     ) {
         let dateTime = NaiveDateTime(
             year: year,
@@ -45,7 +45,7 @@ struct NaiveDateTimeTests {
             hour: hour,
             minute: minute,
             second: second,
-            nanosecond: nanosecond
+            nanosecond: nanosecond,
         )
 
         #expect(dateTime != nil)
@@ -72,7 +72,7 @@ struct NaiveDateTimeTests {
         hour: Int,
         minute: Int,
         second: Int,
-        nanosecond: Int
+        nanosecond: Int,
     ) {
         let dateTime = NaiveDateTime(
             year: year,
@@ -81,7 +81,7 @@ struct NaiveDateTimeTests {
             hour: hour,
             minute: minute,
             second: second,
-            nanosecond: nanosecond
+            nanosecond: nanosecond,
         )
         #expect(dateTime == nil)
     }
@@ -225,7 +225,7 @@ extension NaiveDateTimeTests {
     func standardAdvance() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 10, minute: 0, second: 0)!
+            time: NaiveTime(hour: 10, minute: 0, second: 0)!,
         )
         // Add 1 hour and 30 minutes
         let result = base.advanced(bySeconds: 3600 + 1800)
@@ -239,7 +239,7 @@ extension NaiveDateTimeTests {
     func forwardRollover() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 23, minute: 59, second: 50)!
+            time: NaiveTime(hour: 23, minute: 59, second: 50)!,
         )
         // Add 20 seconds
         let result = base.advanced(bySeconds: 20)
@@ -254,7 +254,7 @@ extension NaiveDateTimeTests {
     func backwardRollover() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 2)!,
-            time: NaiveTime(hour: 0, minute: 0, second: 10)!
+            time: NaiveTime(hour: 0, minute: 0, second: 10)!,
         )
         // Subtract 20 seconds
         let result = base.advanced(bySeconds: -20)
@@ -269,7 +269,7 @@ extension NaiveDateTimeTests {
     func leapYearMultiDay() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2024, month: 2, day: 28)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!
+            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
         )
         // Add 48 hours (2 days)
         let result = base.advanced(bySeconds: 2 * 86400)
@@ -284,7 +284,7 @@ extension NaiveDateTimeTests {
     func nanoOverflow() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 900_000_000)!
+            time: NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 900_000_000)!,
         )
         // Add 200ms
         let result = base.advanced(bySeconds: 0, nanoseconds: 200_000_000)
@@ -298,7 +298,7 @@ extension NaiveDateTimeTests {
     func durationInterface() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!
+            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
         )
         let duration = Duration(seconds: 86400 + 3600, nanoseconds: 0) // 1 day, 1 hour
 
@@ -316,7 +316,7 @@ extension NaiveDateTimeTests {
     func dateTimePlusDuration() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 6, day: 1)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!
+            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
         )
         let delta = Duration(seconds: 3600) // 1 hour
 
@@ -331,7 +331,7 @@ extension NaiveDateTimeTests {
         let delta = Duration(seconds: 86400) // 1 day
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 12, day: 31)!,
-            time: NaiveTime(hour: 10, minute: 0, second: 0)!
+            time: NaiveTime(hour: 10, minute: 0, second: 0)!,
         )
 
         // Tests the (Duration, Self) overload
@@ -347,7 +347,7 @@ extension NaiveDateTimeTests {
     func subSecondAddition() {
         let base = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 500_000_000)!
+            time: NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 500_000_000)!,
         )
         let delta = Duration(seconds: 0, nanoseconds: 600_000_000) // 0.6s
 
@@ -364,7 +364,7 @@ extension NaiveDateTimeTests {
     func compoundAddition() {
         var dt = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!
+            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
         )
         let delta = Duration(seconds: 7200) // 2 hours
 
@@ -380,7 +380,7 @@ extension NaiveDateTimeTests {
     func multipleMutations() {
         var dt = NaiveDateTime(
             date: NaiveDate(year: 1999, month: 12, day: 31)!,
-            time: NaiveTime(hour: 23, minute: 0, second: 0)!
+            time: NaiveTime(hour: 23, minute: 0, second: 0)!,
         )
 
         dt += Duration(seconds: 3600) // Should hit midnight
@@ -411,7 +411,7 @@ extension NaiveDateTimeTests {
         intervalMonth: Int32,
         intervalDay: Int32,
         expectedDay: Int,
-        expectedMonth: Int
+        expectedMonth: Int,
     ) {
         let date = NaiveDate(year: year, month: month, day: day)!
         let time = NaiveTime(hour: hour, minute: 0, second: 0)!
@@ -451,7 +451,7 @@ extension NaiveDateTimeTests {
         // Start: 2025-01-31 23:00:00
         let dt = NaiveDateTime(
             date: NaiveDate(year: 2025, month: 1, day: 31)!,
-            time: NaiveTime(hour: 23, minute: 0, second: 0)!
+            time: NaiveTime(hour: 23, minute: 0, second: 0)!,
         )
 
         // Interval: 1 month and 2 hours
@@ -488,12 +488,12 @@ extension NaiveDateTimeTests {
         let dt1 = NaiveDateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 1,
-            nanosecond: 100_000_000
+            nanosecond: 100_000_000,
         )! // 1.1s
         let dt2 = NaiveDateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 1,
-            nanosecond: 900_000_000
+            nanosecond: 900_000_000,
         )! // 1.9s
 
         let diff = dt1 - dt2 // Should be -0.8s
@@ -567,11 +567,11 @@ extension NaiveDateTimeTests {
         subM: Int32,
         subD: Int32,
         expM: Int,
-        expD: Int
+        expD: Int,
     ) {
         let dt = NaiveDateTime(
             date: NaiveDate(year: y, month: m, day: d)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!
+            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
         )
 
         let interval = CalendarInterval(month: subM, day: subD, nanosecond: 0)
@@ -780,7 +780,7 @@ extension NaiveDateTimeTests {
             day: 1,
             hour: hour,
             minute: minute,
-            second: second
+            second: second,
         )!
         #expect(dt.secondsFromMidnight == expectedSeconds)
     }
@@ -851,7 +851,7 @@ extension NaiveDateTimeTests {
         let dt = NaiveDateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 0,
-            nanosecond: nanos
+            nanosecond: nanos,
         )!
         let truncated = dt.truncateSubseconds(digits)
 
@@ -869,7 +869,7 @@ extension NaiveDateTimeTests {
         let dt = NaiveDateTime(
             year: 2025, month: 1, day: 1,
             hour: 0, minute: 0, second: 0,
-            nanosecond: nanos
+            nanosecond: nanos,
         )!
         let rounded = dt.roundSubseconds(digits)
 
@@ -882,7 +882,7 @@ extension NaiveDateTimeTests {
         let endOfDay = NaiveDateTime(
             year: 2025, month: 1, day: 1,
             hour: 23, minute: 59, second: 59,
-            nanosecond: 999_999_999
+            nanosecond: 999_999_999,
         )!
 
         let truncated = endOfDay.truncateSubseconds(0)
@@ -898,7 +898,7 @@ extension NaiveDateTimeTests {
         let endOfYear = NaiveDateTime(
             year: 2025, month: 12, day: 31,
             hour: 23, minute: 59, second: 59,
-            nanosecond: 600_000_000
+            nanosecond: 600_000_000,
         )!
 
         // Rounding to 0 digits (nearest second) should push it to the next year
@@ -918,7 +918,7 @@ extension NaiveDateTimeTests {
         let dt = NaiveDateTime(
             year: 2025, month: 1, day: 1,
             hour: 12, minute: 0, second: 0,
-            nanosecond: 123
+            nanosecond: 123,
         )!
         let result = dt.roundSubseconds(9)
 
@@ -934,7 +934,7 @@ extension NaiveDateTimeTests {
         // Unix Epoch: 1970-01-01 00:00:00
         let epoch = NaiveDateTime(
             year: 1970, month: 1, day: 1,
-            hour: 0, minute: 0, second: 0
+            hour: 0, minute: 0, second: 0,
         )!
         let instant = epoch.instantUTC
 
@@ -945,7 +945,7 @@ extension NaiveDateTimeTests {
         let dt = NaiveDateTime(
             year: 2025, month: 12, day: 25,
             hour: 15, minute: 30, second: 45,
-            nanosecond: 123_000_000
+            nanosecond: 123_000_000,
         )!
         let instant2 = dt.instantUTC
 
@@ -1046,7 +1046,7 @@ extension NaiveDateTimeTests {
         #expect(zoned.year == 2024)
         #expect(
             zoned.timestamp == naive.instantUTC.timestamp - 3600,
-            "The underlying instant should shift correctly (10:00 local at +1 is 09:00 UTC)"
+            "The underlying instant should shift correctly (10:00 local at +1 is 09:00 UTC)",
         )
     }
 

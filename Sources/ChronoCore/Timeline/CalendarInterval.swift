@@ -11,7 +11,7 @@ public struct CalendarInterval: Equatable, Hashable, Sendable {
     public init(
         month: Int32,
         day: Int32 = 0,
-        nanosecond: Int64 = 0
+        nanosecond: Int64 = 0,
     ) {
         let extraDay = nanosecond / NanoSeconds.perDay64
         let remainingNanos = nanosecond % NanoSeconds.perDay64
@@ -90,7 +90,7 @@ public extension CalendarInterval {
         let result = Self(
             month: lhs.month + rhs.month,
             day: lhs.day + rhs.day,
-            nanosecond: lhs.nanosecond + rhs.nanosecond
+            nanosecond: lhs.nanosecond + rhs.nanosecond,
         )
 
         if (result.day > 0 && result.nanosecond < 0) || (result.day < 0 && result.nanosecond > 0) {
@@ -98,7 +98,7 @@ public extension CalendarInterval {
             return Self(
                 month: normalized.month,
                 day: normalized.day,
-                nanosecond: normalized.nanosecond
+                nanosecond: normalized.nanosecond,
             )
         }
 
@@ -115,7 +115,7 @@ public extension CalendarInterval {
         Self(
             month: -value.month,
             day: -value.day,
-            nanosecond: -value.nanosecond
+            nanosecond: -value.nanosecond,
         )
     }
 
@@ -130,7 +130,7 @@ public extension CalendarInterval {
         let result = Self(
             month: Int32(month),
             day: Int32(day),
-            nanosecond: nanos
+            nanosecond: nanos,
         )
 
         if (result.day > 0 && result.nanosecond < 0) || (result.day < 0 && result.nanosecond > 0) {
@@ -143,7 +143,7 @@ public extension CalendarInterval {
 
     @inlinable
     static func * (lhs: Int, rhs: Self) -> Self {
-        return rhs * lhs
+        rhs * lhs
     }
 
     @inlinable
@@ -173,7 +173,7 @@ extension CalendarInterval {
         return (
             month: month,
             day: Int32(totalDays),
-            nanosecond: remainingNanos
+            nanosecond: remainingNanos,
         )
     }
 }

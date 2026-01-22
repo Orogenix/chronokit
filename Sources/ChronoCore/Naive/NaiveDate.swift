@@ -12,7 +12,7 @@ public struct NaiveDate: Equatable, Hashable, Sendable {
     public init(daysSinceEpoch days: Int64) {
         precondition(
             days >= CalendarConstants.minInputDay && days <= CalendarConstants.maxInputDay,
-            "Day since epoch exceeds maximum supported calendar range."
+            "Day since epoch exceeds maximum supported calendar range.",
         )
 
         let civil = civilDate(from: days)
@@ -214,7 +214,7 @@ public extension NaiveDate {
     func at(nanosecondsSinceMidnight second: Int64) -> NaiveDateTime {
         NaiveDateTime(
             date: self,
-            time: NaiveTime(nanosecondsSinceMidnight: second)
+            time: NaiveTime(nanosecondsSinceMidnight: second),
         )
     }
 
@@ -224,11 +224,11 @@ public extension NaiveDate {
             hour: hour,
             minute: minute,
             second: second,
-            nanosecond: nanosecond
+            nanosecond: nanosecond,
         ) else { return nil }
         return NaiveDateTime(
             date: self,
-            time: time
+            time: time,
         )
     }
 }

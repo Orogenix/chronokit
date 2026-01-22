@@ -4,7 +4,7 @@ extension ChronoParser {
     @usableFromInline
     func parseParts(
         from raw: UnsafeRawBufferPointer,
-        separator: UInt8
+        separator: UInt8,
     ) -> RawDateTimeParts? {
         guard raw.count >= 10 else { return nil }
 

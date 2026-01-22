@@ -8,7 +8,7 @@ extension ChronoFormatter {
     func writeDate(
         date: some DateProtocol,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         var cursor = offset
         cursor += FixedWriter.write4(date.year, to: buffer, at: cursor)
@@ -25,7 +25,7 @@ extension ChronoFormatter {
     func writeTime(
         time: some TimeProtocol,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         var cursor = offset
         cursor += FixedWriter.write2(time.hour, to: buffer, at: cursor)
@@ -43,7 +43,7 @@ extension ChronoFormatter {
         _ value: some BinaryInteger,
         digits: Int,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         guard digits > 0 else { return 0 }
         var cursor = offset
@@ -59,12 +59,12 @@ extension ChronoFormatter {
         _ value: some BinaryInteger,
         useZulu: Bool,
         to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
+        at offset: Int,
     ) -> Int {
         if useZulu, value == 0 {
-            return FixedWriter.writeChar(ASCII.charZ, to: buffer, at: offset)
+            FixedWriter.writeChar(ASCII.charZ, to: buffer, at: offset)
         } else {
-            return FixedWriter.writeOffset(value, to: buffer, at: offset)
+            FixedWriter.writeOffset(value, to: buffer, at: offset)
         }
     }
 }
@@ -95,7 +95,7 @@ public extension ChronoFormatter {
         date: some DateProtocol,
         time: some TimeProtocol,
         offset: Int? = nil,
-        to buffer: UnsafeMutableRawBufferPointer
+        to buffer: UnsafeMutableRawBufferPointer,
     ) -> Int {
         switch strategy {
         case .dateHyphen:
@@ -129,7 +129,7 @@ public extension ChronoFormatter {
     func string(
         date: some DateProtocol,
         time: some TimeProtocol,
-        offset: Int? = nil
+        offset: Int? = nil,
     ) -> String {
         let capacity = bufferCapacity(offset: offset)
         return withUnsafeTemporaryAllocation(of: UInt8.self, capacity: capacity) { buffer in
