@@ -1,9 +1,8 @@
 import ChronoCore
 import ChronoMath
-@testable import ChronoParse
+@testable import ChronoParser
 import Testing
 
-@Suite("Calendar Interval Parse Tests")
 struct CalendarIntervalParseTests {
     @inline(__always)
     func parse(_ string: String) -> CalendarInterval? {

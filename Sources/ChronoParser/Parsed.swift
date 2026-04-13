@@ -1,19 +1,18 @@
 import ChronoCore
 
 @usableFromInline
-struct RawDateTimeParts {
-    @usableFromInline var year: Int = 0
-    @usableFromInline var month: Int = 0
-    @usableFromInline var day: Int = 0
-    @usableFromInline var hour: Int = 0
-    @usableFromInline var minute: Int = 0
-    @usableFromInline var second: Int = 0
-    @usableFromInline var nanosecond: Int64 = 0
-    @usableFromInline var offset: Int?
+struct ParsedDate {
+    @usableFromInline let year: Int
+    @usableFromInline let month: Int
+    @usableFromInline let day: Int
+}
 
-    @usableFromInline
-    @inline(__always)
-    init() {}
+@usableFromInline
+struct ParsedTime {
+    @usableFromInline let hour: Int
+    @usableFromInline let minute: Int
+    @usableFromInline let second: Int
+    @usableFromInline let nanosecond: Int64
 }
 
 @usableFromInline

@@ -1,0 +1,24 @@
+---
+identifier_name:
+  allowed_symbols: []
+  min_length: 1
+  max_length: 40
+
+file_length:
+  warning: 1000
+  error: 1500
+
+function_body_length:
+  warning: 100
+  error: 200
+
+large_tuple:
+  warning: 3
+  error: 5
+
+disabled_rules:
+  - trailing_comma
+  - cyclomatic_complexity
+  - opening_brace
+  - statement_position
+  - optional_data_string_conversion
