@@ -1,8 +1,7 @@
 import ChronoCore
-@testable import ChronoFormat
+@testable import ChronoFormatter
 import Testing
 
-@Suite("Time Format Tests")
 struct TimeFormatTests {
     let sampleTime = NaiveTime(hour: 14, minute: 05, second: 09, nanosecond: 123_456_789)!
 
@@ -12,15 +11,15 @@ struct TimeFormatTests {
     }
 
     @Test("TimeFormatTests: Padding check for early morning times")
-    func earlyTimePadding() {
-        let earlyTime = NaiveTime(hour: 0, minute: 9, second: 5, nanosecond: 0)!
+    func earlyTimePadding() throws {
+        let earlyTime = try #require(NaiveTime(hour: 0, minute: 9, second: 5, nanosecond: 0))
         #expect(earlyTime.string() == "00:09:05")
     }
 
     @Test("TimeFormatTests: Protocol dispatch with ISO strategies (Unix Epoch anchor)", arguments: [
         // Ensure that it uses 1970-01-01 when asked to render a date-time strategy
         (ChronoFormatter.iso8601(), "1970-01-01T14:05:09"),
-        (ChronoFormatter.dateTimeSpace(digits: 3), "1970-01-01 14:05:09.123")
+        (ChronoFormatter.dateTimeSpace(digits: 3), "1970-01-01 14:05:09.123"),
     ])
     func timeWithDateFormatters(strategy: ChronoFormatter, expected: String) {
         #expect(sampleTime.string(with: strategy) == expected)
@@ -43,33 +42,33 @@ struct TimeFormatTests {
         (23, 59, 59, "23:59:59"),
         (0, 0, 0, "00:00:00") // Midnight
     ])
-    func standardFormatting(hour: Int, minute: Int, second: Int, expected: String) {
-        let time = NaiveTime(hour: hour, minute: minute, second: second)!
+    func standardFormatting(hour: Int, minute: Int, second: Int, expected: String) throws {
+        let time = try #require(NaiveTime(hour: hour, minute: minute, second: second))
         #expect(time.description == expected)
     }
 
     @Test("TimeFormatTests: Padding for single-digit components")
-    func paddingTest() {
+    func paddingTest() throws {
         // Verifies that FixedWriter.write2 adds leading zeros correctly
-        let time = NaiveTime(hour: 9, minute: 5, second: 1)!
+        let time = try #require(NaiveTime(hour: 9, minute: 5, second: 1))
         #expect(time.description == "09:05:01")
     }
 
     @Test("TimeFormatTests: Nanoseconds are ignored in timeHyphen strategy")
-    func ignoreNanoseconds() {
+    func ignoreNanoseconds() throws {
         // The .timeHyphen strategy returns exactly 8 characters (HH:mm:ss)
         // Even if nanoseconds are present, they should not appear in the description.
-        let time = NaiveTime(hour: 12, minute: 0, second: 0, nanosecond: 999_999_999)!
+        let time = try #require(NaiveTime(hour: 12, minute: 0, second: 0, nanosecond: 999_999_999))
         #expect(time.description == "12:00:00")
         #expect(time.description.count == 8)
     }
 
     @Test("TimeFormatTests: Noon and Midnight boundaries")
-    func boundaries() {
+    func boundaries() throws {
         let midnight = NaiveTime.midnight
         #expect(midnight.description == "00:00:00")
 
-        let noon = NaiveTime(hour: 12, minute: 0, second: 0)!
+        let noon = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
         #expect(noon.description == "12:00:00")
     }
 }

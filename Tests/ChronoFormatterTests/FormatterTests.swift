@@ -1,8 +1,7 @@
 import ChronoCore
-@testable import ChronoFormat
+@testable import ChronoFormatter
 import Testing
 
-@Suite("ChronoFormatter Integration Tests")
 struct ChronoFormatterTests {
     typealias Strategy = ChronoFormatter.Strategy
     let testDate = NaiveDate(year: 2025, month: 12, day: 31)!
@@ -13,31 +12,31 @@ struct ChronoFormatterTests {
             strategy: Strategy.dateHyphen,
             offset: nil,
             expectedCap: 10,
-            expectedStr: "2025-12-31",
+            expectedStr: "2025-12-31"
         ),
         (
             strategy: Strategy.timeHyphen,
             offset: nil,
             expectedCap: 8,
-            expectedStr: "23:59:58",
+            expectedStr: "23:59:58"
         ),
         (
             strategy: Strategy.dateTimeSpace(digits: 3),
             offset: nil,
             expectedCap: 19 + 4,
-            expectedStr: "2025-12-31 23:59:58.123",
+            expectedStr: "2025-12-31 23:59:58.123"
         ),
         (
             strategy: Strategy.iso8601(digits: 0, includeOffset: true, useZulu: true),
             offset: 0,
             expectedCap: 19 + 1,
-            expectedStr: "2025-12-31T23:59:58Z",
+            expectedStr: "2025-12-31T23:59:58Z"
         ),
         (
             strategy: Strategy.iso8601(digits: 9, includeOffset: true, useZulu: true),
             offset: 3600,
             expectedCap: 19 + 10 + 6,
-            expectedStr: "2025-12-31T23:59:58.123456789+01:00",
+            expectedStr: "2025-12-31T23:59:58.123456789+01:00"
         ),
     ])
     func capacityAndFormatSync(strategy: Strategy, offset: Int?, expectedCap: Int, expectedStr: String) {

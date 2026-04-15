@@ -1,8 +1,7 @@
 import ChronoCore
-@testable import ChronoFormat
+@testable import ChronoFormatter
 import Testing
 
-@Suite("Calendar Interval Format Tests")
 struct CalendarIntervalFormatTests {
     @Test("CalendarIntervalFormatTests: Standard Date-only Intervals", arguments: [
         (0, 0, 0, "P0D"), // 0 Interval

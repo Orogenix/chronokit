@@ -1,7 +1,6 @@
-@testable import ChronoFormat
+@testable import ChronoFormatter
 import Testing
 
-@Suite("FixedWriter Performance & Correctness")
 struct FixedWriterTests {
     // MARK: - Fixed Digit Write Tests
 

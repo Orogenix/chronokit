@@ -1,13 +1,12 @@
 import ChronoCore
-@testable import ChronoFormat
+@testable import ChronoFormatter
 import Testing
 
-@Suite("Naive Date Time Format Tests")
 struct NaiveDateTimeFormatTests {
     let dt = NaiveDateTime(
         year: 2025, month: 12, day: 29,
         hour: 15, minute: 30, second: 0,
-        nanosecond: 500_000_000,
+        nanosecond: 500_000_000
     )!
 
     @Test("NaiveDateTimeFormatTests: Default combined string uses ISO 8601")
