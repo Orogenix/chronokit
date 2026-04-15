@@ -12,22 +12,17 @@ struct DateParserTests {
         ("2024-02-29", 2024, 2, 29), // Leap year
     ])
     func validDateInit_rfc3339(input: String, year: Int32, month: Int, day: Int) {
-        let date = NaiveDate(input, as: .rfc3339)
+        let date = NaiveDate(rfc3339: input)
         #expect(date != nil)
         #expect(date?.year == year)
         #expect(date?.month == month)
         #expect(date?.day == day)
     }
 
-    @Test("DateParserTests: Initializes correctly from full DateTime strings")
+    @Test("DateParserTests: Initializes from full DateTime strings")
     func initFromDateTimeString_rfc3339() {
-        // NaiveDate should accept a full ISO string but only store the date parts
         let input = "2025-12-29T15:30:45.123Z"
-        let date = NaiveDate(input, as: .rfc3339)
-        #expect(date != nil)
-        #expect(date?.year == 2025)
-        #expect(date?.month == 12)
-        #expect(date?.day == 29)
+        #expect(NaiveDate(rfc3339: input) == nil, "Shouldn't accept a full ISO string, use DateTime<TimeZone>")
     }
 
     @Test("DateParserTests: Fails on invalid formatting", arguments: [
@@ -37,7 +32,7 @@ struct DateParserTests {
         "NotADate" // Garbage
     ])
     func invalidFormat_rfc3339(input: String) {
-        #expect(NaiveDate(input, as: .rfc3339) == nil)
+        #expect(NaiveDate(rfc3339: input) == nil)
     }
 
     @Test("DateParserTests: Fails on invalid calendar dates", arguments: [
@@ -48,6 +43,6 @@ struct DateParserTests {
     func invalidCalendar_rfc3339(input: String) {
         // This ensures the internal NaiveDate(year:month:day:) validation
         // or your parseParts validation is working through the init
-        #expect(NaiveDate(input, as: .rfc3339) == nil)
+        #expect(NaiveDate(rfc3339: input) == nil)
     }
 }

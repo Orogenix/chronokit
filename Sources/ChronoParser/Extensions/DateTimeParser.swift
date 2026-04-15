@@ -1,32 +1,12 @@
 import ChronoCore
 import ChronoMath
 
-extension NaiveDateTime {
+public extension NaiveDateTime {
     @inlinable
-    public init?(_ string: String, as standard: ChronoStandard = .rfc3339) {
-        let parsed: (date: ParsedDate, time: ParsedTime)? = switch standard {
-        case .rfc3339:
-            Self.parsedRFC3339(string)
-        }
-
-        guard let parsed else { return nil }
-
-        self.init(
-            year: Int32(parsed.date.year),
-            month: parsed.date.month,
-            day: parsed.date.day,
-            hour: parsed.time.hour,
-            minute: parsed.time.minute,
-            second: parsed.time.second,
-            nanosecond: Int(parsed.time.nanosecond)
-        )
-    }
-
-    @inlinable
-    static func parsedRFC3339(_ string: String) -> (date: ParsedDate, time: ParsedTime)? {
+    init?(rfc3339 string: String) {
         var input = string
 
-        return input.withUTF8 { buffer -> (ParsedDate, ParsedTime)? in
+        let parsed: (date: ParsedDate, time: ParsedTime)? = input.withUTF8 { buffer -> (ParsedDate, ParsedTime)? in
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
@@ -54,16 +34,25 @@ extension NaiveDateTime {
 
             return (parsedDate.parsed, parsedTime.parsed)
         }
+
+        guard let parsed else { return nil }
+
+        self.init(
+            year: Int32(parsed.date.year),
+            month: parsed.date.month,
+            day: parsed.date.day,
+            hour: parsed.time.hour,
+            minute: parsed.time.minute,
+            second: parsed.time.second,
+            nanosecond: Int(parsed.time.nanosecond)
+        )
     }
 }
 
 public extension DateTime where TZ == FixedOffset {
     @inlinable
-    init?(_ string: String, as standard: ChronoStandard = .rfc3339) {
-        let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = switch standard {
-        case .rfc3339:
-            Instant.parsedRFC3339(string)
-        }
+    init?(rfc3339 string: String) {
+        let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = Instant.parsedRFC3339(string)
 
         guard let parsed else { return nil }
 

@@ -1,11 +1,15 @@
 import ChronoCore
 
-extension NaiveDate {
+public extension NaiveDate {
     @inlinable
-    public init?(_ string: String, as standard: ChronoStandard = .rfc3339) {
-        let parsed: ParsedDate? = switch standard {
-        case .rfc3339:
-            Self.parsedRFC3339(string)
+    init?(rfc3339 string: String) {
+        var input = string
+
+        let parsed: ParsedDate? = input.withUTF8 { buffer in
+            let raw = UnsafeRawBufferPointer(buffer)
+            guard let result = ChronoScanner.scanDate(from: raw, at: 0),
+                  result.consumed == raw.count else { return nil }
+            return result.parsed
         }
 
         guard let parsed else { return nil }
@@ -15,19 +19,5 @@ extension NaiveDate {
             month: UInt8(parsed.month),
             day: UInt8(parsed.day)
         )
-    }
-
-    @inlinable
-    static func parsedRFC3339(_ string: String) -> ParsedDate? {
-        var parsed: ParsedDate?
-        var input = string
-
-        input.withUTF8 { buffer in
-            guard buffer.count >= 10 else { return }
-            let raw = UnsafeRawBufferPointer(buffer)
-            parsed = ChronoScanner.scanDate(from: raw, at: 0)?.parsed
-        }
-
-        return parsed
     }
 }

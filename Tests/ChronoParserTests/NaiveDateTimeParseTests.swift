@@ -18,7 +18,7 @@ struct NaiveDateTimeParserTests {
         min: Int,
         sec: Int
     ) {
-        let ndt = NaiveDateTime(input, as: .rfc3339)
+        let ndt = NaiveDateTime(rfc3339: input)
         #expect(ndt != nil)
         #expect(ndt?.year == year)
         #expect(ndt?.month == month)
@@ -35,7 +35,7 @@ struct NaiveDateTimeParserTests {
     ])
     func ignoresOffsets_rfc3339(input: String) {
         // All should parse to the same LOCAL time
-        let ndt = NaiveDateTime(input, as: .rfc3339)
+        let ndt = NaiveDateTime(rfc3339: input)
         #expect(ndt != nil)
         #expect(ndt?.hour == 10)
     }
@@ -46,7 +46,7 @@ struct NaiveDateTimeParserTests {
         ("2025-12-29T10:00:00,500", 500_000_000) // Comma separator
     ])
     func fractions_rfc3339(input: String, expectedNanos: Int) {
-        let ndt = NaiveDateTime(input, as: .rfc3339)
+        let ndt = NaiveDateTime(rfc3339: input)
         #expect(ndt?.nanosecond == expectedNanos)
     }
 
@@ -58,7 +58,7 @@ struct NaiveDateTimeParserTests {
     ])
     func invalidDates_rfc3339(input: String) {
         // parser.parse might succeed, but NaiveDateTime.init? should return nil
-        let ndt = NaiveDateTime(input, as: .rfc3339)
+        let ndt = NaiveDateTime(rfc3339: input)
         #expect(ndt == nil)
     }
 
@@ -68,6 +68,6 @@ struct NaiveDateTimeParserTests {
         "T10:00:00"
     ])
     func garbage_rfc3339(input: String) {
-        #expect(NaiveDateTime(input, as: .rfc3339) == nil)
+        #expect(NaiveDateTime(rfc3339: input) == nil)
     }
 }

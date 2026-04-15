@@ -13,8 +13,7 @@ struct InstantParserTests {
         "2025-12-29T17:00:00+07:00",
     ])
     func instantNormalization_rfc3339(input: String) {
-        let instant = Instant(input, as: .rfc3339)
-
+        let instant = Instant(rfc3339: input)
         #expect(instant != nil)
         // Verify against a known epoch second if your Instant stores seconds
         // or simply ensure they are all equal to each other
@@ -33,7 +32,7 @@ struct InstantParserTests {
         ("2025-12-29T10:00:00.999999999Z", 999_999_999) // Maximum nanoseconds
     ])
     func fractionalPrecision_rfc3339(input: String, expectedNanos: Int32) {
-        let instant = Instant(input, as: .rfc3339)
+        let instant = Instant(rfc3339: input)
         #expect(instant != nil)
         #expect(instant?.nanoseconds == expectedNanos)
     }
@@ -43,7 +42,7 @@ struct InstantParserTests {
         "2025-12-29T10:00:00,5Z" // Comma (Technically allowed by ISO 8601)
     ])
     func decimalSeparators_rfc3339(input: String) {
-        let instant = Instant(input, as: .rfc3339)
+        let instant = Instant(rfc3339: input)
         #expect(instant?.nanoseconds == 500_000_000)
     }
 
@@ -51,7 +50,7 @@ struct InstantParserTests {
         "2025-12-29T10:00:00.123456789123Z"
     ])
     func excessivePrecision_rfc3339(input: String) {
-        let instant = Instant(input, as: .rfc3339)
+        let instant = Instant(rfc3339: input)
         #expect(instant?.nanoseconds == 123_456_789, "Should still equal the max 9-digit precision")
     }
 
@@ -61,6 +60,6 @@ struct InstantParserTests {
         "InvalidString"
     ])
     func failures_rfc3339(input: String) {
-        #expect(Instant(input) == nil)
+        #expect(Instant(rfc3339: input) == nil)
     }
 }

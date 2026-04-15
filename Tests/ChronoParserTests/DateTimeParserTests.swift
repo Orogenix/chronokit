@@ -9,7 +9,7 @@ struct DateTimeParserTests {
         "2025-02-10",
     ])
     func missingOffsetFails_rfc3339(input: String) {
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt == nil)
     }
 
@@ -20,8 +20,7 @@ struct DateTimeParserTests {
         ("2025-12-29T10:00:00+0530", 10, 19800) // India Standard Time
     ])
     func offsetCapture_rfc3339(input: String, hour: Int, offset: Int) throws {
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
-
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt != nil)
         #expect(dt?.hour == hour)
         #expect(try dt?.timezone.offset(for: #require(dt?.instant)) == .seconds(offset))
@@ -32,7 +31,7 @@ struct DateTimeParserTests {
         ("2025-12-29T10:00:00.123456789+01:00", 123_456_789),
     ])
     func fractionsAndOffset_rfc3339(input: String, expectedNanos: Int) {
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt?.nanosecond == expectedNanos)
     }
 
@@ -42,14 +41,14 @@ struct DateTimeParserTests {
         "2025-12-29T24:00:00Z", // 24:00 is usually invalid in strict parsers
     ])
     func calendarValidation_rfc3339(input: String) {
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt == nil)
     }
 
     @Test("DateTimeParserTests: Supports comma separator with offset")
     func commaWithOffset_rfc3339() throws {
         let input = "2025-12-29T10:00:00,5+02:00"
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
 
         #expect(dt != nil)
         #expect(dt?.nanosecond == 500_000_000)
@@ -61,7 +60,7 @@ struct DateTimeParserTests {
         ("2025-12-29T10:00:00-05", -18000),
     ])
     func compactOffsets_rfc3339(input: String, expectedSeconds: Int64) throws {
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(try dt?.timezone.offset(for: #require(dt?.instant)).seconds == expectedSeconds)
     }
 
@@ -72,7 +71,7 @@ struct DateTimeParserTests {
         "2025-12-29T10:00:00.abcZ", // Letters in fraction
     ])
     func malformedFractions_rfc3339(input: String) {
-        #expect(DateTime<FixedOffset>(input, as: .rfc3339) == nil)
+        #expect(DateTime<FixedOffset>(rfc3339: input) == nil)
     }
 
     @Test("DateTimeParserTests: Boundary times", arguments: [
@@ -80,7 +79,7 @@ struct DateTimeParserTests {
         ("2025-12-29T23:59:59Z", 23), // Just before next day
     ])
     func boundaryTimes_rfc3339(input: String, expectedHour: Int) {
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt?.hour == expectedHour)
     }
 
@@ -88,7 +87,7 @@ struct DateTimeParserTests {
     func extremeOffsets_rfc3339() throws {
         // Valid ISO, though unlikely in the real world
         let input = "2025-12-29T10:00:00+18:00"
-        let dt = DateTime<FixedOffset>(input, as: .rfc3339)
+        let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt != nil)
         #expect(try dt?.timezone.offset(for: #require(dt?.instant)) == .hours(18))
     }

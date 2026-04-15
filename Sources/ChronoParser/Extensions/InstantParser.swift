@@ -3,11 +3,8 @@ import ChronoMath
 
 extension Instant {
     @inlinable
-    public init?(_ string: String, as standard: ChronoStandard = .rfc3339) {
-        let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = switch standard {
-        case .rfc3339:
-            Self.parsedRFC3339(string)
-        }
+    public init?(rfc3339 string: String) {
+        let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = Self.parsedRFC3339(string)
 
         guard let parsed,
               let naive = NaiveDateTime(

@@ -13,7 +13,7 @@ struct TimeParserTests {
         ("12:30:45,888", 12, 30, 45, 888_000_000), // ISO 8601 comma support
     ])
     func validTimes_rfc3339(input: String, h: Int, m: Int, s: Int, ns: Int) {
-        let time = NaiveTime(input, as: .rfc3339)
+        let time = NaiveTime(rfc3339: input)
         #expect(time != nil)
         #expect(time?.hour == h)
         #expect(time?.minute == m)
@@ -31,7 +31,7 @@ struct TimeParserTests {
     ])
     func strictFailureCases_rfc3339(input: String) {
         // Because of result.consumed == raw.count, these should all return nil
-        #expect(NaiveTime(input, as: .rfc3339) == nil)
+        #expect(NaiveTime(rfc3339: input) == nil)
     }
 
     @Test("TimeParserTests: Performance Path: withUTF8 execution")
