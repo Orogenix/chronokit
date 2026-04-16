@@ -144,9 +144,3 @@ enum FixedWriter {
         return 1
     }
 }
-
-func foo(list: [Int]) {
-    for _ in 0 ..< list.count {
-        for _ in 0 ..< list.count {}
-    }
-}

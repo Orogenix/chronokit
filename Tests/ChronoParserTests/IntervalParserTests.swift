@@ -3,7 +3,7 @@ import ChronoMath
 @testable import ChronoParser
 import Testing
 
-struct CalendarIntervalParseTests {
+struct CalendarIntervalParserTests {
     @inline(__always)
     func parse(_ string: String) -> CalendarInterval? {
         CalendarInterval(string)
@@ -32,7 +32,7 @@ struct CalendarIntervalParseTests {
         #expect(interval.nanosecond == nanosecond, sourceLocation: sourceLocation)
     }
 
-    @Test("CalendarIntervalParseTests: Parse date component")
+    @Test("CalendarIntervalParserTests: Parse date component")
     func parseDateComponents() {
         expect("P1Y", month: 12)
         expect("P2M", month: 2)
@@ -40,14 +40,14 @@ struct CalendarIntervalParseTests {
         expect("P1Y2M3D", month: 14, day: 3)
     }
 
-    @Test("CalendarIntervalParseTests: Parse time component")
+    @Test("CalendarIntervalParserTests: Parse time component")
     func parseTimeComponents() {
         expect("PT1H", nanosecond: NanoSeconds.perHour64)
         expect("PT2M", nanosecond: 2 * NanoSeconds.perMinute64)
         expect("PT3S", nanosecond: 3 * NanoSeconds.perSecond64)
     }
 
-    @Test("CalendarIntervalParseTests: Parse date and time component")
+    @Test("CalendarIntervalParserTests: Parse date and time component")
     func parseDateAndTime() {
         expect(
             "P1Y2M3DT4H5M6S",
@@ -59,7 +59,7 @@ struct CalendarIntervalParseTests {
         )
     }
 
-    @Test("CalendarIntervalParseTests: Parse fractional seconds component")
+    @Test("CalendarIntervalParserTests: Parse fractional seconds component")
     func parseFractionalSeconds() {
         expect(
             "PT1.5S",
@@ -77,7 +77,7 @@ struct CalendarIntervalParseTests {
         )
     }
 
-    @Test("CalendarIntervalParseTests: Parse invalid fractional seconds component")
+    @Test("CalendarIntervalParserTests: Parse invalid fractional seconds component")
     func rejectInvalidFractions() {
         expectNil("P1.5Y")
         expectNil("PT1.5H")
@@ -86,14 +86,14 @@ struct CalendarIntervalParseTests {
         expectNil("PT1.2S3M")
     }
 
-    @Test("CalendarIntervalParseTests: Parse signed intervals")
+    @Test("CalendarIntervalParserTests: Parse signed intervals")
     func parseSignedIntervals() {
         expect("-P1D", day: -1)
         expect("+P1D", day: 1)
         expect("-PT1H", nanosecond: -NanoSeconds.perHour64)
     }
 
-    @Test("CalendarIntervalParseTests: Parse combined negative sign")
+    @Test("CalendarIntervalParserTests: Parse combined negative sign")
     func parseNegativeCombined() {
         expect(
             "-P1Y2M3DT4H",
@@ -103,14 +103,14 @@ struct CalendarIntervalParseTests {
         )
     }
 
-    @Test("CalendarIntervalParseTests: Parse normalized sign from zero")
+    @Test("CalendarIntervalParserTests: Parse normalized sign from zero")
     func zeroNormalizesSign() {
         expect("P0D", day: 0)
         expect("-P0D", day: 0)
         expect("+P0D", day: 0)
     }
 
-    @Test("CalendarIntervalParseTests: Reject invalid structure")
+    @Test("CalendarIntervalParserTests: Reject invalid structure")
     func rejectInvalidStructure() {
         expectNil("1D")
         expectNil("T1S")
@@ -124,19 +124,19 @@ struct CalendarIntervalParseTests {
         expectNil("P1M2Y")
     }
 
-    @Test("CalendarIntervalParseTests: Reject overflow")
+    @Test("CalendarIntervalParserTests: Reject overflow")
     func rejectOverflow() {
         expectNil("P9223372036854775807Y")
         expectNil("PT9223372036854775807S")
     }
 
-    @Test("CalendarIntervalParseTests: Reject calendar interval narrowing overflow")
+    @Test("CalendarIntervalParserTests: Reject calendar interval narrowing overflow")
     func rejectCalendarIntervalNarrowingOverflow() {
         expectNil("P2147483648M")
         expectNil("-P2147483649M")
     }
 
-    @Test("CalendarIntervalParseTests: Reject garbage input")
+    @Test("CalendarIntervalParserTests: Reject garbage input")
     func rejectGarbageInput() {
         expectNil("")
         expectNil("PX")

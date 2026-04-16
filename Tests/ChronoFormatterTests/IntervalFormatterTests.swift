@@ -2,8 +2,8 @@ import ChronoCore
 @testable import ChronoFormatter
 import Testing
 
-struct CalendarIntervalFormatTests {
-    @Test("CalendarIntervalFormatTests: Standard Date-only Intervals", arguments: [
+struct CalendarIntervalFormatterTests {
+    @Test("CalendarIntervalFormatterTests: Standard Date-only Intervals", arguments: [
         (0, 0, 0, "P0D"), // 0 Interval
         (12, 0, 0, "P1Y"), // Exactly 1 year
         (13, 2, 0, "P1Y1M2D"), // Normalized years and months
@@ -17,7 +17,7 @@ struct CalendarIntervalFormatTests {
         #expect(interval.description == expected)
     }
 
-    @Test("CalendarIntervalFormatTests: Time-only and Mixed Intervals", arguments: [
+    @Test("CalendarIntervalFormatterTests: Time-only and Mixed Intervals", arguments: [
         (0, 0, 3600 * 1_000_000_000, "PT1H"), // 1 Hour
         (0, 0, 61 * 1_000_000_000, "PT1M1S"), // 1 Min 1 Sec
         (1, 1, 3661 * 1_000_000_000, "P1M1DT1H1M1S"), // Mixed Date/Time
@@ -27,7 +27,7 @@ struct CalendarIntervalFormatTests {
         #expect(interval.description == expected)
     }
 
-    @Test("CalendarIntervalFormatTests: Fractional Seconds (Nanoseconds)")
+    @Test("CalendarIntervalFormatterTests: Fractional Seconds (Nanoseconds)")
     func fractionalSeconds() {
         // Test exactly 0.5 seconds (500,000,000 nanos)
         let halfSecond = CalendarInterval(month: 0, day: 0, nanosecond: 500_000_000)
@@ -38,14 +38,14 @@ struct CalendarIntervalFormatTests {
         #expect(microNano.description == "PT1.000000001S")
     }
 
-    @Test("CalendarIntervalFormatTests: Zero Interval Edge Case")
+    @Test("CalendarIntervalFormatterTests: Zero Interval Edge Case")
     func zeroInterval() {
         // Should produce P0D per your logic
         let zero = CalendarInterval(month: 0, day: 0, nanosecond: 0)
         #expect(zero.description == "P0D")
     }
 
-    @Test("CalendarIntervalFormatTests: Negative Intervals (Floor Math check)")
+    @Test("CalendarIntervalFormatterTests: Negative Intervals (Floor Math check)")
     func negativeIntervals() {
         // -13 months should be -2 years, +11 months if using floorDiv/floorMod correctly
         // Or -1Y -1M depending on how your specific floor logic maps to ISO8601
@@ -55,7 +55,7 @@ struct CalendarIntervalFormatTests {
         #expect(negInterval.description == "P-2Y11M")
     }
 
-    @Test("CalendarIntervalFormatTests: Buffer Overflow Safety")
+    @Test("CalendarIntervalFormatterTests: Buffer Overflow Safety")
     func bufferSafety() {
         let interval = CalendarInterval(month: 100, day: 100, nanosecond: 100_000_000_000)
 
