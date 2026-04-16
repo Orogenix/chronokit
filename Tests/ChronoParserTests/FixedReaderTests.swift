@@ -16,7 +16,8 @@ struct FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            #expect(FixedReader.read2(from: raw, at: 0) == expected)
+            var cursor = 0
+            #expect(FixedReader.read2(from: raw, at: &cursor) == expected)
         }
     }
 
@@ -27,7 +28,8 @@ struct FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            #expect(FixedReader.read4(from: raw, at: 0) == expected)
+            var cursor = 0
+            #expect(FixedReader.read4(from: raw, at: &cursor) == expected)
         }
     }
 
@@ -42,8 +44,10 @@ struct FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            #expect(FixedReader.read2(from: raw, at: 0) == nil)
-            #expect(FixedReader.read4(from: raw, at: 0) == nil)
+            var cursor2 = 0
+            #expect(FixedReader.read2(from: raw, at: &cursor2) == nil)
+            var cursor4 = 0
+            #expect(FixedReader.read4(from: raw, at: &cursor4) == nil)
         }
     }
 }
@@ -62,9 +66,10 @@ extension FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let result = FixedReader.readFraction(from: raw, at: 0)
-            #expect(result?.value == expectedVal)
-            #expect(result?.consumed == expectedConsumed)
+            var cursor = 0
+            let result = FixedReader.readFraction(from: raw, at: &cursor)
+            #expect(result == expectedVal)
+            #expect(cursor == expectedConsumed)
         }
     }
 
@@ -73,21 +78,24 @@ extension FixedReaderTests {
         var noDotOrComma = "123"
         noDotOrComma.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let res = FixedReader.readFraction(from: raw, at: 0)
+            var cursor = 0
+            let res = FixedReader.readFraction(from: raw, at: &cursor)
             #expect(res == nil, "No dot or comma should return nil")
         }
 
         var dotOnly = "."
         dotOnly.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let res = FixedReader.readFraction(from: raw, at: 0)
+            var cursor = 0
+            let res = FixedReader.readFraction(from: raw, at: &cursor)
             #expect(res == nil, "Dot with no digits should fail")
         }
 
         var commaOnly = ","
         commaOnly.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let res = FixedReader.readFraction(from: raw, at: 0)
+            var cursor = 0
+            let res = FixedReader.readFraction(from: raw, at: &cursor)
             #expect(res == nil, "Dot with no digits should fail")
         }
     }

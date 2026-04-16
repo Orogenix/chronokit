@@ -7,9 +7,12 @@ public extension NaiveTime {
 
         let parsed: ParsedTime? = input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            guard let result = ChronoScanner.scanTime(from: raw, at: 0),
-                  result.consumed == raw.count else { return nil }
-            return result.parsed
+            var cursor = 0
+
+            guard let result = ChronoScanner.scanTime(from: raw, at: &cursor),
+                  cursor == raw.count else { return nil }
+
+            return result
         }
 
         guard let parsed else { return nil }

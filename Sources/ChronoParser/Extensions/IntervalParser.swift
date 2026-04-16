@@ -6,20 +6,18 @@ extension CalendarInterval {
     static func parse(from buffer: UnsafeRawBufferPointer) -> ParsedInterval? {
         guard !buffer.isEmpty else { return nil }
 
-        var index = 0
-        var sign: Int64 = 1
+        var cursor = 0
 
-        if buffer[index] == ASCII.dash {
+        var sign: Int64 = 1
+        if buffer.expect(ASCII.dash, &cursor) {
             sign = -1
-            index += 1
-        } else if buffer[index] == ASCII.plus {
-            index += 1
+            // index += 1
+        } else {
+            buffer.expect(ASCII.plus, &cursor)
+            // index += 1
         }
 
-        guard index < buffer.count,
-              buffer[index] == ASCII.charP else { return nil }
-
-        index += 1
+        guard buffer.expect(ASCII.charP, &cursor) else { return nil }
 
         var parts = ParsedInterval()
         var isTimeSection = false
@@ -30,74 +28,48 @@ extension CalendarInterval {
         // Y=0, M=1, D=2, H=3, M(time)=4, S=5
         var lastRank = -1
 
-        while index < buffer.count {
-            let char = buffer[index]
-
-            if char == ASCII.charT {
-                guard !isTimeSection else { return nil }
-
-                // Forbid trailing T
-                guard index + 1 < buffer.count else { return nil }
-
+        while cursor < buffer.count {
+            if buffer.expect(ASCII.charT, &cursor) {
+                guard !isTimeSection, cursor < buffer.count else { return nil }
                 isTimeSection = true
-                index += 1
-
                 continue
             }
 
-            guard let (unsignedValue, consumed) = FixedReader.readVarInt(from: buffer, at: index)
-            else { return nil }
-
-            index += consumed
-
+            guard let unsignedValue = FixedReader.readVarInt(from: buffer, at: &cursor) else { return nil }
             let value = unsignedValue * sign
 
             var fractionalNanos: Int64 = 0
-            let hasFraction: Bool = (index < buffer.count)
-                && (buffer[index] == ASCII.dot || buffer[index] == ASCII.comma)
-
-            if hasFraction {
+            if let nanos = buffer.readFraction(&cursor) {
                 guard !fractionUsed else { return nil }
-
-                guard let (unsignedNanos, nanosConsumed) = FixedReader.readFraction(from: buffer, at: index)
-                else { return nil }
-
-                fractionalNanos = unsignedNanos * sign
-                index += nanosConsumed
+                fractionalNanos = nanos * sign
                 fractionUsed = true
             }
 
-            guard index < buffer.count else { return nil }
-            let designator = buffer[index]
-            index += 1
+            guard cursor < buffer.count else { return nil }
+            let designator = buffer[cursor]
+            cursor += 1
 
             let currentRank: Int
-
             switch (designator, isTimeSection) {
             case (ASCII.charY, false):
                 currentRank = 0
-                guard !hasFraction,
-                      parts.sumChecked(year: value) else { return nil }
+                guard !fractionUsed, parts.sumChecked(year: value) else { return nil }
 
             case (ASCII.charM, false):
                 currentRank = 1
-                guard !hasFraction,
-                      parts.sumChecked(month: value) else { return nil }
+                guard !fractionUsed, parts.sumChecked(month: value) else { return nil }
 
             case (ASCII.charD, false):
                 currentRank = 2
-                guard !hasFraction,
-                      parts.sumChecked(day: value) else { return nil }
+                guard !fractionUsed, parts.sumChecked(day: value) else { return nil }
 
             case (ASCII.charH, true):
                 currentRank = 3
-                guard !hasFraction,
-                      parts.sumChecked(hour: value) else { return nil }
+                guard !fractionUsed, parts.sumChecked(hour: value) else { return nil }
 
             case (ASCII.charM, true):
                 currentRank = 4
-                guard !hasFraction,
-                      parts.sumChecked(minute: value) else { return nil }
+                guard !fractionUsed, parts.sumChecked(minute: value) else { return nil }
 
             case (ASCII.charS, true):
                 currentRank = 5
@@ -114,12 +86,10 @@ extension CalendarInterval {
             sawAnyComponent = true
 
             // ISO 8601: If a fraction is used, it MUST be the last component
-            if fractionUsed, index < buffer.count { return nil }
+            if fractionUsed, cursor < buffer.count { return nil }
         }
 
-        guard sawAnyComponent else { return nil }
-
-        return parts
+        return sawAnyComponent ? parts : nil
     }
 }
 

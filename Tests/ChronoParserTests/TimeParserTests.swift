@@ -40,10 +40,11 @@ struct TimeParserTests {
         var input = "15:04:05.999"
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let result = ChronoScanner.scanTime(from: raw, at: 0)
+            var cursor = 0
+            let result = ChronoScanner.scanTime(from: raw, at: &cursor)
 
             #expect(result != nil)
-            #expect(result?.consumed == buffer.count)
+            #expect(cursor == buffer.count)
         }
     }
 }

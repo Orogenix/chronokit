@@ -10,11 +10,9 @@ public extension NaiveDateTime {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            guard let parsedDate = ChronoScanner.scanDate(from: raw, at: cursor) else { return nil }
-            cursor += parsedDate.consumed
+            guard let date = ChronoScanner.scanDate(from: raw, at: &cursor) else { return nil }
 
             guard cursor < raw.count else { return nil }
-
             let separator = raw[cursor]
             guard separator == ASCII.charT
                 || separator == ASCII.lowerT
@@ -22,17 +20,15 @@ public extension NaiveDateTime {
             else { return nil }
             cursor += 1
 
-            guard let parsedTime = ChronoScanner.scanTime(from: raw, at: cursor) else { return nil }
-            cursor += parsedTime.consumed
+            guard let time = ChronoScanner.scanTime(from: raw, at: &cursor) else { return nil }
 
             if cursor < raw.count {
-                guard let parsedOffset = ChronoScanner.scanOffset(from: raw, at: cursor) else { return nil }
-                cursor += parsedOffset.consumed
+                guard ChronoScanner.scanOffset(from: raw, at: &cursor) != nil else { return nil }
             }
 
             guard cursor == raw.count else { return nil }
 
-            return (parsedDate.parsed, parsedTime.parsed)
+            return (date, time)
         }
 
         guard let parsed else { return nil }

@@ -14,13 +14,14 @@ struct ScannerTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let result = ChronoScanner.scanDate(from: raw, at: 0)
+            var cursor = 0
+            let result = ChronoScanner.scanDate(from: raw, at: &cursor)
 
             #expect(result != nil)
-            #expect(result?.parsed.year == year)
-            #expect(result?.parsed.month == month)
-            #expect(result?.parsed.day == day)
-            #expect(result?.consumed == 10)
+            #expect(result?.year == year)
+            #expect(result?.month == month)
+            #expect(result?.day == day)
+            #expect(cursor == 10)
         }
     }
 
@@ -33,7 +34,8 @@ struct ScannerTests {
     func scanDateFailures(input: String) {
         var input = input
         input.withUTF8 { buffer in
-            #expect(ChronoScanner.scanDate(from: UnsafeRawBufferPointer(buffer), at: 0) == nil)
+            var cursor = 0
+            #expect(ChronoScanner.scanDate(from: UnsafeRawBufferPointer(buffer), at: &cursor) == nil)
         }
     }
 }
@@ -51,13 +53,14 @@ extension ScannerTests {
     func scanValidTime(input: String, h: Int, m: Int, s: Int, ns: Int64, expectedConsumed: Int) {
         var input = input
         input.withUTF8 { buffer in
-            let result = ChronoScanner.scanTime(from: UnsafeRawBufferPointer(buffer), at: 0)
+            var cursor = 0
+            let result = ChronoScanner.scanTime(from: UnsafeRawBufferPointer(buffer), at: &cursor)
             #expect(result != nil)
-            #expect(result?.parsed.hour == h)
-            #expect(result?.parsed.minute == m)
-            #expect(result?.parsed.second == s)
-            #expect(result?.parsed.nanosecond == ns)
-            #expect(result?.consumed == expectedConsumed)
+            #expect(result?.hour == h)
+            #expect(result?.minute == m)
+            #expect(result?.second == s)
+            #expect(result?.nanosecond == ns)
+            #expect(cursor == expectedConsumed)
         }
     }
 }
@@ -77,10 +80,11 @@ extension ScannerTests {
     func scanOffsets(input: String, expectedSeconds: Int, expectedConsumed: Int) {
         var input = input
         input.withUTF8 { buffer in
-            let result = ChronoScanner.scanOffset(from: UnsafeRawBufferPointer(buffer), at: 0)
+            var cursor = 0
+            let result = ChronoScanner.scanOffset(from: UnsafeRawBufferPointer(buffer), at: &cursor)
             #expect(result != nil)
-            #expect(result?.second == expectedSeconds)
-            #expect(result?.consumed == expectedConsumed)
+            #expect(result == expectedSeconds)
+            #expect(cursor == expectedConsumed)
         }
     }
 
@@ -93,7 +97,8 @@ extension ScannerTests {
     func scanOffsetFailures(input: String) {
         var input = input
         input.withUTF8 { buffer in
-            #expect(ChronoScanner.scanOffset(from: UnsafeRawBufferPointer(buffer), at: 0) == nil)
+            var cursor = 0
+            #expect(ChronoScanner.scanOffset(from: UnsafeRawBufferPointer(buffer), at: &cursor) == nil)
         }
     }
 }

@@ -31,11 +31,9 @@ extension Instant {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            guard let parsedDate = ChronoScanner.scanDate(from: raw, at: cursor) else { return nil }
-            cursor += parsedDate.consumed
+            guard let date = ChronoScanner.scanDate(from: raw, at: &cursor) else { return nil }
 
             guard cursor < raw.count else { return nil }
-
             let separator = raw[cursor]
             guard separator == ASCII.charT
                 || separator == ASCII.lowerT
@@ -43,17 +41,13 @@ extension Instant {
             else { return nil }
             cursor += 1
 
-            guard let parsedTime = ChronoScanner.scanTime(from: raw, at: cursor) else { return nil }
-            cursor += parsedTime.consumed
-
-            guard cursor < raw.count else { return nil }
-
-            guard let parsedOffset = ChronoScanner.scanOffset(from: raw, at: cursor) else { return nil }
-            cursor += parsedOffset.consumed
+            guard let time = ChronoScanner.scanTime(from: raw, at: &cursor),
+                  let offset = ChronoScanner.scanOffset(from: raw, at: &cursor)
+            else { return nil }
 
             guard cursor == raw.count else { return nil }
 
-            return (parsedDate.parsed, parsedTime.parsed, parsedOffset.second)
+            return (date, time, offset)
         }
     }
 }
