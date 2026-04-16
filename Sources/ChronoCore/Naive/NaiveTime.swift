@@ -13,7 +13,7 @@ public struct NaiveTime: Equatable, Hashable, Sendable {
     public init(nanosecondsSinceMidnight: Int64) {
         precondition(
             nanosecondsSinceMidnight >= 0 && nanosecondsSinceMidnight < NanoSeconds.perDay64,
-            "Time out of bounds",
+            "Time out of bounds"
         )
 
         self.nanosecondsSinceMidnight = nanosecondsSinceMidnight
@@ -91,7 +91,7 @@ public extension NaiveTime {
     func advanced(by duration: Duration) -> Self {
         advanced(
             bySeconds: duration.seconds,
-            nanoseconds: Int64(duration.nanoseconds),
+            nanoseconds: Int64(duration.nanoseconds)
         )
     }
 }
@@ -122,7 +122,7 @@ public extension NaiveTime {
     static func - (lhs: Self, rhs: Duration) -> Self {
         lhs.advanced(
             bySeconds: -rhs.seconds,
-            nanoseconds: -Int64(rhs.nanoseconds),
+            nanoseconds: -Int64(rhs.nanoseconds)
         )
     }
 
@@ -200,7 +200,7 @@ public extension NaiveTime {
     func on(daysSinceEpoch days: Int64) -> NaiveDateTime {
         NaiveDateTime(
             date: NaiveDate(daysSinceEpoch: days),
-            time: self,
+            time: self
         )
     }
 
@@ -209,7 +209,7 @@ public extension NaiveTime {
         guard let date = NaiveDate(year: year, month: month, day: day) else { return nil }
         return NaiveDateTime(
             date: date,
-            time: self,
+            time: self
         )
     }
 
@@ -218,7 +218,7 @@ public extension NaiveTime {
         guard let date = NaiveDate(year: year, month: month, day: day) else { return nil }
         return NaiveDateTime(
             date: date,
-            time: self,
+            time: self
         )
     }
 }
