@@ -16,7 +16,7 @@ struct ParsedTime {
 }
 
 @usableFromInline
-struct RawIntervalParts {
+struct ParsedInterval {
     @usableFromInline var month: Int64 = 0
     @usableFromInline var day: Int64 = 0
     @usableFromInline var nanosecond: Int64 = 0
@@ -26,7 +26,7 @@ struct RawIntervalParts {
     init() {}
 }
 
-extension RawIntervalParts {
+extension ParsedInterval {
     @usableFromInline
     @discardableResult
     mutating func sumChecked(year: Int64) -> Bool {

@@ -3,7 +3,7 @@ import ChronoMath
 
 extension CalendarInterval {
     @usableFromInline
-    static func parse(from buffer: UnsafeRawBufferPointer) -> RawIntervalParts? {
+    static func parse(from buffer: UnsafeRawBufferPointer) -> ParsedInterval? {
         guard !buffer.isEmpty else { return nil }
 
         var index = 0
@@ -21,7 +21,7 @@ extension CalendarInterval {
 
         index += 1
 
-        var parts = RawIntervalParts()
+        var parts = ParsedInterval()
         var isTimeSection = false
         var sawAnyComponent = false
         var fractionUsed = false
@@ -125,7 +125,7 @@ extension CalendarInterval {
 
 extension CalendarInterval {
     @usableFromInline
-    init?(from parts: RawIntervalParts) {
+    init?(from parts: ParsedInterval) {
         guard
             parts.month >= Int32.min, parts.month <= Int32.max,
             parts.day >= Int32.min, parts.day <= Int32.max
