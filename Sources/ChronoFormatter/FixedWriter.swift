@@ -4,71 +4,74 @@ import ChronoMath
 @usableFromInline
 enum FixedWriter {
     @usableFromInline
-    @discardableResult
     @inline(__always)
     static func write2(
         _ value: some BinaryInteger,
-        to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
-    ) -> Int {
-        guard offset + 1 < buffer.count else { return 0 }
+        to raw: UnsafeMutableRawBufferPointer,
+        at cursor: inout Int
+    ) {
+        guard cursor + 1 < raw.count else { return }
         let val = Int(value)
-        buffer[offset] = ASCII.zero + UInt8((val / 10) % 10)
-        buffer[offset + 1] = ASCII.zero + UInt8(val % 10)
-        return 2
+        raw[cursor] = ASCII.zero + UInt8((val / 10) % 10)
+        raw[cursor + 1] = ASCII.zero + UInt8(val % 10)
+        cursor += 2
     }
 
     @usableFromInline
-    @discardableResult
     @inline(__always)
     static func write4(
         _ value: some BinaryInteger,
-        to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
-    ) -> Int {
-        guard offset + 3 < buffer.count else { return 0 }
+        to raw: UnsafeMutableRawBufferPointer,
+        at cursor: inout Int
+    ) {
+        guard cursor + 3 < raw.count else { return }
         let val = Int(value)
-        buffer[offset] = ASCII.zero + UInt8((val / 1000) % 10)
-        buffer[offset + 1] = ASCII.zero + UInt8((val / 100) % 10)
-        buffer[offset + 2] = ASCII.zero + UInt8((val / 10) % 10)
-        buffer[offset + 3] = ASCII.zero + UInt8(val % 10)
-        return 4
+        raw[cursor] = ASCII.zero + UInt8((val / 1000) % 10)
+        raw[cursor + 1] = ASCII.zero + UInt8((val / 100) % 10)
+        raw[cursor + 2] = ASCII.zero + UInt8((val / 10) % 10)
+        raw[cursor + 3] = ASCII.zero + UInt8(val % 10)
+        cursor += 4
     }
 
     @usableFromInline
-    @discardableResult
     @inline(__always)
     static func writeFraction(
         _ value: some BinaryInteger,
         digits: Int,
-        to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
-    ) -> Int {
+        to raw: UnsafeMutableRawBufferPointer,
+        at cursor: inout Int
+    ) {
         guard digits >= 0,
-              digits <= 9,
-              offset + digits <= buffer.count else { return 0 }
+              cursor + digits <= raw.count else { return }
 
-        let span = NanosecondMath.span(forDigits: digits)
+        let actualDigits = min(digits, 9)
+        let span = NanosecondMath.span(forDigits: actualDigits)
         var val = Int(value) / Int(span)
 
         // Write backward
-        for index in (0 ..< digits).reversed() {
-            buffer[offset + index] = ASCII.zero + UInt8(val % 10)
+        let start = cursor
+        for index in (0 ..< actualDigits).reversed() {
+            raw[start + index] = ASCII.zero + UInt8(val % 10)
             val /= 10
         }
 
-        return digits
+        if digits > 9 {
+            for index in 9 ..< digits {
+                raw[cursor + index] = ASCII.zero
+            }
+        }
+
+        cursor += digits
     }
 
     @usableFromInline
-    @discardableResult
     @inline(__always)
     static func writeOffset(
         _ value: some BinaryInteger,
-        to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
-    ) -> Int {
-        guard offset + 5 < buffer.count else { return 0 }
+        to raw: UnsafeMutableRawBufferPointer,
+        at cursor: inout Int
+    ) {
+        guard cursor + 5 < raw.count else { return }
 
         let val = Int(value)
         let isNegative = val < 0
@@ -76,29 +79,43 @@ enum FixedWriter {
         let hours = absVal / Seconds.perHour
         let minutes = (absVal % Seconds.perHour) / Seconds.perMinute
 
-        buffer[offset] = isNegative ? ASCII.dash : ASCII.plus
-        write2(hours, to: buffer, at: offset + 1)
-        buffer[offset + 3] = ASCII.colon
-        write2(minutes, to: buffer, at: offset + 4)
+        raw[cursor] = isNegative ? ASCII.dash : ASCII.plus
+        cursor += 1
 
-        return 6
+        write2(hours, to: raw, at: &cursor)
+
+        raw[cursor] = ASCII.colon
+        cursor += 1
+
+        write2(minutes, to: raw, at: &cursor)
     }
 
     @usableFromInline
-    @discardableResult
+    @inline(__always)
+    static func writeByte(
+        _ value: UInt8,
+        to raw: UnsafeMutableRawBufferPointer,
+        at cursor: inout Int
+    ) {
+        guard cursor < raw.count else { return }
+        raw[cursor] = value
+        cursor += 1
+    }
+
+    @usableFromInline
     @inline(__always)
     static func writeVarInt(
         _ value: some BinaryInteger,
-        to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
-    ) -> Int {
+        to raw: UnsafeMutableRawBufferPointer,
+        at cursor: inout Int
+    ) {
         var val = Int(value)
+
         if val == 0 {
-            if offset < buffer.count {
-                buffer[offset] = ASCII.zero
-                return 1
-            }
-            return 0
+            guard cursor < raw.count else { return }
+            raw[cursor] = ASCII.zero
+            cursor += 1
+            return
         }
 
         let isNegative = val < 0
@@ -106,41 +123,28 @@ enum FixedWriter {
 
         // Find length of the number
         var temp = val
-        var length = 0
+        var digitLength = 0
         while temp > 0 {
             temp /= 10
-            length += 1
+            digitLength += 1
         }
 
-        let totalLength = length + (isNegative ? 1 : 0)
-        guard offset + totalLength <= buffer.count else { return 0 }
+        let totalLength = digitLength + (isNegative ? 1 : 0)
+        guard cursor + totalLength <= raw.count else { return }
 
         // Write digits backwards
-        var writeIndex = offset + totalLength - 1
+        var writeIndex = cursor + totalLength - 1
         var remaining = val
         while remaining > 0 {
-            buffer[writeIndex] = ASCII.zero + UInt8(remaining % 10)
+            raw[writeIndex] = ASCII.zero + UInt8(remaining % 10)
             remaining /= 10
             writeIndex -= 1
         }
 
         if isNegative {
-            buffer[offset] = ASCII.dash
+            raw[cursor] = ASCII.dash
         }
 
-        return totalLength
-    }
-
-    @usableFromInline
-    @discardableResult
-    @inline(__always)
-    static func writeChar(
-        _ char: UInt8,
-        to buffer: UnsafeMutableRawBufferPointer,
-        at offset: Int
-    ) -> Int {
-        guard offset < buffer.count else { return 0 }
-        buffer[offset] = char
-        return 1
+        cursor += totalLength
     }
 }

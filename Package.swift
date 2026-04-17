@@ -58,7 +58,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ChronoFormatterTests",
-            dependencies: ["ChronoFormatter"],
+            dependencies: ["ChronoCore", "ChronoFormatter", "ChronoMath"],
             path: "Tests/ChronoFormatterTests"
         ),
         .testTarget(
@@ -68,7 +68,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ChronoParserTests",
-            dependencies: ["ChronoParser"],
+            dependencies: ["ChronoCore", "ChronoParser", "ChronoMath"],
             path: "Tests/ChronoParserTests"
         ),
     ]

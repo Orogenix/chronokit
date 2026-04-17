@@ -5,29 +5,30 @@ import ChronoMath
 enum FixedReader {
     @usableFromInline
     @inline(__always)
-    static func read2(from buffer: UnsafeRawBufferPointer, at offset: Int) -> Int? {
-        guard offset + 1 < buffer.count else { return nil }
+    static func read2(from raw: UnsafeRawBufferPointer, at cursor: inout Int) -> Int? {
+        guard cursor + 1 < raw.count else { return nil }
 
         // ASCII '0' is 48. We subtract 48 from each byte
-        let d1 = buffer[offset] &- 48
-        let d2 = buffer[offset + 1] &- 48
+        let d1 = raw[cursor] &- 48
+        let d2 = raw[cursor + 1] &- 48
 
         // Validate they are actually digits
         guard d1 <= 9, d2 <= 9 else { return nil }
 
+        cursor += 2
         return Int(d1) * 10 + Int(d2)
     }
 
     @usableFromInline
     @inline(__always)
-    static func read4(from buffer: UnsafeRawBufferPointer, at offset: Int) -> Int? {
-        guard offset + 3 < buffer.count else { return nil }
+    static func read4(from raw: UnsafeRawBufferPointer, at cursor: inout Int) -> Int? {
+        guard cursor + 3 < raw.count else { return nil }
 
         // ASCII '0' is 48. We subtract 48 from each byte
-        let d1 = buffer[offset] &- 48
-        let d2 = buffer[offset + 1] &- 48
-        let d3 = buffer[offset + 2] &- 48
-        let d4 = buffer[offset + 3] &- 48
+        let d1 = raw[cursor] &- 48
+        let d2 = raw[cursor + 1] &- 48
+        let d3 = raw[cursor + 2] &- 48
+        let d4 = raw[cursor + 3] &- 48
 
         // Validate they are actually digits
         guard d1 <= 9,
@@ -35,23 +36,24 @@ enum FixedReader {
               d3 <= 9,
               d4 <= 9 else { return nil }
 
+        cursor += 4
         return Int(d1) * 1000 + Int(d2) * 100 + Int(d3) * 10 + Int(d4)
     }
 
     @usableFromInline
     @inline(__always)
-    static func readFraction(from buffer: UnsafeRawBufferPointer, at offset: Int) -> (value: Int64, consumed: Int)? {
-        guard offset < buffer.count else { return nil }
+    static func readFraction(from raw: UnsafeRawBufferPointer, at cursor: inout Int) -> Int64? {
+        guard cursor < raw.count else { return nil }
 
-        let separator = buffer[offset]
+        let separator = raw[cursor]
         guard separator == ASCII.dot || separator == ASCII.comma else { return nil }
 
         var value: Int64 = 0
         var count = 0
-        var index = offset + 1
+        var index = cursor + 1
 
-        while index < buffer.count {
-            let digit = Int64(buffer[index]) &- 48
+        while index < raw.count {
+            let digit = Int64(raw[index]) &- 48
             guard digit >= 0, digit <= 9 else { break }
 
             if count < 9 {
@@ -62,32 +64,47 @@ enum FixedReader {
             index += 1
         }
 
-        if count == 0 { return nil }
+        guard count > 0 else { return nil }
+
+        cursor = index
 
         let scale = NanosecondMath.span(forDigits: count)
-        return (value * scale, index - offset)
+        return value * scale
     }
 
     @usableFromInline
     @inline(__always)
-    static func readVarInt(from buffer: UnsafeRawBufferPointer, at offset: Int) -> (value: Int64, consumed: Int)? {
+    static func readVarInt(from raw: UnsafeRawBufferPointer, at cursor: inout Int) -> Int64? {
+        let start = cursor
         var value: Int64 = 0
-        var index = offset
 
-        while index < buffer.count {
-            let byte = buffer[index]
-            let digit = Int64(byte) - 48
+        while cursor < raw.count {
+            let digit = Int64(raw[cursor]) &- 48
             guard digit >= 0, digit <= 9 else { break }
 
             // Check for potential overflow before multiplying
             // (Standard for high-performance parsers)
             value = (value * 10) + digit
-            index += 1
+            cursor += 1
         }
 
         // If we didn't consume any digits, it's not a valid number
-        guard index > offset else { return nil }
+        guard cursor > start else { return nil }
 
-        return (value, index - offset)
+        return value
+    }
+
+    @usableFromInline
+    @inline(__always)
+    static func pack3(from raw: UnsafeRawBufferPointer, at cursor: inout Int) -> UInt32? {
+        guard raw.count >= cursor + 3 else { return nil }
+        // We mask to lowercase to make it case-insensitive
+        let b0 = UInt32(raw[cursor] | 0x20)
+        let b1 = UInt32(raw[cursor + 1] | 0x20)
+        let b2 = UInt32(raw[cursor + 2] | 0x20)
+
+        cursor += 3
+
+        return (b0 << 16) | (b1 << 8) | b2
     }
 }

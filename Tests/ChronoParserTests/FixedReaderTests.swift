@@ -16,7 +16,8 @@ struct FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            #expect(FixedReader.read2(from: raw, at: 0) == expected)
+            var cursor = 0
+            #expect(FixedReader.read2(from: raw, at: &cursor) == expected)
         }
     }
 
@@ -27,7 +28,8 @@ struct FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            #expect(FixedReader.read4(from: raw, at: 0) == expected)
+            var cursor = 0
+            #expect(FixedReader.read4(from: raw, at: &cursor) == expected)
         }
     }
 
@@ -42,8 +44,10 @@ struct FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            #expect(FixedReader.read2(from: raw, at: 0) == nil)
-            #expect(FixedReader.read4(from: raw, at: 0) == nil)
+            var cursor2 = 0
+            #expect(FixedReader.read2(from: raw, at: &cursor2) == nil)
+            var cursor4 = 0
+            #expect(FixedReader.read4(from: raw, at: &cursor4) == nil)
         }
     }
 }
@@ -62,9 +66,10 @@ extension FixedReaderTests {
         var input = input
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let result = FixedReader.readFraction(from: raw, at: 0)
-            #expect(result?.value == expectedVal)
-            #expect(result?.consumed == expectedConsumed)
+            var cursor = 0
+            let result = FixedReader.readFraction(from: raw, at: &cursor)
+            #expect(result == expectedVal)
+            #expect(cursor == expectedConsumed)
         }
     }
 
@@ -73,22 +78,93 @@ extension FixedReaderTests {
         var noDotOrComma = "123"
         noDotOrComma.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let res = FixedReader.readFraction(from: raw, at: 0)
+            var cursor = 0
+            let res = FixedReader.readFraction(from: raw, at: &cursor)
             #expect(res == nil, "No dot or comma should return nil")
         }
 
         var dotOnly = "."
         dotOnly.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let res = FixedReader.readFraction(from: raw, at: 0)
+            var cursor = 0
+            let res = FixedReader.readFraction(from: raw, at: &cursor)
             #expect(res == nil, "Dot with no digits should fail")
         }
 
         var commaOnly = ","
         commaOnly.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
-            let res = FixedReader.readFraction(from: raw, at: 0)
+            var cursor = 0
+            let res = FixedReader.readFraction(from: raw, at: &cursor)
             #expect(res == nil, "Dot with no digits should fail")
+        }
+    }
+}
+
+// MARK: - Variable Integer
+
+extension FixedReaderTests {
+    @Test("FixedReaderTests: Reading variable length integers", arguments: [
+        ("1", 1, 1),
+        ("123", 123, 3),
+        ("00042", 42, 5),
+        ("9223372036854775807", 9_223_372_036_854_775_807, 19), // Int64.max
+        ("123-abc", 123, 3), // Should stop at non-digit
+    ])
+    func testReadVarInt(input: String, expectedVal: Int64, expectedConsumed: Int) {
+        var input = input
+        input.withUTF8 { buffer in
+            let raw = UnsafeRawBufferPointer(buffer)
+            var cursor = 0
+            let result = FixedReader.readVarInt(from: raw, at: &cursor)
+            #expect(result == expectedVal)
+            #expect(cursor == expectedConsumed)
+        }
+    }
+
+    @Test("FixedReaderTests: readVarInt failure cases", arguments: [
+        "", // Empty string
+        "abc", // No digits
+        " -1", // Leading space or sign (handled by scanners, not FixedReader)
+    ])
+    func readVarIntFailures(input: String) {
+        var input = input
+        input.withUTF8 { buffer in
+            let raw = UnsafeRawBufferPointer(buffer)
+            var cursor = 0
+            #expect(FixedReader.readVarInt(from: raw, at: &cursor) == nil)
+        }
+    }
+}
+
+// MARK: - Bit-Packing Tests
+
+extension FixedReaderTests {
+    @Test("FixedReaderTests: Packing 3-byte sequences", arguments: [
+        ("jan", 0x6A616E),
+        ("JAN", 0x6A616E), // Case insensitivity test
+        ("Feb", 0x666562), // Mixed case
+        ("mar", 0x6D6172),
+        ("may", 0x6D6179),
+    ])
+    func testPack3(input: String, expected: UInt32) {
+        var input = input
+        input.withUTF8 { buffer in
+            let raw = UnsafeRawBufferPointer(buffer)
+            var cursor = 0
+            let result = FixedReader.pack3(from: raw, at: &cursor)
+            #expect(result == expected)
+            #expect(cursor == 3)
+        }
+    }
+
+    @Test("FixedReaderTests: pack3 failure cases")
+    func pack3Failures() {
+        var tooShort = "ja"
+        tooShort.withUTF8 { buffer in
+            let raw = UnsafeRawBufferPointer(buffer)
+            var cursor = 0
+            #expect(FixedReader.pack3(from: raw, at: &cursor) == nil)
         }
     }
 }
