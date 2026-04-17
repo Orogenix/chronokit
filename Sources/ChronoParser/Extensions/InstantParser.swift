@@ -52,7 +52,7 @@ extension Instant {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            guard let date = ChronoScanner.scanDateRFC3339(from: raw, at: &cursor) else { return nil }
+            guard let date = raw.scanDateRFC3339(at: &cursor) else { return nil }
 
             guard cursor < raw.count else { return nil }
             let separator = raw[cursor]
@@ -62,8 +62,8 @@ extension Instant {
             else { return nil }
             cursor += 1
 
-            guard let time = ChronoScanner.scanTimeRFC3339(from: raw, at: &cursor),
-                  let offset = ChronoScanner.scanOffset(from: raw, at: &cursor)
+            guard let time = raw.scanTimeRFC3339(at: &cursor),
+                  let offset = raw.scanOffset(at: &cursor)
             else { return nil }
 
             guard cursor == raw.count else { return nil }
@@ -80,18 +80,18 @@ extension Instant {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            if ChronoScanner.scanWeekday(from: raw, at: &cursor) != nil {
+            if raw.scanWeekday(at: &cursor) != nil {
                 guard raw.expect(ASCII.comma, &cursor) else { return nil }
             }
-            ChronoScanner.scanFWS(from: raw, at: &cursor)
+            raw.scanFWS(at: &cursor)
 
-            guard let date = ChronoScanner.scanDateRFC5322(from: raw, at: &cursor) else { return nil }
-            ChronoScanner.scanFWS(from: raw, at: &cursor)
+            guard let date = raw.scanDateRFC5322(at: &cursor) else { return nil }
+            raw.scanFWS(at: &cursor)
 
-            guard let time = ChronoScanner.scanTimeRFC5322(from: raw, at: &cursor) else { return nil }
-            ChronoScanner.scanFWS(from: raw, at: &cursor)
+            guard let time = raw.scanTimeRFC5322(at: &cursor) else { return nil }
+            raw.scanFWS(at: &cursor)
 
-            guard let offset = ChronoScanner.scanOffset(from: raw, at: &cursor),
+            guard let offset = raw.scanOffset(at: &cursor),
                   cursor == raw.count else { return nil }
 
             return (date, time, offset)

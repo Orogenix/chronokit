@@ -10,7 +10,7 @@ public extension NaiveDate {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            guard let result = ChronoScanner.scanDateRFC3339(from: raw, at: &cursor),
+            guard let result = raw.scanDateRFC3339(at: &cursor),
                   cursor == raw.count else { return nil }
 
             return result
@@ -33,13 +33,13 @@ public extension NaiveDate {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            if ChronoScanner.scanWeekday(from: raw, at: &cursor) != nil {
+            if raw.scanWeekday(at: &cursor) != nil {
                 guard raw.expect(ASCII.comma, &cursor) else { return nil }
             }
 
-            ChronoScanner.scanFWS(from: raw, at: &cursor)
+            raw.scanFWS(at: &cursor)
 
-            guard let result = ChronoScanner.scanDateRFC5322(from: raw, at: &cursor),
+            guard let result = raw.scanDateRFC5322(at: &cursor),
                   cursor == raw.count else { return nil }
 
             return result

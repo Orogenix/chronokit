@@ -9,7 +9,7 @@ public extension NaiveTime {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            guard let result = ChronoScanner.scanTimeRFC3339(from: raw, at: &cursor),
+            guard let result = raw.scanTimeRFC3339(at: &cursor),
                   cursor == raw.count else { return nil }
 
             return result
@@ -33,7 +33,7 @@ public extension NaiveTime {
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
 
-            guard let result = ChronoScanner.scanTimeRFC5322(from: raw, at: &cursor),
+            guard let result = raw.scanTimeRFC5322(at: &cursor),
                   cursor == raw.count else { return nil }
 
             return result
