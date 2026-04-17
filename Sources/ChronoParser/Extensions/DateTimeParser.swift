@@ -78,6 +78,18 @@ public extension NaiveDateTime {
             nanosecond: Int(parsed.time.nanosecond)
         )
     }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "init(rfc5322:)",
+        message: "Use init(rfc5322:) which provides full compatibility with RFC 2822."
+    )
+    @inlinable
+    @inline(__always)
+    init?(rfc2822 string: String) {
+        self.init(rfc5322: string)
+    }
 }
 
 public extension DateTime where TZ == FixedOffset {
@@ -119,5 +131,17 @@ public extension DateTime where TZ == FixedOffset {
             nanosecond: Int(parsed.time.nanosecond),
             timezone: timezone
         )
+    }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "init(rfc5322:)",
+        message: "Use init(rfc5322:) which provides full compatibility with RFC 2822."
+    )
+    @inlinable
+    @inline(__always)
+    init?(rfc2822 string: String) {
+        self.init(rfc5322: string)
     }
 }

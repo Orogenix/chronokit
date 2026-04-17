@@ -81,3 +81,17 @@ extension TimeParserTests {
         #expect(NaiveTime(rfc5322: input) == nil)
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension TimeParserTests {
+    @available(*, deprecated)
+    @Test("TimeParserTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() {
+        let date = "12:30:45"
+        let modern = NaiveTime(rfc5322: date)
+        let deprecated = NaiveTime(rfc2822: date)
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}

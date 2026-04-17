@@ -1,9 +1,9 @@
 import ChronoCore
 import ChronoMath
 
-extension Instant {
+public extension Instant {
     @inlinable
-    public init?(rfc3339 string: String) {
+    init?(rfc3339 string: String) {
         let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = Self.parsedRFC3339(string)
 
         guard let parsed,
@@ -24,7 +24,7 @@ extension Instant {
     }
 
     @inlinable
-    public init?(rfc5322 string: String) {
+    init?(rfc5322 string: String) {
         let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = Self.parsedRFC5322(string)
 
         guard let parsed,
@@ -44,6 +44,20 @@ extension Instant {
         self = naive.instant(offset: timezone)
     }
 
+    @available(
+        *,
+        deprecated,
+        renamed: "init(rfc5322:)",
+        message: "Use init(rfc5322:) which provides full compatibility with RFC 2822."
+    )
+    @inlinable
+    @inline(__always)
+    init?(rfc2822 string: String) {
+        self.init(rfc5322: string)
+    }
+}
+
+extension Instant {
     @inlinable
     static func parsedRFC3339(_ string: String) -> (date: ParsedDate, time: ParsedTime, offset: Int)? {
         var input = string
