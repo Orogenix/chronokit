@@ -102,3 +102,17 @@ extension DateFormatterTests {
         #expect(sun.rfc5322()?.hasPrefix("Sun") == true)
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension DateFormatterTests {
+    @available(*, deprecated)
+    @Test("DateFormatterTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() throws {
+        let date = try #require(NaiveDate(year: 2026, month: 1, day: 1))
+        let modern = date.rfc5322()
+        let deprecated = date.rfc2822()
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}

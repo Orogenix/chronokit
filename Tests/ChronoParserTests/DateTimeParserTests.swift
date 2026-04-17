@@ -151,3 +151,17 @@ extension DateTimeParserTests {
         #expect(dt?.nanosecond == expectedNanos)
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension DateTimeParserTests {
+    @available(*, deprecated)
+    @Test("DateTimeParserTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() {
+        let date = "Mon, 13 Apr 2026 13:46:00 +0000"
+        let modern = DateTime(rfc5322: date)
+        let deprecated = DateTime(rfc2822: date)
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}

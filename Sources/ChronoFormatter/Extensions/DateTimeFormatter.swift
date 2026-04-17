@@ -70,6 +70,18 @@ public extension NaiveDateTime {
             }
         }
     }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "rfc5322()",
+        message: "RFC 2822 is obsolete. Use `NaiveDateTime.rfc5322()` instead (per RFC 5322 Section 3.3)."
+    )
+    @inlinable
+    @inline(__always)
+    func rfc2822(offset: FixedOffset? = nil) -> String? {
+        rfc5322(offset: offset)
+    }
 }
 
 extension NaiveDateTime {
@@ -165,7 +177,7 @@ public extension DateTime {
     }
 
     @inlinable
-    func rfc5322(digits _: Int = 0) -> String? {
+    func rfc5322() -> String? {
         let capacity = 48
 
         guard let month = Month(rawValue: month) else { return nil }
@@ -199,6 +211,18 @@ public extension DateTime {
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
             }
         }
+    }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "rfc5322()",
+        message: "RFC 2822 is obsolete. Use `DateTime.rfc5322()` instead (per RFC 5322 Section 3.3)."
+    )
+    @inlinable
+    @inline(__always)
+    func rfc2822() -> String? {
+        rfc5322()
     }
 }
 

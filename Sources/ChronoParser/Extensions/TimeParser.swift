@@ -48,4 +48,16 @@ public extension NaiveTime {
             nanosecond: Int(parsed.nanosecond)
         )
     }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "init(rfc5322:)",
+        message: "Use init(rfc5322:) which provides full compatibility with RFC 2822."
+    )
+    @inlinable
+    @inline(__always)
+    init?(rfc2822 string: String) {
+        self.init(rfc5322: string)
+    }
 }

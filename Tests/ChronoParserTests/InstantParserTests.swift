@@ -112,3 +112,17 @@ extension InstantParserTests {
         #expect(Instant(rfc5322: input) == nil)
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension InstantParserTests {
+    @available(*, deprecated)
+    @Test("InstantParserTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() {
+        let date = "Mon, 13 Apr 2026 13:46:00 +0000"
+        let modern = Instant(rfc5322: date)
+        let deprecated = Instant(rfc2822: date)
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}

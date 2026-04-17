@@ -89,3 +89,17 @@ extension DateParserTests {
         #expect(NaiveDate(rfc5322: input) == nil)
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension DateParserTests {
+    @available(*, deprecated)
+    @Test("DateParserTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() {
+        let date = "Tue, 17 Mar 2026"
+        let modern = NaiveDate(rfc5322: date)
+        let deprecated = NaiveDate(rfc2822: date)
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}
