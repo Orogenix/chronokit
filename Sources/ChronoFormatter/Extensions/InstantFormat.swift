@@ -12,15 +12,15 @@ public extension Instant {
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
 
-                ChronoPrinter.printDate(date: utc.date, to: raw, at: &cursor)
-                cursor += FixedWriter.writeChar(ASCII.charT, to: raw, at: cursor)
-                ChronoPrinter.printTime(time: utc.time, to: raw, at: &cursor)
+                raw.printDate(utc.date, at: &cursor)
+                raw.writeByte(ASCII.charT, at: &cursor)
+                raw.printTime(utc.time, at: &cursor)
 
                 if digits > 0 {
-                    ChronoPrinter.printFraction(Int64(utc.time.nanosecond), digits: digits, to: raw, at: &cursor)
+                    raw.printFraction(Int64(utc.time.nanosecond), digits: digits, at: &cursor)
                 }
 
-                cursor += FixedWriter.writeChar(ASCII.charZ, to: raw, at: cursor)
+                raw.writeByte(ASCII.charZ, at: &cursor)
                 return cursor
             }
         } else {
@@ -28,15 +28,15 @@ public extension Instant {
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
 
-                ChronoPrinter.printDate(date: utc.date, to: raw, at: &cursor)
-                cursor += FixedWriter.writeChar(ASCII.charT, to: raw, at: cursor)
-                ChronoPrinter.printTime(time: utc.time, to: raw, at: &cursor)
+                raw.printDate(utc.date, at: &cursor)
+                raw.writeByte(ASCII.charT, at: &cursor)
+                raw.printTime(utc.time, at: &cursor)
 
                 if digits > 0 {
-                    ChronoPrinter.printFraction(Int64(utc.time.nanosecond), digits: digits, to: raw, at: &cursor)
+                    raw.printFraction(Int64(utc.time.nanosecond), digits: digits, at: &cursor)
                 }
 
-                cursor += FixedWriter.writeChar(ASCII.charZ, to: raw, at: cursor)
+                raw.writeByte(ASCII.charZ, at: &cursor)
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
             }
         }

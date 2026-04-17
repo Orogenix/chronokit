@@ -11,16 +11,16 @@ public extension NaiveDateTime {
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
 
-                ChronoPrinter.printDate(date: self.date, to: raw, at: &cursor)
-                cursor += FixedWriter.writeChar(ASCII.charT, to: raw, at: cursor)
-                ChronoPrinter.printTime(time: self.time, to: raw, at: &cursor)
+                raw.printDate(self.date, at: &cursor)
+                raw.writeByte(ASCII.charT, at: &cursor)
+                raw.printTime(self.time, at: &cursor)
 
                 if digits > 0 {
-                    ChronoPrinter.printFraction(Int64(self.time.nanosecond), digits: digits, to: raw, at: &cursor)
+                    raw.printFraction(Int64(self.time.nanosecond), digits: digits, at: &cursor)
                 }
 
                 if let duration = offset?.offset(for: self).resolve(using: .preferEarlier) {
-                    ChronoPrinter.printOffset(duration.seconds, to: raw, at: &cursor)
+                    raw.printOffset(duration.seconds, at: &cursor)
                 }
 
                 return cursor
@@ -30,16 +30,16 @@ public extension NaiveDateTime {
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
 
-                ChronoPrinter.printDate(date: self.date, to: raw, at: &cursor)
-                cursor += FixedWriter.writeChar(ASCII.charT, to: raw, at: cursor)
-                ChronoPrinter.printTime(time: self.time, to: raw, at: &cursor)
+                raw.printDate(self.date, at: &cursor)
+                raw.writeByte(ASCII.charT, at: &cursor)
+                raw.printTime(self.time, at: &cursor)
 
                 if digits > 0 {
-                    ChronoPrinter.printFraction(Int64(self.time.nanosecond), digits: digits, to: raw, at: &cursor)
+                    raw.printFraction(Int64(self.time.nanosecond), digits: digits, at: &cursor)
                 }
 
                 if let duration = offset?.offset(for: self).resolve(using: .preferEarlier) {
-                    ChronoPrinter.printOffset(duration.seconds, to: raw, at: &cursor)
+                    raw.printOffset(duration.seconds, at: &cursor)
                 }
 
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
@@ -64,16 +64,16 @@ public extension DateTime {
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
 
-                ChronoPrinter.printDate(date: self.naive.date, to: raw, at: &cursor)
-                cursor += FixedWriter.writeChar(ASCII.charT, to: raw, at: cursor)
-                ChronoPrinter.printTime(time: self.naive.time, to: raw, at: &cursor)
+                raw.printDate(self.naive.date, at: &cursor)
+                raw.writeByte(ASCII.charT, at: &cursor)
+                raw.printTime(self.naive.time, at: &cursor)
 
                 if digits > 0 {
-                    ChronoPrinter.printFraction(Int64(self.nanosecond), digits: digits, to: raw, at: &cursor)
+                    raw.printFraction(Int64(self.nanosecond), digits: digits, at: &cursor)
                 }
 
                 let duration = self.timezone.offset(for: self.instant)
-                ChronoPrinter.printOffset(duration.seconds, to: raw, at: &cursor)
+                raw.printOffset(duration.seconds, at: &cursor)
 
                 return cursor
             }
@@ -82,16 +82,16 @@ public extension DateTime {
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
 
-                ChronoPrinter.printDate(date: self.naive.date, to: raw, at: &cursor)
-                cursor += FixedWriter.writeChar(ASCII.charT, to: raw, at: cursor)
-                ChronoPrinter.printTime(time: self.naive.time, to: raw, at: &cursor)
+                raw.printDate(self.naive.date, at: &cursor)
+                raw.writeByte(ASCII.charT, at: &cursor)
+                raw.printTime(self.naive.time, at: &cursor)
 
                 if digits > 0 {
-                    ChronoPrinter.printFraction(Int64(self.nanosecond), digits: digits, to: raw, at: &cursor)
+                    raw.printFraction(Int64(self.nanosecond), digits: digits, at: &cursor)
                 }
 
                 let duration = self.timezone.offset(for: self.instant)
-                ChronoPrinter.printOffset(duration.seconds, to: raw, at: &cursor)
+                raw.printOffset(duration.seconds, at: &cursor)
 
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
             }

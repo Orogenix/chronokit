@@ -6,29 +6,29 @@ enum ChronoPrinter {
     @usableFromInline
     @inline(__always)
     static func printDate(
-        date: some DateProtocol,
+        _ date: some DateProtocol,
         to raw: UnsafeMutableRawBufferPointer,
         at cursor: inout Int
     ) {
-        cursor += FixedWriter.write4(date.year, to: raw, at: cursor)
-        cursor += FixedWriter.writeChar(ASCII.dash, to: raw, at: cursor)
-        cursor += FixedWriter.write2(date.month, to: raw, at: cursor)
-        cursor += FixedWriter.writeChar(ASCII.dash, to: raw, at: cursor)
-        cursor += FixedWriter.write2(date.day, to: raw, at: cursor)
+        raw.write4(date.year, at: &cursor)
+        raw.writeByte(ASCII.dash, at: &cursor)
+        raw.write2(date.month, at: &cursor)
+        raw.writeByte(ASCII.dash, at: &cursor)
+        raw.write2(date.day, at: &cursor)
     }
 
     @usableFromInline
     @inline(__always)
     static func printTime(
-        time: some TimeProtocol,
+        _ time: some TimeProtocol,
         to raw: UnsafeMutableRawBufferPointer,
         at cursor: inout Int
     ) {
-        cursor += FixedWriter.write2(time.hour, to: raw, at: cursor)
-        cursor += FixedWriter.writeChar(ASCII.colon, to: raw, at: cursor)
-        cursor += FixedWriter.write2(time.minute, to: raw, at: cursor)
-        cursor += FixedWriter.writeChar(ASCII.colon, to: raw, at: cursor)
-        cursor += FixedWriter.write2(time.second, to: raw, at: cursor)
+        raw.write2(time.hour, at: &cursor)
+        raw.writeByte(ASCII.colon, at: &cursor)
+        raw.write2(time.minute, at: &cursor)
+        raw.writeByte(ASCII.colon, at: &cursor)
+        raw.write2(time.second, at: &cursor)
     }
 
     @usableFromInline
@@ -40,8 +40,8 @@ enum ChronoPrinter {
         at cursor: inout Int
     ) {
         guard digits > 0 else { return }
-        cursor += FixedWriter.writeChar(ASCII.dot, to: raw, at: cursor)
-        cursor += FixedWriter.writeFraction(value, digits: digits, to: raw, at: cursor)
+        raw.writeByte(ASCII.dot, at: &cursor)
+        raw.writeFraction(value, digits: digits, at: &cursor)
     }
 
     @usableFromInline
@@ -52,9 +52,9 @@ enum ChronoPrinter {
         at cursor: inout Int
     ) {
         if value == 0 {
-            cursor += FixedWriter.writeChar(ASCII.charZ, to: raw, at: cursor)
+            raw.writeByte(ASCII.charZ, at: &cursor)
         } else {
-            cursor += FixedWriter.writeOffset(value, to: raw, at: cursor)
+            raw.writeOffset(value, at: &cursor)
         }
     }
 }

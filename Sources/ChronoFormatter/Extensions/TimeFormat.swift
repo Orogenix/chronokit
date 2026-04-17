@@ -8,16 +8,16 @@ public extension NaiveTime {
             return String(unsafeUninitializedCapacity: capacity) { buffer in
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
-                ChronoPrinter.printTime(time: self, to: raw, at: &cursor)
-                ChronoPrinter.printFraction(self.nanosecond, digits: digits, to: raw, at: &cursor)
+                raw.printTime(self, at: &cursor)
+                raw.printFraction(self.nanosecond, digits: digits, at: &cursor)
                 return cursor
             }
         } else {
             return withUnsafeTemporaryAllocation(of: UInt8.self, capacity: capacity) { buffer in
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
-                ChronoPrinter.printTime(time: self, to: raw, at: &cursor)
-                ChronoPrinter.printFraction(self.nanosecond, digits: digits, to: raw, at: &cursor)
+                raw.printTime(self, at: &cursor)
+                raw.printFraction(self.nanosecond, digits: digits, at: &cursor)
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
             }
         }

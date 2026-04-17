@@ -1,5 +1,6 @@
 import ChronoCore
 @testable import ChronoFormatter
+import ChronoMath
 import Testing
 
 struct CalendarIntervalFormatterTests {
@@ -60,12 +61,19 @@ struct CalendarIntervalFormatterTests {
         let interval = CalendarInterval(month: 100, day: 100, nanosecond: 100_000_000_000)
 
         // Use a tiny buffer to trigger the guard in writeByte/writeVarInt
-        let smallBuffer = UnsafeMutableRawBufferPointer.allocate(byteCount: 2, alignment: 1)
+        let capacity = 2
+        let smallBuffer = UnsafeMutableRawBufferPointer.allocate(byteCount: capacity, alignment: 1)
         defer { smallBuffer.deallocate() }
 
-        let written = interval.iso8601(to: smallBuffer)
+        var cursor = 0
+        let written = interval.parse(smallBuffer, at: &cursor)
 
         // It should stop writing at the buffer limit (2)
-        #expect(written <= 2)
+        #expect(written == capacity)
+        #expect(cursor == capacity)
+
+        // Safety check for the buffer content
+        #expect(smallBuffer[0] == ASCII.charP) // 'P'
+        #expect(smallBuffer[1] == 56) // ASCII '8'
     }
 }

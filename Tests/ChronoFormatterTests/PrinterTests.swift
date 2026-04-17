@@ -7,7 +7,7 @@ struct ChronoPrinterTests {
     func testPrintDate() throws {
         let date = try #require(NaiveDate(year: 2026, month: 4, day: 16))
         let result = withBuffer(capacity: 10) { buffer, cursor in
-            ChronoPrinter.printDate(date: date, to: buffer, at: &cursor)
+            ChronoPrinter.printDate(date, to: buffer, at: &cursor)
         }
         #expect(result == "2026-04-16")
     }
@@ -16,7 +16,7 @@ struct ChronoPrinterTests {
     func testPrintTime() throws {
         let time = try #require(NaiveTime(hour: 12, minute: 30, second: 05))
         let result = withBuffer(capacity: 8) { buffer, cursor in
-            ChronoPrinter.printTime(time: time, to: buffer, at: &cursor)
+            ChronoPrinter.printTime(time, to: buffer, at: &cursor)
         }
         #expect(result == "12:30:05")
     }

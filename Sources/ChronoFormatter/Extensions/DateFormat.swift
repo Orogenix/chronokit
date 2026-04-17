@@ -8,14 +8,14 @@ public extension NaiveDate {
             return String(unsafeUninitializedCapacity: capacity) { buffer in
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
-                ChronoPrinter.printDate(date: self, to: raw, at: &cursor)
+                raw.printDate(self, at: &cursor)
                 return cursor
             }
         } else {
             return withUnsafeTemporaryAllocation(of: UInt8.self, capacity: capacity) { buffer in
                 let raw = UnsafeMutableRawBufferPointer(buffer)
                 var cursor = 0
-                ChronoPrinter.printDate(date: self, to: raw, at: &cursor)
+                raw.printDate(self, at: &cursor)
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
             }
         }
