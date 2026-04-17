@@ -42,17 +42,23 @@ enum FixedWriter {
         at cursor: inout Int
     ) {
         guard digits >= 0,
-              digits <= 9,
               cursor + digits <= raw.count else { return }
 
-        let span = NanosecondMath.span(forDigits: digits)
+        let actualDigits = min(digits, 9)
+        let span = NanosecondMath.span(forDigits: actualDigits)
         var val = Int(value) / Int(span)
 
         // Write backward
         let start = cursor
-        for index in (0 ..< digits).reversed() {
+        for index in (0 ..< actualDigits).reversed() {
             raw[start + index] = ASCII.zero + UInt8(val % 10)
             val /= 10
+        }
+
+        if digits > 9 {
+            for index in 9 ..< digits {
+                raw[cursor + index] = ASCII.zero
+            }
         }
 
         cursor += digits

@@ -6,7 +6,7 @@ import Testing
 // MARK: - RFC 3339 Date Scanning Tests
 
 struct ScannerTests {
-    @Test("ScannerTests: Scan RFC3339 date parts", arguments: [
+    @Test("ScannerTests: Scan RFC 3339 date parts", arguments: [
         ("2026-04-13", 2026, 4, 13),
         ("0001-01-01", 1, 1, 1),
         ("9999-12-31", 9999, 12, 31),
@@ -26,7 +26,7 @@ struct ScannerTests {
         }
     }
 
-    @Test("ScannerTests: Scan invalid RFC3339 date", arguments: [
+    @Test("ScannerTests: Scan invalid RFC 3339 date", arguments: [
         "2026/04/13", // Wrong separator
         "2026-4-13", // Missing padding
         "202-04-13", // Short year
@@ -44,7 +44,7 @@ struct ScannerTests {
 // MARK: - RFC 3339 Time Scanning Tests
 
 extension ScannerTests {
-    @Test("ScannerTests: Scan RFC3339 times (with and without fractions)", arguments: [
+    @Test("ScannerTests: Scan RFC 3339 times (with and without fractions)", arguments: [
         ("13:46:11", 13, 46, 11, 0, 8),
         ("13:46:11.123", 13, 46, 11, 123_000_000, 12),
         ("13:46:11,5", 13, 46, 11, 500_000_000, 10), // Comma support
@@ -69,7 +69,7 @@ extension ScannerTests {
 // MARK: - RFC 5322 Date Scanning Tests
 
 extension ScannerTests {
-    @Test("ScannerTests: Scan RFC5322 Date parts", arguments: [
+    @Test("ScannerTests: Scan RFC 5322 Date parts", arguments: [
         ("13 Apr 2026", 2026, 4, 13),
         ("1 Jan 0001", 1, 1, 1),
         ("31 Dec 9999", 9999, 12, 31),
@@ -91,7 +91,7 @@ extension ScannerTests {
         }
     }
 
-    @Test("ScannerTests: Scan invalid RFC5322 date", arguments: [
+    @Test("ScannerTests: Scan invalid RFC 5322 date", arguments: [
         "2026/04/13", // Wrong separator
         "2026-4-13", // Missing padding
         "202-04-13", // Short year
@@ -102,7 +102,7 @@ extension ScannerTests {
         input.withUTF8 { buffer in
             let raw = UnsafeRawBufferPointer(buffer)
             var cursor = 0
-            #expect(ChronoScanner.scanTimeRFC5322(from: raw, at: &cursor) == nil)
+            #expect(ChronoScanner.scanDateRFC5322(from: raw, at: &cursor) == nil)
         }
     }
 }
@@ -110,7 +110,7 @@ extension ScannerTests {
 // MARK: - RFC 5322 Time Scanning Tests
 
 extension ScannerTests {
-    @Test("ScannerTests: Scan RFC5322 Time parts (Optional Seconds)", arguments: [
+    @Test("ScannerTests: Scan RFC 5322 Time parts (Optional Seconds)", arguments: [
         ("13:46", 13, 46, 0),
         ("13:46:11", 13, 46, 11),
         ("13:46:11.500", 13, 46, 11), // Verify nanosecond extraction in 5322

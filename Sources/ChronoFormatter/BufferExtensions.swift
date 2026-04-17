@@ -63,7 +63,25 @@ extension UnsafeMutableRawBufferPointer {
 
     @usableFromInline
     @inline(__always)
-    func printOffset(_ value: some BinaryInteger, at cursor: inout Int) {
-        ChronoPrinter.printOffset(value, to: self, at: &cursor)
+    func printOffsetRFC3339(_ value: some BinaryInteger, at cursor: inout Int) {
+        ChronoPrinter.printOffsetRFC3339(value, to: self, at: &cursor)
+    }
+
+    @usableFromInline
+    @inline(__always)
+    func printOffsetRFC5322(_ value: some BinaryInteger, at cursor: inout Int) {
+        ChronoPrinter.printOffsetRFC5322(value, to: self, at: &cursor)
+    }
+
+    @usableFromInline
+    @inline(__always)
+    func printMonth(_ value: Month, at cursor: inout Int) {
+        ChronoPrinter.printMonth(value, to: self, at: &cursor)
+    }
+
+    @usableFromInline
+    @inline(__always)
+    func printWeekday(_ value: Weekday, at cursor: inout Int) {
+        ChronoPrinter.printWeekday(value, to: self, at: &cursor)
     }
 }

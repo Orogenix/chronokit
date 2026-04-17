@@ -1,7 +1,6 @@
 @testable import ChronoCore
 import Testing
 
-@Suite("Weekday Tests")
 struct WeekdayTests {
     @Test("WeekdayTests: Circular navigation")
     func navigation() {
@@ -39,7 +38,8 @@ struct WeekdayTests {
 
     @Test("WeekdayTests: Comparable")
     func comparison() {
-        #expect(Weekday.monday < Weekday.sunday)
+        #expect(Weekday.sunday < Weekday.monday)
+        #expect(Weekday.sunday < Weekday.saturday)
         #expect(Weekday.thursday > Weekday.tuesday)
     }
 }

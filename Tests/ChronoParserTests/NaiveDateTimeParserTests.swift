@@ -2,10 +2,10 @@ import ChronoCore
 @testable import ChronoParser
 import Testing
 
-// MARK: - RFC3339 Tests
+// MARK: - RFC 3339 Tests
 
 struct NaiveDateTimeParserTests {
-    @Test("NaiveDateTimeParserTests: Correctly parses valid RFC3339 strings", arguments: [
+    @Test("NaiveDateTimeParserTests: Correctly parses valid RFC 3339 strings", arguments: [
         // (Input, Expected Year, Month, Day, Hour, Min, Sec)
         ("2025-12-29T15:30:45", 2025, 12, 29, 15, 30, 45),
         ("1970-01-01T00:00:00", 1970, 1, 1, 0, 0, 0),
@@ -30,7 +30,7 @@ struct NaiveDateTimeParserTests {
         #expect(ndt?.second == sec)
     }
 
-    @Test("NaiveDateTimeParserTests: RFC3339 ignores offsets (Permissive)", arguments: [
+    @Test("NaiveDateTimeParserTests: RFC 3339 ignores offsets (Permissive)", arguments: [
         "2025-12-29T10:00:00Z",
         "2025-12-29T10:00:00+07:00",
         "2025-12-29T10:00:00-05:00",
@@ -42,7 +42,7 @@ struct NaiveDateTimeParserTests {
         #expect(ndt?.hour == 10)
     }
 
-    @Test("NaiveDateTimeParserTests: Handles RFC3339 fractional seconds accurately", arguments: [
+    @Test("NaiveDateTimeParserTests: Handles RFC 3339 fractional seconds accurately", arguments: [
         ("2025-12-29T10:00:00.5", 500_000_000),
         ("2025-12-29T10:00:00.123456789", 123_456_789),
         ("2025-12-29T10:00:00,500", 500_000_000) // Comma separator
@@ -52,7 +52,7 @@ struct NaiveDateTimeParserTests {
         #expect(ndt?.nanosecond == expectedNanos)
     }
 
-    @Test("NaiveDateTimeParserTests: Fails on invalid RFC3339 dates", arguments: [
+    @Test("NaiveDateTimeParserTests: Fails on invalid RFC 3339 dates", arguments: [
         "2025-02-29T10:00:00", // Not a leap year
         "2025-13-01T10:00:00", // Month 13
         "2025-12-32T10:00:00", // Day 32
@@ -64,7 +64,7 @@ struct NaiveDateTimeParserTests {
         #expect(ndt == nil)
     }
 
-    @Test("NaiveDateTimeParserTests: Fails RFC3339 on garbage strings", arguments: [
+    @Test("NaiveDateTimeParserTests: Fails RFC 3339 on garbage strings", arguments: [
         "Not a date",
         "2025-12",
         "T10:00:00"
@@ -77,7 +77,7 @@ struct NaiveDateTimeParserTests {
 // MARK: - RFC 5322 Tests
 
 extension NaiveDateTimeParserTests {
-    @Test("NaiveDateTimeParserTests: Valid RFC5322 DateTime strings", arguments: [
+    @Test("NaiveDateTimeParserTests: Valid RFC 5322 DateTime strings", arguments: [
         // (Input, Year, Month, Day, Hour, Min, Sec)
         ("13 Apr 2026 13:46", 2026, 4, 13, 13, 46, 0),
         ("Mon, 13 Apr 2026 13:46:11", 2026, 4, 13, 13, 46, 11),
@@ -104,7 +104,7 @@ extension NaiveDateTimeParserTests {
         #expect(ndt?.second == sec)
     }
 
-    @Test("NaiveDateTimeParserTests: RFC5322 flexible whitespace and case", arguments: [
+    @Test("NaiveDateTimeParserTests: RFC 5322 flexible whitespace and case", arguments: [
         "mon, 13 apr 2026 13:46:11", // Lowercase
         "13   Apr   2026   13:46", // Multiple spaces (FWS)
         "Mon,\r\n 13 Apr 2026 13:46", // Folding white space with CRLF
@@ -116,7 +116,7 @@ extension NaiveDateTimeParserTests {
         #expect(ndt?.month == 4)
     }
 
-    @Test("NaiveDateTimeParserTests: RFC5322 Failure Cases", arguments: [
+    @Test("NaiveDateTimeParserTests: RFC 5322 Failure Cases", arguments: [
         "Mon 13 Apr 2026 13:46", // Missing comma after weekday
         "13 Apr 2026 13:46 +0700", // Trailing offset (NaiveDateTime must end at time)
         "13 Apr 2026", // Missing time component
