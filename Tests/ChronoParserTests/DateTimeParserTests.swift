@@ -2,6 +2,8 @@ import ChronoCore
 @testable import ChronoParser
 import Testing
 
+// MARK: - RFC3339 Tests
+
 struct DateTimeParserTests {
     @Test("DateTimeParserTests: Fails when offset is missing", arguments: [
         "2025-12-29T15:30:45",
@@ -90,5 +92,62 @@ struct DateTimeParserTests {
         let dt = DateTime<FixedOffset>(rfc3339: input)
         #expect(dt != nil)
         #expect(try dt?.timezone.offset(for: #require(dt?.instant)) == .hours(18))
+    }
+}
+
+// MARK: - RFC5322 Tests
+
+extension DateTimeParserTests {
+    @Test("DateTimeParserTests: RFC5322 Valid inputs", arguments: [
+        // Full standard
+        ("Mon, 13 Apr 2026 13:46:00 +0000", 13, 46, 0),
+        // Optional seconds/weekday
+        ("13 Apr 2026 13:46 +0000", 13, 46, 0),
+        // Different offsets
+        ("13 Apr 2026 20:46:00 +0700", 20, 46, 25200),
+        ("13 Apr 2026 08:46:00 -0500", 8, 46, -18000),
+        // Obsolete alpha zones (Permissive)
+        ("13 Apr 2026 13:46:00 UT", 13, 46, 0),
+        ("13 Apr 2026 13:46:00 GMT", 13, 46, 0),
+    ])
+    func valid_rfc5322(input: String, hour: Int, min: Int, offset: Int) throws {
+        let dt = DateTime<FixedOffset>(rfc5322: input)
+        #expect(dt != nil)
+        #expect(dt?.hour == hour)
+        #expect(dt?.minute == min)
+        #expect(try dt?.timezone.offset(for: #require(dt?.instant)).seconds == Int64(offset))
+    }
+
+    @Test("DateTimeParserTests: RFC5322 Permissive cases (Robutness)", arguments: [
+        // Many systems emit RFC 5322 dates but include the colon in the offset
+        ("Mon, 13 Apr 2026 13:46:00 +00:00", 13, 46, 0),
+        // Short offset
+        ("13 Apr 2026 13:46:00 +07", 13, 46, 25200),
+    ])
+    func permissive_rfc5322(input: String, hour _: Int, min _: Int, offset: Int) throws {
+        let dt = DateTime<FixedOffset>(rfc5322: input)
+        #expect(dt != nil)
+        #expect(try dt?.timezone.offset(for: #require(dt?.instant)).seconds == Int64(offset))
+    }
+
+    @Test("DateTimeParserTests: RFC5322 Failure cases", arguments: [
+        "Mon 13 Apr 2026 13:46:00 +0000", // Missing comma
+        "13 Apr 2026 13:46:00", // Missing offset
+        "13 April 2026 13:46:00 +0000", // Full month name (invalid)
+        "13 Apr 2026 13:46:00 UTC", // 'UTC' is not a valid 5322 alpha zone
+        "13 Apr 2026 13:46:00 +07:", // Dangling colon
+    ])
+    func failures_rfc5322(input: String) {
+        let dt = DateTime<FixedOffset>(rfc5322: input)
+        #expect(dt == nil)
+    }
+
+    @Test("DateTimeParserTests: RFC5322 Fractional support (Optional/Robust)", arguments: [
+        // While not strictly RFC 5322, some systems (like Python) append fractions to these strings
+        ("13 Apr 2026 13:46:00.500 +0000", 500_000_000)
+    ])
+    func fractions_rfc5322(input: String, expectedNanos: Int) {
+        let dt = DateTime<FixedOffset>(rfc5322: input)
+        #expect(dt?.nanosecond == expectedNanos)
     }
 }

@@ -93,21 +93,38 @@ enum FixedReader {
 
         return value
     }
+
+    @usableFromInline
+    @inline(__always)
+    static func pack3(from raw: UnsafeRawBufferPointer, at cursor: inout Int) -> UInt32? {
+        guard raw.count >= cursor + 3 else { return nil }
+        // We mask to lowercase to make it case-insensitive
+        let b0 = UInt32(raw[cursor] | 0x20)
+        let b1 = UInt32(raw[cursor + 1] | 0x20)
+        let b2 = UInt32(raw[cursor + 2] | 0x20)
+
+        cursor += 3
+
+        return (b0 << 16) | (b1 << 8) | b2
+    }
 }
 
 extension UnsafeRawBufferPointer {
+    @usableFromInline
     @discardableResult
     @inline(__always)
     func read2(_ cursor: inout Int) -> Int? {
         FixedReader.read2(from: self, at: &cursor)
     }
 
+    @usableFromInline
     @discardableResult
     @inline(__always)
     func read4(_ cursor: inout Int) -> Int? {
         FixedReader.read4(from: self, at: &cursor)
     }
 
+    @usableFromInline
     @discardableResult
     @inline(__always)
     func expect(_ byte: UInt8, _ cursor: inout Int) -> Bool {
@@ -116,9 +133,24 @@ extension UnsafeRawBufferPointer {
         return true
     }
 
+    @usableFromInline
     @discardableResult
     @inline(__always)
     func readFraction(_ cursor: inout Int) -> Int64? {
         FixedReader.readFraction(from: self, at: &cursor)
+    }
+
+    @usableFromInline
+    @discardableResult
+    @inline(__always)
+    func readVarInt(_ cursor: inout Int) -> Int64? {
+        FixedReader.readVarInt(from: self, at: &cursor)
+    }
+
+    @usableFromInline
+    @discardableResult
+    @inline(__always)
+    func pack3(_ cursor: inout Int) -> UInt32? {
+        FixedReader.pack3(from: self, at: &cursor)
     }
 }
