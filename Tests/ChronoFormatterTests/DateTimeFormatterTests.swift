@@ -122,6 +122,22 @@ extension DateTimeFormatterTests {
     }
 }
 
+// MARK: - RFC 2822 Tests
+
+extension DateTimeFormatterTests {
+    @available(*, deprecated)
+    @Test("DateTimeFormatterTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() {
+        let instant = Instant(seconds: 1_773_748_800, nanoseconds: 0)
+        let jkt = FixedOffset(seconds: 25200)
+        let dt = DateTime(instant: instant, timezone: jkt)
+        let modern = dt.rfc5322()
+        let deprecated = dt.rfc2822()
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}
+
 // MARK: - Helpers
 
 extension DateTimeFormatterTests {

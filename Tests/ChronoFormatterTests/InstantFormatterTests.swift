@@ -91,3 +91,17 @@ extension InstantFormatterTests {
         #expect(result == "Fri, 31 Dec 9999 23:59:59 +0000")
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension InstantFormatterTests {
+    @available(*, deprecated)
+    @Test("InstantFormatterTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() {
+        let instant = Instant(seconds: 0, nanoseconds: 0)
+        let modern = instant.rfc5322()
+        let deprecated = instant.rfc2822()
+        #expect(deprecated != nil)
+        #expect(deprecated == modern)
+    }
+}

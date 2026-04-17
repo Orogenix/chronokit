@@ -45,6 +45,18 @@ public extension NaiveDate {
             }
         }
     }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "rfc5322()",
+        message: "RFC 2822 is obsolete. Use `NaiveDate.rfc5322()` instead (per RFC 5322 Section 3.3)."
+    )
+    @inlinable
+    @inline(__always)
+    func rfc2822() -> String? {
+        rfc5322()
+    }
 }
 
 extension NaiveDate {

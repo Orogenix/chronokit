@@ -35,7 +35,7 @@ public extension Instant {
     }
 
     @inlinable
-    func rfc5322(digits _: Int = 0) -> String? {
+    func rfc5322() -> String? {
         let capacity = 40
         let utc = naiveDateTimeUTC()
 
@@ -69,6 +69,18 @@ public extension Instant {
                 return String(decoding: buffer[..<cursor], as: UTF8.self)
             }
         }
+    }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "rfc5322()",
+        message: "RFC 2822 is obsolete. Use `Instant.rfc5322()` instead (per RFC 5322 Section 3.3)."
+    )
+    @inlinable
+    @inline(__always)
+    func rfc2822() -> String? {
+        rfc5322()
     }
 }
 

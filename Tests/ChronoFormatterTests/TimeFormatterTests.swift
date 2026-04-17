@@ -83,3 +83,16 @@ extension TimeFormatterTests {
         #expect(time.rfc3339(digits: 1) == "14:05:09.5")
     }
 }
+
+// MARK: - RFC 2822 Tests
+
+extension TimeFormatterTests {
+    @available(*, deprecated)
+    @Test("TimeFormatterTests: RFC 2822 alias yields identical results to RFC 5322")
+    func redirectedDeprecation_rfc2822() throws {
+        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 0))
+        let modern = time.rfc5322()
+        let deprecated = time.rfc2822()
+        #expect(deprecated == modern)
+    }
+}
