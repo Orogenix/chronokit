@@ -22,6 +22,8 @@ let package = Package(
         ),
     ],
     targets: [
+        // MARK: - Kit Libraries
+
         .target(
             name: "ChronoCore",
             dependencies: ["ChronoMath"],
@@ -51,6 +53,16 @@ let package = Package(
             path: "Sources/ChronoParser",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+
+        // MARK: - Build-time Tools
+
+        .executableTarget(
+            name: "ChronoTZGen",
+            path: "Tools/ChronoTZGen"
+        ),
+
+        // MARK: - Tests
+
         .testTarget(
             name: "ChronoCoreTests",
             dependencies: ["ChronoCore"],
