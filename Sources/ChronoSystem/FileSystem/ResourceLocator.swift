@@ -57,6 +57,8 @@ package enum ResourceLocator {
         //     return path
         // }
 
+        preconditionFailure("Resources not found")
+
         return nil
     }
 
