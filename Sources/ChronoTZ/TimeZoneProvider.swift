@@ -1,5 +1,6 @@
 import ChronoCore
 import ChronoSystem
+import Foundation
 
 public protocol TimeZoneProvider {
     func getTimeZone(named: String) throws -> TimeZoneInfo
@@ -29,8 +30,13 @@ public extension IANAProvider {
             if let existing = _shared { return existing }
 
             let resource = "iana.tzdb"
-            guard let path = ResourceLocator.find(named: resource)
-                ?? ResourceLocator.findInProject(named: resource)
+            // guard let path = ResourceLocator.find(named: resource)
+            //     ?? ResourceLocator.findInProject(named: resource)
+            // else {
+            //     preconditionFailure("ChronoTZ: \(resource) not found.")
+            // }
+
+            guard let path = Bundle.module.url(forResource: "iana", withExtension: "tzdb")?.path
             else {
                 preconditionFailure("ChronoTZ: \(resource) not found.")
             }
