@@ -1,9 +1,11 @@
-# ChronoKit
+<div align="center">
+  <br>
+  <strong>ChronoKit</strong><br>
+  <small>High-performance, no-foundation, and zero-dependency date and time primitives for Swift.</small>
+  <br><br>
+</div>
 
-## Overview
-
-ChronoKit is a high-performance, no-foundation, and zero-dependency date and time library for Swift.
-Designed for systems where runtime efficiency and binary size are critical.
+ChronoKit is designed for systems where runtime efficiency and binary size are critical, providing an alternative to `Foundation` with zero dependencies.
 
 ## Features
 
