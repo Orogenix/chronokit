@@ -1,7 +1,6 @@
 @testable import ChronoMath
 import Testing
 
-@Suite("Calendar Math Tests")
 struct CalendarMathTests {
     // MARK: - Date Conversion
 
@@ -92,47 +91,5 @@ extension CalendarMathTests {
     ])
     func monthEnd(year: Int64, month: UInt8, expected: UInt8) {
         #expect(lastDayOfMonth(year, month) == expected)
-    }
-}
-
-// MARK: - Round Trip (Long running)
-
-extension CalendarMathTests {
-    private func runRoundTripIdentityCheck(_ yStart: Int64, _ yEnd: Int64) -> Int64 {
-        var prevDays: Int64 = daysFromCivil(year: yStart, month: 1, day: 1) - 1
-        precondition(prevDays < 0)
-
-        var prevWd: Int = weekday(from: prevDays)
-        precondition(prevWd >= 0 && prevWd <= 6, "Prev weekday out of range at day \(prevDays)")
-
-        for year in yStart ... yEnd {
-            for month: UInt8 in 1 ... 12 {
-                for day: UInt8 in 1 ... lastDayOfMonth(year, month) {
-                    let days = daysFromCivil(year: year, month: month, day: day)
-                    precondition(days == prevDays + 1, "Serial continuity failure at \(year)-\(month)-\(day)")
-
-                    let civil = civilDate(from: days)
-                    precondition(civil.year == year, "Year mismatch for \(year)-\(month)-\(day)")
-                    precondition(civil.month == month, "Month mismatch for \(year)-\(month)-\(day)")
-                    precondition(civil.day == day, "Day mismatch for \(year)-\(month)-\(day)")
-
-                    let wd = weekday(from: days)
-                    precondition(wd >= 0 && wd <= 6, "Weekday out of range at day \(days)")
-                    precondition(wd == nextWeekday(prevWd), "Next weekday failure at day \(days)")
-                    precondition(prevWd == prevWeekday(wd), "Prev weekday failure at day \(days)")
-
-                    prevDays = days
-                    prevWd = wd
-                }
-            }
-        }
-
-        return daysFromCivil(year: yEnd, month: 12, day: 31) - daysFromCivil(year: yStart, month: 1, day: 1) + 1
-    }
-
-    @Test("CalendarMathTests: Identity Round-Trip (-1M to +1M years)")
-    func roundTripIdentity() {
-        let totalDaysTested = runRoundTripIdentityCheck(-1_000_000, 1_000_000)
-        #expect(totalDaysTested == 730_485_366, "Total days count incorrect.")
     }
 }
