@@ -18,7 +18,7 @@ public struct NaiveDateTime: Equatable, Hashable, Sendable {
         hour: Int = 0,
         minute: Int = 0,
         second: Int = 0,
-        nanosecond: Int = 0,
+        nanosecond: Int = 0
     ) {
         guard let date = NaiveDate(year: year, month: month, day: day),
               let time = NaiveTime(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
@@ -76,7 +76,7 @@ public extension NaiveDateTime {
 
         return Self(
             date: date.advanced(byDays: extraDaysFromNanos + extraDaysFromSecs + finalDayDelta),
-            time: NaiveTime(nanosecondsSinceMidnight: finalNanos),
+            time: NaiveTime(nanosecondsSinceMidnight: finalNanos)
         )
     }
 
@@ -84,7 +84,7 @@ public extension NaiveDateTime {
     func advanced(by duration: Duration) -> Self {
         advanced(
             bySeconds: duration.seconds,
-            nanoseconds: Int64(duration.nanoseconds),
+            nanoseconds: Int64(duration.nanoseconds)
         )
     }
 }
@@ -144,7 +144,7 @@ public extension NaiveDateTime {
 
         return Duration(
             seconds: totalSec + extraSec,
-            nanoseconds: normalizedNanos,
+            nanoseconds: normalizedNanos
         )
     }
 
@@ -152,7 +152,7 @@ public extension NaiveDateTime {
     static func - (lhs: Self, rhs: Duration) -> Self {
         lhs.advanced(
             bySeconds: -rhs.seconds,
-            nanoseconds: -Int64(rhs.nanoseconds),
+            nanoseconds: -Int64(rhs.nanoseconds)
         )
     }
 
@@ -297,10 +297,10 @@ extension NaiveDateTime: TimeProtocol {
     }
 }
 
-// MARK: - Rounding Helpers
+// MARK: - Nanos Timestamp
 
-extension NaiveDateTime {
-    @usableFromInline
+package extension NaiveDateTime {
+    @inlinable
     func timestampNanosecondsChecked() -> Int64? {
         let (daysStamp, daysOverflow) = date
             .daysSinceEpoch
@@ -314,14 +314,14 @@ extension NaiveDateTime {
         return stamp
     }
 
-    @usableFromInline
-    static func fromTimestampNanoseconds(_ stamp: Int64) -> Self {
-        let days = floorDiv(stamp, NanoSeconds.perDay64)
-        let nanos = floorMod(stamp, NanoSeconds.perDay64)
+    @inlinable
+    static func fromTimestampNanoseconds(_ timestamp: Int64) -> Self {
+        let days = floorDiv(timestamp, NanoSeconds.perDay64)
+        let nanos = floorMod(timestamp, NanoSeconds.perDay64)
 
         return Self(
             date: NaiveDate(daysSinceEpoch: days),
-            time: NaiveTime(nanosecondsSinceMidnight: nanos),
+            time: NaiveTime(nanosecondsSinceMidnight: nanos)
         )
     }
 }
@@ -427,7 +427,7 @@ public extension NaiveDateTime {
     @inlinable
     func instant(
         in timezone: some TimeZoneProtocol,
-        resolving policy: DSTResolutionPolicy = .preferEarlier,
+        resolving policy: DSTResolutionPolicy = .preferEarlier
     ) -> Instant? {
         guard let offset = timezone
             .offset(for: self)
@@ -436,15 +436,15 @@ public extension NaiveDateTime {
 
         let daysInSecs = date.daysSinceEpoch * Seconds.perDay64
 
-        let rawSecs = daysInSecs - offset.seconds
-        let rawNanos = time.nanosecondsSinceMidnight - Int64(offset.nanoseconds)
+        let rawSecs = daysInSecs - offset.duration.seconds
+        let rawNanos = time.nanosecondsSinceMidnight - Int64(offset.duration.nanoseconds)
 
         let extraSecs = floorDiv(rawNanos, NanoSeconds.perSecond64)
         let normalizedNanos = floorMod(rawNanos, NanoSeconds.perSecond64)
 
         return Instant(
             seconds: rawSecs + extraSecs,
-            nanoseconds: Int32(normalizedNanos),
+            nanoseconds: Int32(normalizedNanos)
         )
     }
 
@@ -460,7 +460,7 @@ public extension NaiveDateTime {
 
         return Instant(
             seconds: rawSecs + extraSecs,
-            nanoseconds: Int32(finalNanos),
+            nanoseconds: Int32(finalNanos)
         )
     }
 }
