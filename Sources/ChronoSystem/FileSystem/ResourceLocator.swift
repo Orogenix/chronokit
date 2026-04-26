@@ -11,38 +11,13 @@
 
 package enum ResourceLocator {
     package static func find(named name: String) -> String? {
-        var info = Dl_info()
-        let symbol = unsafeBitCast(FileSystem.self, to: UnsafeRawPointer.self)
-        guard dladdr(symbol, &info) != 0 else { return nil }
-
-        guard let path = info.dli_fname else { return nil }
-        let libPath = String(cString: path)
-        let libDir = String(libPath.split(separator: "/").dropLast().joined(separator: "/"))
-
-        if let dir = opendir(libDir) {
-            defer { closedir(dir) }
-
-            while let entry = readdir(dir) {
-                let namePtr = entry.pointee.d_name
-                let fileName = withUnsafePointer(to: namePtr) {
-                    $0.withMemoryRebound(to: CChar.self, capacity: Int(MemoryLayout.size(ofValue: namePtr))) {
-                        String(cString: $0)
-                    }
-                }
-
-                if fileName.hasSuffix(".bundle") {
-                    let candidate = "\(libDir)/\(fileName)/Resources/\(name)"
-                    if access(candidate, F_OK) == 0 {
-                        return candidate
-                    }
-
-                    let altCandidate = "\(libDir)/\(fileName)/\(name)"
-                    if access(altCandidate, F_OK) == 0 {
-                        return altCandidate
-                    }
-                }
-            }
-        }
+        // var info = Dl_info()
+        // let symbol = unsafeBitCast(FileSystem.self, to: UnsafeRawPointer.self)
+        // guard dladdr(symbol, &info) != 0 else { return nil }
+        //
+        // guard let path = info.dli_fname else { return nil }
+        // let libPath = String(cString: path)
+        // let libDir = String(libPath.split(separator: "/").dropLast().joined(separator: "/"))
 
         // let bundleName = "ChronoTZ_ChronoTZ.bundle"
         //
@@ -57,8 +32,48 @@ package enum ResourceLocator {
         //     return path
         // }
 
-        preconditionFailure("Resources not found")
+        var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
+        guard getcwd(&buffer, buffer.count) != nil else { return nil }
+        let root = String(cString: buffer)
+        return search(in: root, for: name)
+    }
 
+    private static func search(in directory: String, for fileName: String) -> String? {
+        guard let dir = opendir(directory) else { return nil }
+        defer { closedir(dir) }
+
+        while let entry = readdir(dir) {
+            let namePtr = entry.pointee.d_name
+            let entryName = withUnsafePointer(to: namePtr) {
+                $0.withMemoryRebound(to: CChar.self, capacity: Int(MemoryLayout.size(ofValue: namePtr))) {
+                    String(cString: $0)
+                }
+            }
+
+            // Skip self and parent
+            if entryName == "." || entryName == ".." { continue }
+
+            let fullPath = "\(directory)/\(entryName)"
+
+            // Check if it's the file we want
+            if entryName == fileName {
+                // Verify it's a file
+                var st = stat()
+                if stat(fullPath, &st) == 0, st.st_mode & S_IFMT == S_IFREG {
+                    return fullPath
+                }
+            }
+
+            // If it's a directory, recurse (don't go into hidden folders to save time)
+            if entryName.first != "." {
+                var st = stat()
+                if stat(fullPath, &st) == 0, st.st_mode & S_IFMT == S_IFDIR {
+                    if let found = search(in: fullPath, for: fileName) {
+                        return found
+                    }
+                }
+            }
+        }
         return nil
     }
 
