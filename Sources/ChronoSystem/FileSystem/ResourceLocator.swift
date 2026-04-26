@@ -17,7 +17,8 @@ package enum ResourceLocator {
 
         let path = String(cString: info.dli_fname)
         let baseDir = String(path.split(separator: "/").dropLast().joined(separator: "/"))
-        let candidate = "/\(baseDir)/Resources/\(name)"
+        let bundleName = "ChronoTZ_ChronoTZ.bundle"
+        let candidate = "/\(baseDir)/\(bundleName)/\(name)"
 
         print("✅ Found \(name) at: \(candidate)")
         return access(candidate, F_OK) == 0 ? candidate : nil
