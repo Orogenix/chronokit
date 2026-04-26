@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  High-performance, no-foundation, and zero-dependency date and time primitives for Swift.
+  High-performance, no-foundation, zero-dependency date and time primitives for Swift.
 </p>
 
 <br><br>
