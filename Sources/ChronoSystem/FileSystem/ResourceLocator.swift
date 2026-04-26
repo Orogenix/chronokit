@@ -19,10 +19,13 @@ package enum ResourceLocator {
         let libPath = String(cString: path)
         let libDir = String(libPath.split(separator: "/").dropLast().joined(separator: "/"))
 
+        let bundleName = "ChronoTZ_ChronoTZ.bundle"
+
         let candidates = [
-            "\(libDir)/Resources/\(name)", // Standard placement
-            "\(libDir)/../Resources/\(name)", // Common nested bundle
-            "\(libDir)/../../Resources/\(name)", // Deep hierarchy
+            "\(libDir)/\(bundleName)/Resources/\(name)",
+            "\(libDir)/\(bundleName)/\(name)",
+            "\(libDir)/../Resources/\(name)",
+            "\(libDir)/../../Resources/\(name)",
         ]
 
         for path in candidates where access(path, F_OK) == 0 {
