@@ -4,66 +4,66 @@ import Testing
 
 // MARK: - RFC 3339 Tests
 
-struct NaiveDateTimeFormatterTests {
-    let dt = NaiveDateTime(
+struct PlainDateTimeFormatterTests {
+    let dt = PlainDateTime(
         year: 2026, month: 12, day: 29,
         hour: 15, minute: 30, second: 0,
         nanosecond: 500_000_000
     )
 
-    @Test("NaiveDateTimeFormatterTests: Default string RFC 3339 formatting")
+    @Test("PlainDateTimeFormatterTests: Default string RFC 3339 formatting")
     func defaultCombinedFormatting_rfc3339() throws {
-        let datetime = try #require(dt, "Sample naive date time should valid")
+        let datetime = try #require(dt, "Sample plain date time should valid")
         #expect(datetime.rfc3339() == "2026-12-29T15:30:00")
         #expect(datetime.description == "2026-12-29T15:30:00")
         #expect("Today is \(datetime)" == "Today is 2026-12-29T15:30:00")
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 3339 combined string with custom precision", arguments: [
+    @Test("PlainDateTimeFormatterTests: RFC 3339 combined string with custom precision", arguments: [
         (3, "2026-12-29T15:30:00.500"),
         (0, "2026-12-29T15:30:00"),
     ])
     func combinedPrecision_rfc3339(digits: Int, expected: String) throws {
-        let datetime = try #require(dt, "Sampe naive date time should valid")
+        let datetime = try #require(dt, "Sampe plain date time should valid")
         #expect(datetime.rfc3339(digits: digits) == expected)
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 3339 Naive with Fixed Offset")
+    @Test("PlainDateTimeFormatterTests: RFC 3339 Plain with Fixed Offset")
     func withOffset_rfc3339() throws {
-        let dt = NaiveDateTime(year: 2026, month: 4, day: 16, hour: 13, minute: 0, second: 0)
-        let naive = try #require(dt)
+        let dt = PlainDateTime(year: 2026, month: 4, day: 16, hour: 13, minute: 0, second: 0)
+        let plain = try #require(dt)
         let offset = FixedOffset(seconds: 25200) // +07:00
-        let result = naive.rfc3339(digits: 0, offset: offset)
+        let result = plain.rfc3339(digits: 0, offset: offset)
         #expect(result == "2026-04-16T13:00:00+07:00")
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 3339 Naive with UTC Offset (Zulu)")
+    @Test("PlainDateTimeFormatterTests: RFC 3339 Plain with UTC Offset (Zulu)")
     func withUTCOffset_rfc3339() throws {
-        let dt = NaiveDateTime(year: 2026, month: 1, day: 1, hour: 0, minute: 0, second: 0)
-        let naive = try #require(dt)
-        let result = naive.rfc3339(digits: 0, offset: .utc)
+        let dt = PlainDateTime(year: 2026, month: 1, day: 1, hour: 0, minute: 0, second: 0)
+        let plain = try #require(dt)
+        let result = plain.rfc3339(digits: 0, offset: .utc)
         #expect(result == "2026-01-01T00:00:00Z", "Should print zulu offset")
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 3339 Fractions and Offsets Combined")
+    @Test("PlainDateTimeFormatterTests: RFC 3339 Fractions and Offsets Combined")
     func fractionsAndOffsets_rfc3339() throws {
-        let dt = NaiveDateTime(year: 2026, month: 4, day: 16, hour: 13, minute: 0, second: 0, nanosecond: 123_456_789)
-        let naive = try #require(dt)
+        let dt = PlainDateTime(year: 2026, month: 4, day: 16, hour: 13, minute: 0, second: 0, nanosecond: 123_456_789)
+        let plain = try #require(dt)
         let offset = FixedOffset(seconds: -18000) // -05:00
-        #expect(naive.rfc3339(digits: 3, offset: offset) == "2026-04-16T13:00:00.123-05:00")
-        #expect(naive.rfc3339(digits: 9, offset: offset) == "2026-04-16T13:00:00.123456789-05:00")
+        #expect(plain.rfc3339(digits: 3, offset: offset) == "2026-04-16T13:00:00.123-05:00")
+        #expect(plain.rfc3339(digits: 9, offset: offset) == "2026-04-16T13:00:00.123456789-05:00")
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 3339 Max Digits Padding")
+    @Test("PlainDateTimeFormatterTests: RFC 3339 Max Digits Padding")
     func fractionPadding_rfc3339() throws {
-        let dt = NaiveDateTime(year: 2026, month: 4, day: 16, hour: 12, minute: 0, second: 0, nanosecond: 0)
-        let naive = try #require(dt)
-        #expect(naive.rfc3339(digits: 3) == "2026-04-16T12:00:00.000", "Should print .000 even if nanos is 0")
+        let dt = PlainDateTime(year: 2026, month: 4, day: 16, hour: 12, minute: 0, second: 0, nanosecond: 0)
+        let plain = try #require(dt)
+        #expect(plain.rfc3339(digits: 3) == "2026-04-16T12:00:00.000", "Should print .000 even if nanos is 0")
     }
 
-    @Test("NaiveDateTimeFormatterTests: Leap Year RFC 3339")
+    @Test("PlainDateTimeFormatterTests: Leap Year RFC 3339")
     func leapYear_rfc3339() throws {
-        let leap = try #require(NaiveDateTime(
+        let leap = try #require(PlainDateTime(
             year: 2024,
             month: 2,
             day: 29,
@@ -74,9 +74,9 @@ struct NaiveDateTimeFormatterTests {
         #expect(leap.rfc3339() == "2024-02-29T23:59:59")
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 3339 Formatting at Year Boundaries")
+    @Test("PlainDateTimeFormatterTests: RFC 3339 Formatting at Year Boundaries")
     func yearBoundaries_rfc3339() throws {
-        let yearStart = try #require(NaiveDateTime(
+        let yearStart = try #require(PlainDateTime(
             year: 2026,
             month: 1,
             day: 1,
@@ -84,7 +84,7 @@ struct NaiveDateTimeFormatterTests {
             minute: 0,
             second: 0
         ))
-        let yearEnd = try #require(NaiveDateTime(
+        let yearEnd = try #require(PlainDateTime(
             year: 2025,
             month: 12,
             day: 31,
@@ -100,8 +100,8 @@ struct NaiveDateTimeFormatterTests {
 
 // MARK: - RFC 5322 Tests
 
-extension NaiveDateTimeFormatterTests {
-    @Test("NaiveDateTimeFormatterTests: RFC 5322 standard formatting", arguments: [
+extension PlainDateTimeFormatterTests {
+    @Test("PlainDateTimeFormatterTests: RFC 5322 standard formatting", arguments: [
         (2026, 12, 29, 15, 30, 0, "Tue, 29 Dec 2026 15:30:00"),
     ])
     // swiftlint:disable:next function_parameter_count
@@ -114,7 +114,7 @@ extension NaiveDateTimeFormatterTests {
         second: Int,
         expected: String
     ) throws {
-        let datetime = try #require(NaiveDateTime(
+        let datetime = try #require(PlainDateTime(
             year: year,
             month: month,
             day: day,
@@ -125,7 +125,7 @@ extension NaiveDateTimeFormatterTests {
         #expect(datetime.rfc5322() == expected)
     }
 
-    @Test("NaiveDateTimeFormatterTests: RFC 5322 with Offset", arguments: [
+    @Test("PlainDateTimeFormatterTests: RFC 5322 with Offset", arguments: [
         (25200, "Tue, 29 Dec 2026 15:30:00 +0700"), // +07:00
         (-18000, "Tue, 29 Dec 2026 15:30:00 -0500"), // -05:00
         (0, "Tue, 29 Dec 2026 15:30:00 +0000"), // RFC 5322 uses +0000, not Z
@@ -136,9 +136,9 @@ extension NaiveDateTimeFormatterTests {
         #expect(datetime.rfc5322(offset: offset) == expected)
     }
 
-    @Test("NaiveDateTimeFormatterTests: Handling nil month in RFC 5322")
+    @Test("PlainDateTimeFormatterTests: Handling nil month in RFC 5322")
     func invalidMonth_rfc5322() {
-        let rawDT = NaiveDateTime(
+        let rawDT = PlainDateTime(
             year: 2026,
             month: 13,
             day: 1,
@@ -152,11 +152,11 @@ extension NaiveDateTimeFormatterTests {
 
 // MARK: - RFC 2822 Tests
 
-extension NaiveDateTimeFormatterTests {
+extension PlainDateTimeFormatterTests {
     @available(*, deprecated)
-    @Test("NaiveDateTimeFormatterTests: RFC 2822 alias yields identical results to RFC 5322")
+    @Test("PlainDateTimeFormatterTests: RFC 2822 alias yields identical results to RFC 5322")
     func redirectedDeprecation_rfc2822() throws {
-        let datetime = try #require(NaiveDateTime(
+        let datetime = try #require(PlainDateTime(
             year: 2026,
             month: 1,
             day: 1,

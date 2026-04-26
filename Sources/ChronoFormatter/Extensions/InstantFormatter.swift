@@ -5,7 +5,7 @@ public extension Instant {
     @inlinable
     func rfc3339(digits: Int = 0) -> String {
         let capacity = 32
-        let utc = naiveDateTimeUTC()
+        let utc = plainDateTimeUTC()
 
         if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *) {
             return String(unsafeUninitializedCapacity: capacity) { buffer in
@@ -37,7 +37,7 @@ public extension Instant {
     @inlinable
     func rfc5322() -> String? {
         let capacity = 40
-        let utc = naiveDateTimeUTC()
+        let utc = plainDateTimeUTC()
 
         guard let month = Month(rawValue: utc.date.month) else { return nil }
         let weekday = Weekday(rawValue: utc.date.weekday)
@@ -87,7 +87,7 @@ public extension Instant {
 extension Instant {
     @usableFromInline
     func formatRFC3339(
-        utc: NaiveDateTime,
+        utc: PlainDateTime,
         digits: Int,
         into raw: UnsafeMutableRawBufferPointer,
         at cursor: inout Int
@@ -102,7 +102,7 @@ extension Instant {
 
     @usableFromInline
     func formatRFC5322(
-        utc: NaiveDateTime,
+        utc: PlainDateTime,
         weekday: Weekday?,
         month: Month,
         into raw: UnsafeMutableRawBufferPointer,

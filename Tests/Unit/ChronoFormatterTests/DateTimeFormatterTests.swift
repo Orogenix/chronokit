@@ -149,7 +149,7 @@ extension DateTimeFormatterTests {
             return .seconds(0)
         }
 
-        func offset(for _: NaiveDateTime) -> LocalOffset {
+        func offset(for _: PlainDateTime) -> PlainOffset {
             return .unique(.standard(.seconds(0)))
         }
     }

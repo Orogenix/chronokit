@@ -1,8 +1,8 @@
 import ChronoCore
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     static func now(in timezone: some TimeZoneProtocol) -> Self {
-        Instant.now().naiveDateTime(in: timezone)
+        Instant.now().plainDateTime(in: timezone)
     }
 
     static func now() -> Self {

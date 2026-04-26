@@ -2,27 +2,26 @@
 import ChronoMath
 import Testing
 
-@Suite("Naive Date Tests")
-struct NaiveDateTests {
+struct PlainDateTests {
     // MARK: - Initialization Tests
 
-    @Test("NaiveDateTests: Initialize from daysSinceEpoch")
+    @Test("PlainDateTests: Initialize from daysSinceEpoch")
     func daysSinceEpochInitialization() {
-        let date = NaiveDate(daysSinceEpoch: 0)
+        let date = PlainDate(daysSinceEpoch: 0)
         #expect(date.year == 1970, "Year should be as expected")
         #expect(date.month == 1, "Month should be as expected")
         #expect(date.day == 1, "Day should be as expected")
     }
 
-    @Test("NaiveDateTests: Initialize from valid YMD components (Int & UInt8)", arguments: [
+    @Test("PlainDateTests: Initialize from valid YMD components (Int & UInt8)", arguments: [
         (2025, 1, 31),
         (2024, 2, 29),
         (2000, 2, 29),
         (1900, 2, 28) // Not a leap year
     ])
     func validYMDInitialization(year: Int32, month: Int, day: Int) {
-        let dateInt = NaiveDate(year: year, month: month, day: day)
-        let dateUInt8 = NaiveDate(year: year, month: UInt8(month), day: UInt8(day))
+        let dateInt = PlainDate(year: year, month: month, day: day)
+        let dateUInt8 = PlainDate(year: year, month: UInt8(month), day: UInt8(day))
 
         #expect(dateInt != nil)
         #expect(dateUInt8 != nil)
@@ -32,7 +31,7 @@ struct NaiveDateTests {
         #expect(dateInt?.day == day)
     }
 
-    @Test("NaiveDateTests: Initialize from invalid components returns nil", arguments: [
+    @Test("PlainDateTests: Initialize from invalid components returns nil", arguments: [
         (2025, 13, 1), // Invalid month
         (2025, 2, 29), // 2025 is not a leap year
         (2024, 2, 30), // Feb 30 never exists
@@ -41,33 +40,33 @@ struct NaiveDateTests {
         (2025, 1, 0) // Day out of range
     ])
     func invalidYMDInitialization(year: Int32, month: Int, day: Int) {
-        #expect(NaiveDate(year: year, month: month, day: day) == nil)
+        #expect(PlainDate(year: year, month: month, day: day) == nil)
     }
 
-    @Test("NaiveDateTests: Initialize from leap year", arguments: [
+    @Test("PlainDateTests: Initialize from leap year", arguments: [
         (2020, 2, 29),
         (2024, 2, 29),
         (2028, 2, 29),
     ])
     func invalidYMDInitialization(year: Int32, month: UInt8, day: UInt8) {
         #expect(
-            NaiveDate(year: year, month: month, day: day) != nil,
+            PlainDate(year: year, month: month, day: day) != nil,
             "Dates should be valid",
         )
     }
 
-    @Test("NaiveDateTests: Component to daysSinceEpoch round-trip")
+    @Test("PlainDateTests: Component to daysSinceEpoch round-trip")
     func roundTrip() {
-        let leapDay = NaiveDate(year: 2024, month: 2, day: 29)!
-        let roundTrip = NaiveDate(daysSinceEpoch: leapDay.daysSinceEpoch)
+        let leapDay = PlainDate(year: 2024, month: 2, day: 29)!
+        let roundTrip = PlainDate(daysSinceEpoch: leapDay.daysSinceEpoch)
         #expect(roundTrip == leapDay)
     }
 
-    @Test("NaiveDateTests: Boundary constants integrity")
+    @Test("PlainDateTests: Boundary constants integrity")
     func boundaries() {
         // Accessing these ensures no initialization crashes
-        let minDate: NaiveDate = .min
-        let maxDate: NaiveDate = .max
+        let minDate: PlainDate = .min
+        let maxDate: PlainDate = .max
 
         #expect(minDate.daysSinceEpoch == CalendarConstants.minInputDay)
         #expect(maxDate.daysSinceEpoch == CalendarConstants.maxInputDay)
@@ -80,18 +79,18 @@ struct NaiveDateTests {
 
 // MARK: - Comparison Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Strict inequality across component boundaries", arguments: [
+extension PlainDateTests {
+    @Test("PlainDateTests: Strict inequality across component boundaries", arguments: [
         // Different Years
-        (NaiveDate(year: 2023, month: 12, day: 31)!, NaiveDate(year: 2024, month: 1, day: 1)!),
+        (PlainDate(year: 2023, month: 12, day: 31)!, PlainDate(year: 2024, month: 1, day: 1)!),
         // Different Months
-        (NaiveDate(year: 2024, month: 2, day: 28)!, NaiveDate(year: 2024, month: 3, day: 1)!),
+        (PlainDate(year: 2024, month: 2, day: 28)!, PlainDate(year: 2024, month: 3, day: 1)!),
         // Different Days
-        (NaiveDate(year: 2024, month: 6, day: 15)!, NaiveDate(year: 2024, month: 6, day: 16)!),
+        (PlainDate(year: 2024, month: 6, day: 15)!, PlainDate(year: 2024, month: 6, day: 16)!),
         // Leap Year specific
-        (NaiveDate(year: 2024, month: 2, day: 29)!, NaiveDate(year: 2024, month: 3, day: 1)!),
+        (PlainDate(year: 2024, month: 2, day: 29)!, PlainDate(year: 2024, month: 3, day: 1)!),
     ])
-    func strictInequality(lhs: NaiveDate, rhs: NaiveDate) {
+    func strictInequality(lhs: PlainDate, rhs: PlainDate) {
         #expect(lhs < rhs)
         #expect(rhs > lhs)
         #expect(lhs != rhs)
@@ -99,10 +98,10 @@ extension NaiveDateTests {
         #expect(!(rhs < lhs))
     }
 
-    @Test("NaiveDateTests: Equality and reflexive properties")
+    @Test("PlainDateTests: Equality and reflexive properties")
     func equality() {
-        let lhs = NaiveDate(year: 2025, month: 5, day: 1)!
-        let rhs = NaiveDate(year: 2025, month: 5, day: 1)!
+        let lhs = PlainDate(year: 2025, month: 5, day: 1)!
+        let rhs = PlainDate(year: 2025, month: 5, day: 1)!
 
         #expect(lhs == rhs)
         #expect(lhs <= rhs)
@@ -111,12 +110,12 @@ extension NaiveDateTests {
         #expect(!(lhs > rhs))
     }
 
-    @Test("NaiveDateTests: Sorting a collection of dates")
+    @Test("PlainDateTests: Sorting a collection of dates")
     func sorting() {
-        let d1 = NaiveDate(year: 1990, month: 1, day: 1)!
-        let d2 = NaiveDate(year: 2000, month: 5, day: 10)!
-        let d3 = NaiveDate(year: 2024, month: 2, day: 29)!
-        let d4 = NaiveDate(year: 2024, month: 12, day: 31)!
+        let d1 = PlainDate(year: 1990, month: 1, day: 1)!
+        let d2 = PlainDate(year: 2000, month: 5, day: 10)!
+        let d3 = PlainDate(year: 2024, month: 2, day: 29)!
+        let d4 = PlainDate(year: 2024, month: 12, day: 31)!
 
         let unsorted = [d3, d1, d4, d2]
         let sorted = unsorted.sorted()
@@ -124,30 +123,30 @@ extension NaiveDateTests {
         #expect(sorted == [d1, d2, d3, d4])
     }
 
-    @Test("NaiveDateTests: Range and boundary check")
+    @Test("PlainDateTests: Range and boundary check")
     func ranges() {
-        let start = NaiveDate(year: 2025, month: 1, day: 1)!
-        let mid = NaiveDate(year: 2025, month: 5, day: 10)!
-        let end = NaiveDate(year: 2025, month: 12, day: 31)!
+        let start = PlainDate(year: 2025, month: 1, day: 1)!
+        let mid = PlainDate(year: 2025, month: 5, day: 10)!
+        let end = PlainDate(year: 2025, month: 12, day: 31)!
 
         let yearRange = start ... end
 
         #expect(yearRange.contains(mid))
         #expect(yearRange.contains(start))
         #expect(yearRange.contains(end))
-        #expect(!yearRange.contains(NaiveDate(year: 2024, month: 12, day: 31)!))
-        #expect(!yearRange.contains(NaiveDate(year: 2026, month: 1, day: 1)!))
+        #expect(!yearRange.contains(PlainDate(year: 2024, month: 12, day: 31)!))
+        #expect(!yearRange.contains(PlainDate(year: 2026, month: 1, day: 1)!))
     }
 
-    @Test("NaiveDateTests: Extreme boundaries (Min/Max)")
+    @Test("PlainDateTests: Extreme boundaries (Min/Max)")
     func extremeBoundaries() {
-        let minDate: NaiveDate = .min
-        let maxDate: NaiveDate = .max
+        let minDate: PlainDate = .min
+        let maxDate: PlainDate = .max
 
         #expect(minDate < maxDate)
         #expect(minDate != maxDate)
 
-        let middle = NaiveDate(year: 2000, month: 1, day: 1)!
+        let middle = PlainDate(year: 2000, month: 1, day: 1)!
         #expect(minDate < middle)
         #expect(maxDate > middle)
     }
@@ -155,10 +154,10 @@ extension NaiveDateTests {
 
 // MARK: - Arithmetic Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Within the same month")
+extension PlainDateTests {
+    @Test("PlainDateTests: Within the same month")
     func standardAdvance() {
-        let base = NaiveDate(year: 2025, month: 1, day: 1)!
+        let base = PlainDate(year: 2025, month: 1, day: 1)!
         let result = base.advanced(byDays: 10)
 
         #expect(result.year == 2025)
@@ -166,9 +165,9 @@ extension NaiveDateTests {
         #expect(result.day == 11)
     }
 
-    @Test("NaiveDateTests: Across month boundary")
+    @Test("PlainDateTests: Across month boundary")
     func monthBoundary() {
-        let base = NaiveDate(year: 2025, month: 1, day: 31)!
+        let base = PlainDate(year: 2025, month: 1, day: 31)!
         let result = base.advanced(byDays: 1)
 
         #expect(result.year == 2025)
@@ -176,9 +175,9 @@ extension NaiveDateTests {
         #expect(result.day == 1)
     }
 
-    @Test("NaiveDateTests: Across year boundary")
+    @Test("PlainDateTests: Across year boundary")
     func yearBoundary() {
-        let base = NaiveDate(year: 2025, month: 12, day: 31)!
+        let base = PlainDate(year: 2025, month: 12, day: 31)!
         let result = base.advanced(byDays: 1)
 
         #expect(result.year == 2026)
@@ -186,10 +185,10 @@ extension NaiveDateTests {
         #expect(result.day == 1)
     }
 
-    @Test("NaiveDateTests: Leap year Feb 28 to 29")
+    @Test("PlainDateTests: Leap year Feb 28 to 29")
     func leapYearAdvance() {
         // 2024 was a leap year
-        let base = NaiveDate(year: 2024, month: 2, day: 28)!
+        let base = PlainDate(year: 2024, month: 2, day: 28)!
         let result = base.advanced(byDays: 1)
 
         #expect(result.month == 2)
@@ -200,19 +199,19 @@ extension NaiveDateTests {
         #expect(nextDay.day == 1)
     }
 
-    @Test("NaiveDateTests: Common year Feb 28 to March 1")
+    @Test("PlainDateTests: Common year Feb 28 to March 1")
     func commonYearAdvance() {
         // 2025 is not a leap year
-        let base = NaiveDate(year: 2025, month: 2, day: 28)!
+        let base = PlainDate(year: 2025, month: 2, day: 28)!
         let result = base.advanced(byDays: 1)
 
         #expect(result.month == 3)
         #expect(result.day == 1)
     }
 
-    @Test("NaiveDateTests: Negative days (Backward)")
+    @Test("PlainDateTests: Negative days (Backward)")
     func negativeAdvance() {
-        let base = NaiveDate(year: 2025, month: 1, day: 1)!
+        let base = PlainDate(year: 2025, month: 1, day: 1)!
         let result = base.advanced(byDays: -1)
 
         #expect(result.year == 2024)
@@ -220,9 +219,9 @@ extension NaiveDateTests {
         #expect(result.day == 31)
     }
 
-    @Test("NaiveDateTests: Crossing the Epoch (1970-01-01)")
+    @Test("PlainDateTests: Crossing the Epoch (1970-01-01)")
     func epochCrossing() {
-        let epoch = NaiveDate(daysSinceEpoch: 0) // 1970-01-01
+        let epoch = PlainDate(daysSinceEpoch: 0) // 1970-01-01
         let result = epoch.advanced(byDays: -1)
 
         #expect(result.year == 1969)
@@ -231,11 +230,11 @@ extension NaiveDateTests {
         #expect(result.daysSinceEpoch == -1)
     }
 
-    @Test("NaiveDateTests: Chained mutations")
+    @Test("PlainDateTests: Chained mutations")
     func chainedMutations() {
-        var dt = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 0, minute: 0, second: 0)!,
+        var dt = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 0, minute: 0, second: 0)!,
         )
 
         dt += CalendarInterval.days(1)
@@ -250,10 +249,10 @@ extension NaiveDateTests {
 
 // MARK: - Addition Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Date + Int64")
+extension PlainDateTests {
+    @Test("PlainDateTests: Date + Int64")
     func datePlusInt() {
-        let base = NaiveDate(year: 2025, month: 1, day: 1)!
+        let base = PlainDate(year: 2025, month: 1, day: 1)!
         let result = base + 31 // Move forward 31 days
 
         #expect(result.month == 2)
@@ -261,10 +260,10 @@ extension NaiveDateTests {
         #expect(result.year == 2025)
     }
 
-    @Test("NaiveDateTests: Int64 + Date (Commutative)")
+    @Test("PlainDateTests: Int64 + Date (Commutative)")
     func intPlusDate() {
         let days: Int64 = 7
-        let base = NaiveDate(year: 2025, month: 12, day: 25)!
+        let base = PlainDate(year: 2025, month: 12, day: 25)!
 
         // This tests the (Int64, Self) overload
         let result = days + base
@@ -274,9 +273,9 @@ extension NaiveDateTests {
         #expect(result.day == 1)
     }
 
-    @Test("NaiveDateTests: Large additions")
+    @Test("PlainDateTests: Large additions")
     func largeAddition() {
-        let base = NaiveDate(year: 2024, month: 1, day: 1)!
+        let base = PlainDate(year: 2024, month: 1, day: 1)!
         let result = base + 366 // 2024 is a leap year
 
         #expect(result.year == 2025)
@@ -284,9 +283,9 @@ extension NaiveDateTests {
         #expect(result.day == 1)
     }
 
-    @Test("NaiveDateTests: In-place mutation")
+    @Test("PlainDateTests: In-place mutation")
     func compoundAddition() {
-        var date = NaiveDate(year: 2025, month: 5, day: 20)!
+        var date = PlainDate(year: 2025, month: 5, day: 20)!
         date += 11 // Should move to May 31
 
         #expect(date.day == 31)
@@ -297,9 +296,9 @@ extension NaiveDateTests {
         #expect(date.day == 1)
     }
 
-    @Test("NaiveDateTests: Multiple chain mutations")
+    @Test("PlainDateTests: Multiple chain mutations")
     func multipleMutations() {
-        var date = NaiveDate(year: 2000, month: 1, day: 1)!
+        var date = PlainDate(year: 2000, month: 1, day: 1)!
         let increments: Int64 = 366 // 2000 was a leap year
 
         date += increments
@@ -310,7 +309,7 @@ extension NaiveDateTests {
         #expect(date.day == 2)
     }
 
-    @Test("NaiveDateTests: Month and Year Normalization", arguments: [
+    @Test("PlainDateTests: Month and Year Normalization", arguments: [
         // Basic: Add 1 month to Jan -> Feb
         (y: 2025, m: 1, d: 1, addM: 1, addD: 0, expY: 2025, expM: 2, expD: 1),
         // Year wrap: Dec + 1 month -> Jan next year
@@ -333,7 +332,7 @@ extension NaiveDateTests {
         expM: Int,
         expD: Int,
     ) {
-        let date = NaiveDate(year: y, month: m, day: d)!
+        let date = PlainDate(year: y, month: m, day: d)!
         let interval = CalendarInterval(month: addM, day: addD)
         let result = date + interval
 
@@ -342,7 +341,7 @@ extension NaiveDateTests {
         #expect(result.day == expD)
     }
 
-    @Test("NaiveDateTests: Saturating / Clamping Logic", arguments: [
+    @Test("PlainDateTests: Saturating / Clamping Logic", arguments: [
         // Jan 31 + 1 month -> Feb 28 (Common Year)
         (y: 2025, m: 1, d: 31, addM: 1, expM: 2, expD: 28),
         // Jan 31 + 1 month -> Feb 29 (Leap Year)
@@ -361,7 +360,7 @@ extension NaiveDateTests {
         expM: Int,
         expD: Int,
     ) {
-        let date = NaiveDate(year: y, month: m, day: d)!
+        let date = PlainDate(year: y, month: m, day: d)!
         let interval = CalendarInterval.months(addM)
         let result = date + interval
 
@@ -369,7 +368,7 @@ extension NaiveDateTests {
         #expect(result.day == expD)
     }
 
-    @Test("NaiveDateTests: Day Addition Overflowing Months", arguments: [
+    @Test("PlainDateTests: Day Addition Overflowing Months", arguments: [
         // Feb 28 + 1 day -> March 1
         (y: 2025, m: 2, d: 28, addD: 1, expY: 2025, expM: 3, expD: 1),
         // Dec 31 + 1 day -> Jan 1 next year
@@ -387,7 +386,7 @@ extension NaiveDateTests {
         expM: Int,
         expD: Int,
     ) {
-        let date = NaiveDate(year: y, month: m, day: d)!
+        let date = PlainDate(year: y, month: m, day: d)!
         let interval = CalendarInterval.days(addD)
         let result = date + interval
 
@@ -396,13 +395,13 @@ extension NaiveDateTests {
         #expect(result.day == expD)
     }
 
-    @Test("NaiveDateTests: Order of Operations (Months then Days)")
+    @Test("PlainDateTests: Order of Operations (Months then Days)")
     func orderOfOperations() {
         // Start: Jan 30
         // If we add 1 Month then 1 Day:
         // 1. Jan 30 + 1 Month = Feb 28 (Clamped)
         // 2. Feb 28 + 1 Day = March 1
-        let date = NaiveDate(year: 2025, month: 1, day: 30)!
+        let date = PlainDate(year: 2025, month: 1, day: 30)!
         let interval = CalendarInterval(month: 1, day: 1)
 
         let result = date + interval
@@ -411,12 +410,12 @@ extension NaiveDateTests {
         #expect(result.day == 1)
     }
 
-    @Test("NaiveDateTests: In-place addition (+=) correctly updates state")
+    @Test("PlainDateTests: In-place addition (+=) correctly updates state")
     func inPlaceAddition() {
         // Start at 2025-01-31 23:00
-        var dt = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 31)!,
-            time: NaiveTime(hour: 23, minute: 0, second: 0)!,
+        var dt = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 31)!,
+            time: PlainTime(hour: 23, minute: 0, second: 0)!,
         )
 
         // Add 1 month and 2 hours
@@ -436,19 +435,19 @@ extension NaiveDateTests {
 
 // MARK: - Substraction Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Subtract days within same month")
+extension PlainDateTests {
+    @Test("PlainDateTests: Subtract days within same month")
     func subtractDays() {
-        let base = NaiveDate(year: 2025, month: 1, day: 15)!
+        let base = PlainDate(year: 2025, month: 1, day: 15)!
         let result = base - 10
 
         #expect(result.day == 5)
         #expect(result.month == 1)
     }
 
-    @Test("NaiveDateTests: Subtract across month and year boundaries")
+    @Test("PlainDateTests: Subtract across month and year boundaries")
     func subtractAcrossBoundaries() {
-        let jan1 = NaiveDate(year: 2025, month: 1, day: 1)!
+        let jan1 = PlainDate(year: 2025, month: 1, day: 1)!
         let result = jan1 - 1 // Should be Dec 31, 2024
 
         #expect(result.year == 2024)
@@ -456,10 +455,10 @@ extension NaiveDateTests {
         #expect(result.day == 31)
     }
 
-    @Test("NaiveDateTests: Distance between dates")
+    @Test("PlainDateTests: Distance between dates")
     func dateDistance() {
-        let start = NaiveDate(year: 2025, month: 1, day: 1)!
-        let end = NaiveDate(year: 2025, month: 1, day: 11)!
+        let start = PlainDate(year: 2025, month: 1, day: 1)!
+        let end = PlainDate(year: 2025, month: 1, day: 11)!
 
         let diff = end - start
         #expect(diff == 10)
@@ -468,18 +467,18 @@ extension NaiveDateTests {
         #expect(negativeDiff == -10)
     }
 
-    @Test("NaiveDateTests: Leap year distance")
+    @Test("PlainDateTests: Leap year distance")
     func leapYearDistance() {
-        let feb28 = NaiveDate(year: 2024, month: 2, day: 28)!
-        let march1 = NaiveDate(year: 2024, month: 3, day: 1)!
+        let feb28 = PlainDate(year: 2024, month: 2, day: 28)!
+        let march1 = PlainDate(year: 2024, month: 3, day: 1)!
 
         // 2024 is a leap year, so there is Feb 29 in between
         #expect(march1 - feb28 == 2)
     }
 
-    @Test("NaiveDateTests: Mutating subtraction")
+    @Test("PlainDateTests: Mutating subtraction")
     func compoundSubtraction() {
-        var date = NaiveDate(year: 2025, month: 2, day: 1)!
+        var date = PlainDate(year: 2025, month: 2, day: 1)!
         date -= 1 // Move to Jan 31
 
         #expect(date.month == 1)
@@ -487,9 +486,9 @@ extension NaiveDateTests {
         #expect(date.year == 2025)
     }
 
-    @Test("NaiveDateTests: Large backward mutation")
+    @Test("PlainDateTests: Large backward mutation")
     func largeMutation() {
-        var date = NaiveDate(year: 2024, month: 12, day: 31)!
+        var date = PlainDate(year: 2024, month: 12, day: 31)!
         date -= 366 // Move back one leap year's worth of days
 
         #expect(date.year == 2023)
@@ -497,12 +496,12 @@ extension NaiveDateTests {
         #expect(date.day == 31)
     }
 
-    @Test("NaiveDateTests: In-place subtraction (-=) correctly updates state")
+    @Test("PlainDateTests: In-place subtraction (-=) correctly updates state")
     func inPlaceSubtraction() {
         // Start at 2025-03-01 01:00
-        var dt = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 3, day: 1)!,
-            time: NaiveTime(hour: 1, minute: 0, second: 0)!,
+        var dt = PlainDateTime(
+            date: PlainDate(year: 2025, month: 3, day: 1)!,
+            time: PlainTime(hour: 1, minute: 0, second: 0)!,
         )
 
         // Subtract 1 month and 2 hours
@@ -520,8 +519,8 @@ extension NaiveDateTests {
 
 // MARK: - Era and Year Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Year CE calculation", arguments: [
+extension PlainDateTests {
+    @Test("PlainDateTests: Year CE calculation", arguments: [
         (2025, true, 2025),
         (1, true, 1),
         (0, false, 1), // 1 BCE
@@ -529,42 +528,42 @@ extension NaiveDateTests {
         (-99, false, 100), // 100 BCE
     ])
     func yearCE(inputYear: Int32, expectedIsCE: Bool, expectedYear: UInt32) {
-        let date = NaiveDate(year: inputYear, month: 1, day: 1)!
+        let date = PlainDate(year: inputYear, month: 1, day: 1)!
         #expect(date.yearCE.isCE == expectedIsCE)
         #expect(date.yearCE.year == expectedYear)
     }
 
-    @Test("NaiveDateTests: Leap year property", arguments: [
+    @Test("PlainDateTests: Leap year property", arguments: [
         (2024, true), // Normal leap
         (2000, true), // Century leap
         (2100, false), // Century non-leap
         (2023, false) // Normal year
     ])
     func leapYear(year: Int32, expected: Bool) {
-        let date = NaiveDate(year: year, month: 1, day: 1)!
+        let date = PlainDate(year: year, month: 1, day: 1)!
         #expect(date.isLeapYear == expected)
     }
 }
 
 // MARK: - Quarter Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Quarter calculation", arguments: [
+extension PlainDateTests {
+    @Test("PlainDateTests: Quarter calculation", arguments: [
         (1, 1), (3, 1), // Q1
         (4, 2), (6, 2), // Q2
         (7, 3), (9, 3), // Q3
         (10, 4), (12, 4), // Q4
     ])
     func quarters(month: Int, expectedQuarter: Int) {
-        let date = NaiveDate(year: 2025, month: month, day: 1)!
+        let date = PlainDate(year: 2025, month: month, day: 1)!
         #expect(date.quarter == expectedQuarter)
     }
 }
 
 // MARK: - Month Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Month calculation", arguments: [
+extension PlainDateTests {
+    @Test("PlainDateTests: Month calculation", arguments: [
         (1, 1, 0),
         (2, 2, 1),
         (3, 3, 2),
@@ -579,12 +578,12 @@ extension NaiveDateTests {
         (12, 12, 11),
     ])
     func months(inputMonth: Int, expected: Int, expectedZeroBased: Int) {
-        let date = NaiveDate(year: 2025, month: inputMonth, day: 1)!
+        let date = PlainDate(year: 2025, month: inputMonth, day: 1)!
         #expect(date.month == expected)
         #expect(date.month - 1 == expectedZeroBased)
     }
 
-    @Test("NaiveDateTests: Month symbols", arguments: [
+    @Test("PlainDateTests: Month symbols", arguments: [
         (1, Month.january),
         (2, Month.february),
         (3, Month.march),
@@ -599,80 +598,80 @@ extension NaiveDateTests {
         (12, Month.december),
     ])
     func symbols(month: Int, symbol: Month) {
-        let date = NaiveDate(year: 2025, month: month, day: 10)!
+        let date = PlainDate(year: 2025, month: month, day: 10)!
         #expect(date.monthSymbol == symbol)
     }
 }
 
 // MARK: - Weekday Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Weekday Symbol Calculation", arguments: [1, 2, 3, 4, 5, 6, 7])
+extension PlainDateTests {
+    @Test("PlainDateTests: Weekday Symbol Calculation", arguments: [1, 2, 3, 4, 5, 6, 7])
     func weekdaySymbolCheck(day: Int) {
-        let date = NaiveDate(year: 2023, month: 5, day: day)!
+        let date = PlainDate(year: 2023, month: 5, day: day)!
         #expect(date.weekdaySymbol!.rawValue == date.weekday)
     }
 
-    @Test("NaiveDateTests: ISO Week Consistency")
+    @Test("PlainDateTests: ISO Week Consistency")
     func isoWeekCheck() {
         // Thursday, Jan 1, 2026 is Week 1 of 2026
-        let date = NaiveDate(year: 2026, month: 1, day: 1)!
+        let date = PlainDate(year: 2026, month: 1, day: 1)!
         #expect(date.isoWeek.year == 2026)
 
         // Monday, Dec 29, 2025 is also Week 1 of 2026
-        let isoDate = NaiveDate(year: 2025, month: 12, day: 29)!
+        let isoDate = PlainDate(year: 2025, month: 12, day: 29)!
         #expect(isoDate.isoWeek.week == 1)
     }
 }
 
 // MARK: - Day Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Day zero-based components")
+extension PlainDateTests {
+    @Test("PlainDateTests: Day zero-based components")
     func zeroBasedProperties() {
-        let date = NaiveDate(year: 2025, month: 12, day: 25)!
+        let date = PlainDate(year: 2025, month: 12, day: 25)!
         #expect(date.monthZeroBased == 11)
     }
 
-    @Test("NaiveDateTests: Unix Epoch Alignment")
+    @Test("PlainDateTests: Unix Epoch Alignment")
     func unixEpoch() {
-        let epoch = NaiveDate(year: 1970, month: 1, day: 1)!
+        let epoch = PlainDate(year: 1970, month: 1, day: 1)!
         #expect(epoch.daysSinceEpoch == 0)
 
-        let beforeEpoch = NaiveDate(year: 1969, month: 12, day: 31)!
+        let beforeEpoch = PlainDate(year: 1969, month: 12, day: 31)!
         #expect(beforeEpoch.daysSinceEpoch == -1)
     }
 
-    @Test("NaiveDateTests: Days in month", arguments: [
+    @Test("PlainDateTests: Days in month", arguments: [
         (2024, 2, 29), // Leap Feb
         (2025, 2, 28), // Standard Feb
         (2025, 4, 30), // April
         (2025, 1, 31) // January
     ])
     func daysInMonth(year: Int32, month: Int, expectedDays: Int) {
-        let date = NaiveDate(year: year, month: month, day: 1)!
+        let date = PlainDate(year: year, month: month, day: 1)!
         #expect(date.daysInMonth == expectedDays)
     }
 }
 
 // MARK: - Ordinal Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Ordinal day calculation")
+extension PlainDateTests {
+    @Test("PlainDateTests: Ordinal day calculation")
     func ordinalDayCalculation() {
-        let jan1 = NaiveDate(year: 2025, month: 1, day: 1)!
+        let jan1 = PlainDate(year: 2025, month: 1, day: 1)!
         #expect(jan1.ordinal == 1, "Jan 1 ordinal should be 1")
 
-        let feb1 = NaiveDate(year: 2025, month: 2, day: 1)!
+        let feb1 = PlainDate(year: 2025, month: 2, day: 1)!
         #expect(feb1.ordinal == 32, "Feb 1 ordinal should be 32")
 
-        let dec31 = NaiveDate(year: 2024, month: 12, day: 31)!
+        let dec31 = PlainDate(year: 2024, month: 12, day: 31)!
         #expect(dec31.ordinal == 366, "Dec 31 on leap year ordinal should be 366")
     }
 
-    @Test("NaiveDateTests: Ordinal day zero-based calculation")
+    @Test("PlainDateTests: Ordinal day zero-based calculation")
     func ordinalDayZeroBasedCalculation() {
-        let jan1 = NaiveDate(year: 2025, month: 1, day: 1)!
+        let jan1 = PlainDate(year: 2025, month: 1, day: 1)!
         #expect(jan1.ordinal == 1)
         #expect(jan1.ordinalZeroBased == 0)
     }
@@ -680,10 +679,10 @@ extension NaiveDateTests {
 
 // MARK: - Modification Tests
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Modify components using 'with'")
+extension PlainDateTests {
+    @Test("PlainDateTests: Modify components using 'with'")
     func modificationWith() {
-        let base = NaiveDate(year: 2023, month: 5, day: 1)!
+        let base = PlainDate(year: 2023, month: 5, day: 1)!
 
         #expect(base.with(year: 2025)!.year == 2025)
         #expect(base.with(month: 10)!.month == 10)
@@ -692,14 +691,14 @@ extension NaiveDateTests {
         #expect(base.with(day: 31)!.day == 31)
         #expect(base.with(dayZeroBased: 10)!.day == 11)
 
-        let leapDay = NaiveDate(year: 2024, month: 2, day: 29)!
+        let leapDay = PlainDate(year: 2024, month: 2, day: 29)!
         #expect(leapDay.with(year: 2025) == nil)
     }
 
-    @Test("NaiveDateTests: Ordinal modifications and leap years")
+    @Test("PlainDateTests: Ordinal modifications and leap years")
     func ordinalModifications() {
-        let commonYear = NaiveDate(year: 2023, month: 1, day: 1)!
-        let leapYear = NaiveDate(year: 2024, month: 1, day: 1)!
+        let commonYear = PlainDate(year: 2023, month: 1, day: 1)!
+        let leapYear = PlainDate(year: 2024, month: 1, day: 1)!
 
         // Day 60 in common year is March 1
         let mar1 = commonYear.with(ordinal: 60)
@@ -714,7 +713,7 @@ extension NaiveDateTests {
         #expect(leapYear.with(ordinal: 366) != nil)
     }
 
-    @Test("NaiveDateTests: Modifying components to invalid states returns nil", arguments: [
+    @Test("PlainDateTests: Modifying components to invalid states returns nil", arguments: [
         // Trying to set Feb 29 on a non-leap year
         (2025, 2, 29),
         // Trying to set April 31
@@ -723,20 +722,20 @@ extension NaiveDateTests {
         (2025, 13, 1)
     ])
     func invalidModifications(year: Int32, month: Int, day: Int) {
-        let base = NaiveDate(year: 2024, month: 1, day: 1)!
+        let base = PlainDate(year: 2024, month: 1, day: 1)!
 
         // We test multiple paths to these invalid states
         #expect(base.with(year: year)?.with(month: month)?.with(day: day) == nil)
     }
 }
 
-// MARK: - Naive Date Time Conversion
+// MARK: - Plain Date Time Conversion
 
-extension NaiveDateTests {
-    @Test("NaiveDateTests: Convert using NaiveTime object")
+extension PlainDateTests {
+    @Test("PlainDateTests: Convert using PlainTime object")
     func toDateTimeWithTimeObject() {
-        let baseDate = NaiveDate(year: 2025, month: 12, day: 25)!
-        let time = NaiveTime(hour: 15, minute: 30, second: 0)!
+        let baseDate = PlainDate(year: 2025, month: 12, day: 25)!
+        let time = PlainTime(hour: 15, minute: 30, second: 0)!
         let dt = baseDate.at(time)
 
         #expect(dt.date == baseDate)
@@ -745,11 +744,11 @@ extension NaiveDateTests {
         #expect(dt.day == 25)
     }
 
-    @Test("NaiveDateTests: Convert using nanoseconds since midnight")
+    @Test("PlainDateTests: Convert using nanoseconds since midnight")
     func toDateTimeWithNanos() {
         // 1 hour = 3,600,000,000,000 nanoseconds
         let nanos: Int64 = 3_600_000_000_000
-        let baseDate = NaiveDate(year: 2025, month: 12, day: 25)!
+        let baseDate = PlainDate(year: 2025, month: 12, day: 25)!
         let dt = baseDate.at(nanosecondsSinceMidnight: nanos)
 
         #expect(dt.date == baseDate)
@@ -757,9 +756,9 @@ extension NaiveDateTests {
         #expect(dt.minute == 0)
     }
 
-    @Test("NaiveDateTests: Convert using valid components")
+    @Test("PlainDateTests: Convert using valid components")
     func toDateTimeWithValidComponents() {
-        let baseDate = NaiveDate(year: 2025, month: 12, day: 25)!
+        let baseDate = PlainDate(year: 2025, month: 12, day: 25)!
         let dt = baseDate.at(hour: 23, minute: 59, second: 59, nanosecond: 999)
 
         #expect(dt != nil)
@@ -768,20 +767,20 @@ extension NaiveDateTests {
         #expect(dt?.year == 2025)
     }
 
-    @Test("NaiveDateTests: Convert using invalid components returns nil", arguments: [
+    @Test("PlainDateTests: Convert using invalid components returns nil", arguments: [
         (24, 0, 0), // Invalid hour
         (12, 60, 0), // Invalid minute
         (12, 0, -1) // Invalid second
     ])
     func toDateTimeWithInvalidComponents(h: Int, m: Int, s: Int) {
-        let baseDate = NaiveDate(year: 2025, month: 12, day: 25)!
+        let baseDate = PlainDate(year: 2025, month: 12, day: 25)!
         let result = baseDate.at(hour: h, minute: m, second: s)
         #expect(result == nil)
     }
 
-    @Test("NaiveDateTests: Default nanosecond value")
+    @Test("PlainDateTests: Default nanosecond value")
     func toDateTimeDefaultNanos() {
-        let baseDate = NaiveDate(year: 2025, month: 12, day: 25)!
+        let baseDate = PlainDate(year: 2025, month: 12, day: 25)!
         let dt = baseDate.at(hour: 10, minute: 0, second: 0)
         #expect(dt?.nanosecond == 0)
     }

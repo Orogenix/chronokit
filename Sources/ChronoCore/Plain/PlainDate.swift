@@ -1,6 +1,6 @@
 import ChronoMath
 
-public struct NaiveDate: Equatable, Hashable, Sendable {
+public struct PlainDate: Equatable, Hashable, Sendable {
     @usableFromInline
     package let daysSinceEpoch: Int64
 
@@ -55,7 +55,7 @@ public struct NaiveDate: Equatable, Hashable, Sendable {
 
 // MARK: - Comparability
 
-extension NaiveDate: Comparable {
+extension PlainDate: Comparable {
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.daysSinceEpoch < rhs.daysSinceEpoch
@@ -64,7 +64,7 @@ extension NaiveDate: Comparable {
 
 // MARK: - Constructors
 
-public extension NaiveDate {
+public extension PlainDate {
     static let min: Self = .init(daysSinceEpoch: CalendarConstants.minInputDay)
     static let max: Self = .init(daysSinceEpoch: CalendarConstants.maxInputDay)
     static let unixEpoch: Self = .init(daysSinceEpoch: 0)
@@ -77,7 +77,7 @@ public extension NaiveDate {
 
 // MARK: - Arithmetic
 
-public extension NaiveDate {
+public extension PlainDate {
     @inlinable
     func advanced(byDays days: Int64) -> Self {
         Self(daysSinceEpoch: daysSinceEpoch + days)
@@ -86,7 +86,7 @@ public extension NaiveDate {
 
 // MARK: - Addition
 
-public extension NaiveDate {
+public extension PlainDate {
     @inlinable
     static func + (lhs: Self, rhs: Int64) -> Self {
         lhs.advanced(byDays: rhs)
@@ -126,7 +126,7 @@ public extension NaiveDate {
 
 // MARK: - Substraction
 
-public extension NaiveDate {
+public extension PlainDate {
     @inlinable
     static func - (lhs: Self, rhs: Int64) -> Self {
         lhs.advanced(byDays: -rhs)
@@ -145,7 +145,7 @@ public extension NaiveDate {
 
 // MARK: - Date Protocol
 
-extension NaiveDate: DateProtocol {
+extension PlainDate: DateProtocol {
     @inlinable
     public var ordinal: Int {
         Int(daysSinceEpoch - jan1 + 1)
@@ -200,31 +200,31 @@ extension NaiveDate: DateProtocol {
     }
 }
 
-// MARK: - Naive Date Time Conversion
+// MARK: - Plain Date Time Conversion
 
-public extension NaiveDate {
+public extension PlainDate {
     @inlinable
-    func at(_ time: NaiveTime) -> NaiveDateTime {
-        NaiveDateTime(date: self, time: time)
+    func at(_ time: PlainTime) -> PlainDateTime {
+        PlainDateTime(date: self, time: time)
     }
 
     @inlinable
-    func at(nanosecondsSinceMidnight second: Int64) -> NaiveDateTime {
-        NaiveDateTime(
+    func at(nanosecondsSinceMidnight second: Int64) -> PlainDateTime {
+        PlainDateTime(
             date: self,
-            time: NaiveTime(nanosecondsSinceMidnight: second)
+            time: PlainTime(nanosecondsSinceMidnight: second)
         )
     }
 
     @inlinable
-    func at(hour: Int, minute: Int, second: Int, nanosecond: Int = 0) -> NaiveDateTime? {
-        guard let time = NaiveTime(
+    func at(hour: Int, minute: Int, second: Int, nanosecond: Int = 0) -> PlainDateTime? {
+        guard let time = PlainTime(
             hour: hour,
             minute: minute,
             second: second,
             nanosecond: nanosecond
         ) else { return nil }
-        return NaiveDateTime(
+        return PlainDateTime(
             date: self,
             time: time
         )

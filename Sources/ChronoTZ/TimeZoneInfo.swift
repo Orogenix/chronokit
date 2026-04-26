@@ -38,17 +38,17 @@ public struct TimeZoneInfo: Equatable, Hashable, Sendable, TimeZoneProtocol {
         return .seconds(payload.types.first?.offset ?? 0)
     }
 
-    public func offset(for local: NaiveDateTime) -> LocalOffset {
+    public func offset(for plain: PlainDateTime) -> PlainOffset {
         if payload.types.count == 1 {
             let type = payload.types[0]
-            return .unique(LocalOffsetMetadata(
+            return .unique(PlainOffsetMetadata(
                 duration: .seconds(type.offset),
                 isDST: type.isDST == 1
             ))
         }
 
-        let localNanos = local.timestampNanosecondsChecked() ?? 0
-        let localSecs = localNanos / NanoSeconds.perSecond64
+        let plainNanos = plain.timestampNanosecondsChecked() ?? 0
+        let plainSecs = plainNanos / NanoSeconds.perSecond64
 
         var candidateOffsets: Set<Int32> = uniqueOffset
 
@@ -57,16 +57,16 @@ public struct TimeZoneInfo: Equatable, Hashable, Sendable, TimeZoneProtocol {
             candidateOffsets.insert(rule.dstOffset)
         }
 
-        var candidates: Set<LocalOffsetMetadata> = []
+        var candidates: Set<PlainOffsetMetadata> = []
 
         for offset in candidateOffsets {
-            let candidateUTC = localSecs - Int64(offset)
+            let candidateUTC = plainSecs - Int64(offset)
             let resolved = payload.resolve(at: candidateUTC)
 
             switch resolved {
             case let .unique(type):
                 if type.offset == offset {
-                    let metadata = LocalOffsetMetadata(
+                    let metadata = PlainOffsetMetadata(
                         duration: .seconds(offset),
                         isDST: type.isDST == 1
                     )
@@ -75,7 +75,7 @@ public struct TimeZoneInfo: Equatable, Hashable, Sendable, TimeZoneProtocol {
 
             case let .ambiguous(earlier, later):
                 if earlier.offset == offset {
-                    let meta = LocalOffsetMetadata(
+                    let meta = PlainOffsetMetadata(
                         duration: .seconds(offset),
                         isDST: earlier.isDST == 1
                     )
@@ -83,7 +83,7 @@ public struct TimeZoneInfo: Equatable, Hashable, Sendable, TimeZoneProtocol {
                 }
 
                 if later.offset == offset {
-                    let meta = LocalOffsetMetadata(
+                    let meta = PlainOffsetMetadata(
                         duration: .seconds(offset),
                         isDST: later.isDST == 1
                     )

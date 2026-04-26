@@ -1,11 +1,11 @@
 import ChronoMath
 
-public struct NaiveDateTime: Equatable, Hashable, Sendable {
-    public let date: NaiveDate
-    public let time: NaiveTime
+public struct PlainDateTime: Equatable, Hashable, Sendable {
+    public let date: PlainDate
+    public let time: PlainTime
 
     @inlinable
-    public init(date: NaiveDate, time: NaiveTime) {
+    public init(date: PlainDate, time: PlainTime) {
         self.date = date
         self.time = time
     }
@@ -20,8 +20,8 @@ public struct NaiveDateTime: Equatable, Hashable, Sendable {
         second: Int = 0,
         nanosecond: Int = 0
     ) {
-        guard let date = NaiveDate(year: year, month: month, day: day),
-              let time = NaiveTime(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
+        guard let date = PlainDate(year: year, month: month, day: day),
+              let time = PlainTime(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
         else { return nil }
 
         self.date = date
@@ -31,7 +31,7 @@ public struct NaiveDateTime: Equatable, Hashable, Sendable {
 
 // MARK: - Comparability
 
-extension NaiveDateTime: Comparable {
+extension PlainDateTime: Comparable {
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
         if lhs.date == rhs.date {
@@ -44,14 +44,14 @@ extension NaiveDateTime: Comparable {
 
 // MARK: - Constructors
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     static let min: Self = .init(date: .min, time: .min)
     static let max: Self = .init(date: .max, time: .max)
 }
 
 // MARK: - Arithmetic
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     func advanced(bySeconds seconds: Int64, nanoseconds: Int64 = 0) -> Self {
         let totalNanos = time.nanosecondsSinceMidnight + nanoseconds
@@ -68,7 +68,7 @@ public extension NaiveDateTime {
 
         return Self(
             date: date.advanced(byDays: extraDaysFromNanos + extraDaysFromSecs + finalDayDelta),
-            time: NaiveTime(nanosecondsSinceMidnight: finalNanos)
+            time: PlainTime(nanosecondsSinceMidnight: finalNanos)
         )
     }
 
@@ -83,7 +83,7 @@ public extension NaiveDateTime {
 
 // MARK: - Addition
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     static func + (lhs: Self, rhs: Duration) -> Self {
         lhs.advanced(by: rhs)
@@ -104,8 +104,8 @@ public extension NaiveDateTime {
         let dayAdjustment = floorDiv(totalNanos, NanoSeconds.perDay64)
         let finalNanos = floorMod(totalNanos, NanoSeconds.perDay64)
 
-        let finalDate = NaiveDate(daysSinceEpoch: newDate.daysSinceEpoch + dayAdjustment)
-        let finalTime = NaiveTime(nanosecondsSinceMidnight: finalNanos)
+        let finalDate = PlainDate(daysSinceEpoch: newDate.daysSinceEpoch + dayAdjustment)
+        let finalTime = PlainTime(nanosecondsSinceMidnight: finalNanos)
 
         return Self(date: finalDate, time: finalTime)
     }
@@ -123,7 +123,7 @@ public extension NaiveDateTime {
 
 // MARK: - Substraction
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     static func - (lhs: Self, rhs: Self) -> Duration {
         let dayDiff = lhs.date.daysSinceEpoch - rhs.date.daysSinceEpoch
@@ -166,7 +166,7 @@ public extension NaiveDateTime {
 
 // MARK: - Date Protocol
 
-extension NaiveDateTime: DateProtocol {
+extension PlainDateTime: DateProtocol {
     @inlinable
     public var year: Int32 {
         date.year
@@ -243,7 +243,7 @@ extension NaiveDateTime: DateProtocol {
 
 // MARK: - Time Protocol
 
-extension NaiveDateTime: TimeProtocol {
+extension PlainDateTime: TimeProtocol {
     @inlinable
     public var hour: Int {
         time.hour
@@ -291,7 +291,7 @@ extension NaiveDateTime: TimeProtocol {
 
 // MARK: - Nanos Timestamp
 
-package extension NaiveDateTime {
+package extension PlainDateTime {
     @inlinable
     func timestampNanosecondsChecked() -> Int64? {
         let (daysStamp, daysOverflow) = date
@@ -312,15 +312,15 @@ package extension NaiveDateTime {
         let nanos = floorMod(timestamp, NanoSeconds.perDay64)
 
         return Self(
-            date: NaiveDate(daysSinceEpoch: days),
-            time: NaiveTime(nanosecondsSinceMidnight: nanos)
+            date: PlainDate(daysSinceEpoch: days),
+            time: PlainTime(nanosecondsSinceMidnight: nanos)
         )
     }
 }
 
 // MARK: - Subsecond Rounding
 
-extension NaiveDateTime: SubsecondRoundable {
+extension PlainDateTime: SubsecondRoundable {
     @inlinable
     public func roundSubseconds(_ digits: Int) -> Self {
         if digits >= 9 { return self }
@@ -358,7 +358,7 @@ extension NaiveDateTime: SubsecondRoundable {
 
 // MARK: - Duration Rounding
 
-extension NaiveDateTime: DurationRoundable {
+extension PlainDateTime: DurationRoundable {
     public typealias RoundingError = TimeRoundingError
 
     @inlinable
@@ -410,7 +410,7 @@ extension NaiveDateTime: DurationRoundable {
 
 // MARK: - Instant Conversion
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     var instantUTC: Instant {
         instant(offset: .utc)
@@ -459,7 +459,7 @@ public extension NaiveDateTime {
 
 // MARK: - Date Time Conversion
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     var dateTimeUTC: DateTime<FixedOffset> {
         instantUTC.dateTime(in: .utc)

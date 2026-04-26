@@ -5,8 +5,8 @@ import Testing
 struct IANAInstantTests {
     let instant = Instant(seconds: 1_713_926_400)
 
-    @Test("IANAInstantTests: NaiveDateTime conversion succeeds with valid provider")
-    func naiveDateTimeSuccess() throws {
+    @Test("IANAInstantTests: PlainDateTime conversion succeeds with valid provider")
+    func plainDateTimeSuccess() throws {
         // Create data payload
         let types = [TypeDefinition(offset: 0, isDST: 0)]
         let transitions = [Transition(unixTime: 1000, typeIndex: 0)]
@@ -18,7 +18,7 @@ struct IANAInstantTests {
         let tz = TimeZoneInfo(identifier: tzName, payload: payload)
         mock.insertZones(tzName, tz: tz)
 
-        _ = try instant.naiveDateTime(in: tzName, provider: mock)
+        _ = try instant.plainDateTime(in: tzName, provider: mock)
     }
 
     @Test("IANAInstantTests: DateTime conversion succeeds with valid provider")
@@ -44,7 +44,7 @@ struct IANAInstantTests {
         let mock = MockTimeZoneProvider()
 
         #expect(throws: (any Error).self) {
-            try instant.naiveDateTime(in: "Invalid/Zone", provider: mock)
+            try instant.plainDateTime(in: "Invalid/Zone", provider: mock)
         }
 
         #expect(throws: (any Error).self) {

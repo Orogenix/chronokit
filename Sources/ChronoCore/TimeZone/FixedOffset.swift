@@ -186,7 +186,7 @@ extension FixedOffset: TimeZoneProtocol {
     }
 
     @inlinable
-    public func offset(for _: NaiveDateTime) -> LocalOffset {
+    public func offset(for _: PlainDateTime) -> PlainOffset {
         .unique(.standard(duration))
     }
 }
