@@ -21,6 +21,7 @@ ChronoKit is designed for systems where runtime efficiency and binary size are c
 
 ```swift
 import ChronoKit
+import ChronoTZ
 
 /// Parse an RFC 3339 string
 let instant = try Instant(rfc3339: "2026-04-26T12:00:00Z")
