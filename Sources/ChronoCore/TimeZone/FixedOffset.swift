@@ -11,7 +11,7 @@ public struct FixedOffset: Equatable, Hashable, Sendable {
         let totalNanos = duration.seconds * NanoSeconds.perSecond64 + Int64(duration.nanoseconds)
         precondition(
             totalNanos >= -NanoSeconds.perDay64 && totalNanos <= NanoSeconds.perDay64,
-            "seconds is out of bounds",
+            "seconds is out of bounds"
         )
         self.duration = duration
     }
@@ -20,7 +20,7 @@ public struct FixedOffset: Equatable, Hashable, Sendable {
     public init(seconds: Int) {
         precondition(
             seconds >= -Seconds.perDay && seconds <= Seconds.perDay,
-            "seconds is out of bounds",
+            "seconds is out of bounds"
         )
         duration = Duration(seconds: Int64(seconds))
     }
@@ -187,6 +187,6 @@ extension FixedOffset: TimeZoneProtocol {
 
     @inlinable
     public func offset(for _: NaiveDateTime) -> LocalOffset {
-        .unique(duration)
+        .unique(.standard(duration))
     }
 }

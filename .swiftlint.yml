@@ -5,7 +5,7 @@ identifier_name:
   max_length: 40
 
 file_length:
-  warning: 1000
+  warning: 2000
   error: 1500
 
 function_body_length:

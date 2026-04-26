@@ -37,12 +37,22 @@ public extension Duration {
     }
 
     @inlinable
+    static func nanoseconds(_ value: Int32) -> Duration {
+        Duration(seconds: 0, nanoseconds: Int64(value))
+    }
+
+    @inlinable
     static func nanoseconds(_ value: Int64) -> Duration {
         Duration(seconds: 0, nanoseconds: value)
     }
 
     @inlinable
     static func microseconds(_ value: Int) -> Duration {
+        Duration(seconds: 0, nanoseconds: Int64(value) * NanoSeconds.perMicroSecond64)
+    }
+
+    @inlinable
+    static func microseconds(_ value: Int32) -> Duration {
         Duration(seconds: 0, nanoseconds: Int64(value) * NanoSeconds.perMicroSecond64)
     }
 
@@ -57,12 +67,22 @@ public extension Duration {
     }
 
     @inlinable
+    static func milliseconds(_ value: Int32) -> Duration {
+        Duration(seconds: 0, nanoseconds: Int64(value) * NanoSeconds.perMilliSecond64)
+    }
+
+    @inlinable
     static func milliseconds(_ value: Int64) -> Duration {
         Duration(seconds: 0, nanoseconds: value * NanoSeconds.perMilliSecond64)
     }
 
     @inlinable
     static func seconds(_ value: Int) -> Duration {
+        Duration(seconds: Int64(value), nanoseconds: 0)
+    }
+
+    @inlinable
+    static func seconds(_ value: Int32) -> Duration {
         Duration(seconds: Int64(value), nanoseconds: 0)
     }
 
@@ -84,12 +104,22 @@ public extension Duration {
     }
 
     @inlinable
+    static func minutes(_ value: Int32) -> Duration {
+        Duration(seconds: Int64(value) * Seconds.perMinute64, nanoseconds: 0)
+    }
+
+    @inlinable
     static func minutes(_ value: Int64) -> Duration {
         Duration(seconds: value * Seconds.perMinute64, nanoseconds: 0)
     }
 
     @inlinable
     static func hours(_ value: Int) -> Duration {
+        Duration(seconds: Int64(value) * Seconds.perHour64, nanoseconds: 0)
+    }
+
+    @inlinable
+    static func hours(_ value: Int32) -> Duration {
         Duration(seconds: Int64(value) * Seconds.perHour64, nanoseconds: 0)
     }
 
@@ -104,12 +134,22 @@ public extension Duration {
     }
 
     @inlinable
+    static func days(_ value: Int32) -> Duration {
+        Duration(seconds: Int64(value) * Seconds.perDay64, nanoseconds: 0)
+    }
+
+    @inlinable
     static func days(_ value: Int64) -> Duration {
         Duration(seconds: value * Seconds.perDay64, nanoseconds: 0)
     }
 
     @inlinable
     static func weeks(_ value: Int) -> Duration {
+        Duration(seconds: Int64(value) * Seconds.perWeek64, nanoseconds: 0)
+    }
+
+    @inlinable
+    static func weeks(_ value: Int32) -> Duration {
         Duration(seconds: Int64(value) * Seconds.perWeek64, nanoseconds: 0)
     }
 
@@ -154,7 +194,7 @@ public extension Duration {
         let remNanos = floorMod(totalNanos, NanoSeconds.perSecond64)
         return Self(
             seconds: lhs.seconds + rhs.seconds + extraSec,
-            nanoseconds: remNanos,
+            nanoseconds: remNanos
         )
     }
 
@@ -165,7 +205,7 @@ public extension Duration {
         let remNanos = floorMod(totalNanos, NanoSeconds.perSecond64)
         return Self(
             seconds: lhs.seconds - rhs.seconds + extraSec,
-            nanoseconds: remNanos,
+            nanoseconds: remNanos
         )
     }
 
@@ -176,7 +216,7 @@ public extension Duration {
         let remNanos = floorMod(totalNanos, NanoSeconds.perSecond64)
         return Self(
             seconds: (lhs.seconds * rhs) + extraSec,
-            nanoseconds: remNanos,
+            nanoseconds: remNanos
         )
     }
 
@@ -199,7 +239,7 @@ public extension Duration {
 
             return Self(
                 seconds: floorDiv(quotientNanos, NanoSeconds.perSecond64),
-                nanoseconds: floorMod(quotientNanos, NanoSeconds.perSecond64),
+                nanoseconds: floorMod(quotientNanos, NanoSeconds.perSecond64)
             )
         } else {
             let quotientSec = floorDiv(lhs.seconds, rhs)
@@ -210,7 +250,7 @@ public extension Duration {
 
             return Self(
                 seconds: quotientSec + floorDiv(quotientNanos, NanoSeconds.perSecond64),
-                nanoseconds: floorMod(quotientNanos, NanoSeconds.perSecond64),
+                nanoseconds: floorMod(quotientNanos, NanoSeconds.perSecond64)
             )
         }
     }

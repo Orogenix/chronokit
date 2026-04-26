@@ -2,7 +2,7 @@ import ChronoMath
 
 public struct NaiveDate: Equatable, Hashable, Sendable {
     @usableFromInline
-    let daysSinceEpoch: Int64
+    package let daysSinceEpoch: Int64
 
     public let year: Int32
     public let month: Int
@@ -12,7 +12,7 @@ public struct NaiveDate: Equatable, Hashable, Sendable {
     public init(daysSinceEpoch days: Int64) {
         precondition(
             days >= CalendarConstants.minInputDay && days <= CalendarConstants.maxInputDay,
-            "Day since epoch exceeds maximum supported calendar range.",
+            "Day since epoch exceeds maximum supported calendar range."
         )
 
         let civil = civilDate(from: days)
@@ -53,6 +53,15 @@ public struct NaiveDate: Equatable, Hashable, Sendable {
     }
 }
 
+// MARK: - Comparability
+
+extension NaiveDate: Comparable {
+    @inlinable
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.daysSinceEpoch < rhs.daysSinceEpoch
+    }
+}
+
 // MARK: - Constructors
 
 public extension NaiveDate {
@@ -60,24 +69,9 @@ public extension NaiveDate {
     static let max: Self = .init(daysSinceEpoch: CalendarConstants.maxInputDay)
     static let unixEpoch: Self = .init(daysSinceEpoch: 0)
 
-    static func now(in timezone: some TimeZoneProtocol) -> Self {
-        NaiveDateTime.now(in: timezone).date
-    }
-
-    static func now() -> Self {
-        now(in: SystemTimeZone())
-    }
-
     @usableFromInline
     internal var jan1: Int64 {
         daysFromCivil(year: Int64(year), month: 1, day: 1)
-    }
-}
-
-extension NaiveDate: Comparable {
-    @inlinable
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.daysSinceEpoch < rhs.daysSinceEpoch
     }
 }
 
@@ -149,6 +143,8 @@ public extension NaiveDate {
     }
 }
 
+// MARK: - Date Protocol
+
 extension NaiveDate: DateProtocol {
     @inlinable
     public var ordinal: Int {
@@ -204,6 +200,8 @@ extension NaiveDate: DateProtocol {
     }
 }
 
+// MARK: - Naive Date Time Conversion
+
 public extension NaiveDate {
     @inlinable
     func at(_ time: NaiveTime) -> NaiveDateTime {
@@ -214,7 +212,7 @@ public extension NaiveDate {
     func at(nanosecondsSinceMidnight second: Int64) -> NaiveDateTime {
         NaiveDateTime(
             date: self,
-            time: NaiveTime(nanosecondsSinceMidnight: second),
+            time: NaiveTime(nanosecondsSinceMidnight: second)
         )
     }
 
@@ -224,11 +222,11 @@ public extension NaiveDate {
             hour: hour,
             minute: minute,
             second: second,
-            nanosecond: nanosecond,
+            nanosecond: nanosecond
         ) else { return nil }
         return NaiveDateTime(
             date: self,
-            time: time,
+            time: time
         )
     }
 }

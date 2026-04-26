@@ -9,15 +9,44 @@ public protocol TimeZoneProtocol: Equatable, Hashable, Sendable {
     func offset(for local: NaiveDateTime) -> LocalOffset
 }
 
+public struct LocalOffsetMetadata: Equatable, Hashable, Sendable {
+    public let duration: Duration
+    public let isDST: Bool
+
+    public init(
+        duration: Duration,
+        isDST: Bool
+    ) {
+        self.duration = duration
+        self.isDST = isDST
+    }
+}
+
+public extension LocalOffsetMetadata {
+    static func standard(_ duration: Duration) -> Self {
+        Self(duration: duration, isDST: false)
+    }
+
+    static func dst(_ duration: Duration) -> Self {
+        Self(duration: duration, isDST: true)
+    }
+}
+
+public enum DSTResolutionPolicy: Equatable, Hashable, Sendable {
+    case preferEarlier
+    case preferLater
+    case strict
+}
+
 public enum LocalOffset: Equatable, Hashable, Sendable {
-    case unique(Duration)
-    case ambiguous(earlier: Duration, later: Duration)
+    case unique(LocalOffsetMetadata)
+    case ambiguous(earlier: LocalOffsetMetadata, later: LocalOffsetMetadata)
     case invalid
 }
 
 public extension LocalOffset {
     @inline(__always)
-    func resolve(using policy: DSTResolutionPolicy) -> Duration? {
+    func resolve(using policy: DSTResolutionPolicy) -> LocalOffsetMetadata? {
         switch self {
         case let .unique(offset):
             offset
@@ -36,12 +65,6 @@ public extension LocalOffset {
             nil
         }
     }
-}
-
-public enum DSTResolutionPolicy: Equatable, Hashable, Sendable {
-    case preferEarlier
-    case preferLater
-    case strict
 }
 
 public enum TimeZoneSign: Character, Equatable, Hashable, Sendable {

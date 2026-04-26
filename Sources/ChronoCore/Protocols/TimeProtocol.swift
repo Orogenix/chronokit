@@ -29,8 +29,8 @@ public extension TimeProtocol {
 
     @inlinable
     var secondsFromMidnight: Int {
-        hour * 3600
-            + minute * 60
+        hour * Seconds.perHour
+            + minute * Seconds.perMinute
             + second
     }
 }
