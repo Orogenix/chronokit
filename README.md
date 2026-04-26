@@ -51,5 +51,5 @@ It is designed to be embedded in low-level systems, CLI tools, and performance-s
 
 ## Acknowledgments
 
-Calendrical logic built upon the foundational work of [Howard Hinnant](hhttps://howardhinnant.github.io/date_algorithms.htmlttps://howardhinnant.github.io/date_algorithms.html).
+Calendrical logic built upon the foundational work of [Howard Hinnant](https://howardhinnant.github.io/date_algorithms.html).
 His efficient algorithms for date and time calculation serve as the core of **ChronoKit**.
