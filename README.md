@@ -1,6 +1,4 @@
-<h1 align="center">
-  <code>ChronoKit</code>
-</h1>
+# ChronoKit
 
 ## Overview
 
