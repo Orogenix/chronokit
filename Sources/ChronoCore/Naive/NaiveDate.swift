@@ -2,7 +2,7 @@ import ChronoMath
 
 public struct NaiveDate: Equatable, Hashable, Sendable {
     @usableFromInline
-    let daysSinceEpoch: Int64
+    package let daysSinceEpoch: Int64
 
     public let year: Int32
     public let month: Int
@@ -12,7 +12,7 @@ public struct NaiveDate: Equatable, Hashable, Sendable {
     public init(daysSinceEpoch days: Int64) {
         precondition(
             days >= CalendarConstants.minInputDay && days <= CalendarConstants.maxInputDay,
-            "Day since epoch exceeds maximum supported calendar range.",
+            "Day since epoch exceeds maximum supported calendar range."
         )
 
         let civil = civilDate(from: days)
@@ -50,6 +50,15 @@ public struct NaiveDate: Equatable, Hashable, Sendable {
         self.year = year
         self.month = Int(month)
         self.day = Int(day)
+    }
+}
+
+// MARK: - Comparability
+
+extension NaiveDate: Comparable {
+    @inlinable
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.daysSinceEpoch < rhs.daysSinceEpoch
     }
 }
 
@@ -149,6 +158,8 @@ public extension NaiveDate {
     }
 }
 
+// MARK: - Date Protocol
+
 extension NaiveDate: DateProtocol {
     @inlinable
     public var ordinal: Int {
@@ -204,6 +215,8 @@ extension NaiveDate: DateProtocol {
     }
 }
 
+// MARK: - Naive Date Time Conversion
+
 public extension NaiveDate {
     @inlinable
     func at(_ time: NaiveTime) -> NaiveDateTime {
@@ -214,7 +227,7 @@ public extension NaiveDate {
     func at(nanosecondsSinceMidnight second: Int64) -> NaiveDateTime {
         NaiveDateTime(
             date: self,
-            time: NaiveTime(nanosecondsSinceMidnight: second),
+            time: NaiveTime(nanosecondsSinceMidnight: second)
         )
     }
 
@@ -224,11 +237,11 @@ public extension NaiveDate {
             hour: hour,
             minute: minute,
             second: second,
-            nanosecond: nanosecond,
+            nanosecond: nanosecond
         ) else { return nil }
         return NaiveDateTime(
             date: self,
-            time: time,
+            time: time
         )
     }
 }
