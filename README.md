@@ -30,10 +30,10 @@ let instant = try Instant(rfc3339: "2026-04-26T12:00:00Z")
 let naive = instant.naiveDateTime(in: "America/New_York")
 
 /// Convert to zoned date time
-let datetime = instant.dateTime(in: "America/New_York")
+let datetime = instant.dateTime(in: FixedOffset.utc)
 
-print(naive) // 2026-04-26T19:00:00
-print(datetime) // 2026-04-26T19:00:00Z
+print(naive) // 2026-04-26T08:00:00
+print(datetime) // 2026-04-26T12:00:00Z
 ```
 
 ## Supported Standards
