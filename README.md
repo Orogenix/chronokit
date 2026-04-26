@@ -1,5 +1,5 @@
 <h1 align="center">
-  <code>quasar</code>
+  ChronoKit
 </h1>
 <p align="center">
   High-performance, no-foundation, and zero-dependency date and time primitives for Swift.
