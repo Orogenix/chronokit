@@ -34,7 +34,8 @@ package enum ResourceLocator {
 
         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
         guard getcwd(&buffer, buffer.count) != nil else { return nil }
-        let root = String(cString: buffer)
+        let bytes = buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+        let root = String(decoding: bytes, as: UTF8.self)
         return search(in: root, for: name)
     }
 
@@ -57,23 +58,25 @@ package enum ResourceLocator {
 
             // Check if it's the file we want
             if entryName == fileName {
-                // Verify it's a file
                 var st = stat()
                 if stat(fullPath, &st) == 0, st.st_mode & S_IFMT == S_IFREG {
+                    print("✅ Found \(fileName) at: \(fullPath)")
                     return fullPath
                 }
             }
 
             // If it's a directory, recurse (don't go into hidden folders to save time)
-            if entryName.first != "." {
-                var st = stat()
-                if stat(fullPath, &st) == 0, st.st_mode & S_IFMT == S_IFDIR {
-                    if let found = search(in: fullPath, for: fileName) {
-                        return found
-                    }
+            var st = stat()
+            if stat(fullPath, &st) == 0, st.st_mode & S_IFMT == S_IFDIR {
+                // OPTIONAL: Skip .git to make it faster
+                if entryName == ".git" { continue }
+
+                if let found = search(in: fullPath, for: fileName) {
+                    return found
                 }
             }
         }
+
         return nil
     }
 
