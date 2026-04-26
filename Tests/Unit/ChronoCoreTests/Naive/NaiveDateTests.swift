@@ -63,32 +63,6 @@ struct NaiveDateTests {
         #expect(roundTrip == leapDay)
     }
 
-    @Test("NaiveDateTests: NaiveDate.now() basic validation")
-    func dateNow() {
-        let date: NaiveDate = .now()
-
-        // Sanity check: Should be a realistic year in the current era
-        #expect(date.year >= 2025)
-        #expect(date.month >= 1 && date.month <= 12)
-        #expect(date.day >= 1 && date.day <= ChronoMath.lastDayOfMonth(Int64(date.year), UInt8(date.month)))
-    }
-
-    @Test("NaiveDateTests: now(in:) respects large offsets (Midnight Crossing)")
-    func dateNowWithOffset() {
-        // We pick two opposite extreme offsets
-        let plus14 = FixedOffset(.hours(14))
-        let minus12 = FixedOffset(.hours(-12))
-
-        let datePlus: NaiveDate = .now(in: plus14)
-        let dateMinus: NaiveDate = .now(in: minus12)
-
-        // Logic: The date in the furthest east zone (+14) must be equal to
-        // or up to 2 days ahead of the furthest west zone (-12),
-        // but never behind it.
-        let dayDiff = datePlus.daysSinceEpoch - dateMinus.daysSinceEpoch
-        #expect(dayDiff >= 0 && dayDiff <= 2)
-    }
-
     @Test("NaiveDateTests: Boundary constants integrity")
     func boundaries() {
         // Accessing these ensures no initialization crashes

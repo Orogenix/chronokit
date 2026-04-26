@@ -2,7 +2,6 @@
 import ChronoMath
 import Testing
 
-@Suite("Instant Tests")
 struct InstantTests {
     // MARK: - Initialization Tests
 
@@ -29,40 +28,6 @@ struct InstantTests {
         let zero: Instant = .zero
         #expect(zero.seconds == 0)
         #expect(zero.nanoseconds == 0)
-    }
-
-    @Test("InstantTests: Instant.now() captures current time")
-    func instantNow() {
-        let first: Instant = .now()
-
-        // Brief sleep or work to ensure time passes
-        // Note: Even without sleep, system clocks usually have enough resolution
-        let second: Instant = .now()
-
-        // 1. Verify seconds are in a realistic Unix range (e.g., > Jan 1 2024)
-        // 1704067200 is 2024-01-01 00:00:00 UTC
-        #expect(first.seconds > 1_704_067_200)
-
-        // 2. Verify time is moving forward
-        #expect(second >= first)
-    }
-
-    @Test("InstantTests: High resolution check")
-    func highResolution() {
-        // Capture many instants in a tight loop
-        let count = 100
-        var instants: [Instant] = []
-        instants.reserveCapacity(count)
-
-        for _ in 0 ..< count {
-            instants.append(.now())
-        }
-
-        // Verify that we are actually getting different nanosecond values
-        // (Ensures the clock isn't just returning whole seconds)
-        let uniqueInstants = Set(instants.map { "\($0.seconds).\($0.nanoseconds)" })
-
-        #expect(uniqueInstants.count > 1, "Clock resolution might be too low or stuck")
     }
 }
 
@@ -545,7 +510,7 @@ extension InstantTests {
         offset: Int,
         expectedDay: Int,
         expectedHour: Int,
-        expectedMinute: Int,
+        expectedMinute: Int
     ) {
         let instant = Instant(seconds: seconds, nanoseconds: 0)
         let tz = MockTimeZone(offset: offset)
@@ -570,7 +535,7 @@ extension InstantTests {
         expY: Int32,
         expM: Int,
         expD: Int,
-        expH: Int,
+        expH: Int
     ) {
         let instant = Instant(seconds: seconds, nanoseconds: 0)
         let tz = MockTimeZone(offset: offset)

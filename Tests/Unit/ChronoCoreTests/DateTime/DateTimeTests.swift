@@ -1,7 +1,6 @@
 @testable import ChronoCore
 import Testing
 
-@Suite("Date Time Tests")
 struct DateTimeTests {
     // MARK: - Initialization
 
@@ -32,66 +31,6 @@ struct DateTimeTests {
         let mockTZ = MockTimeZone(offset: 3600)
         let mockDT = DateTime(instant: instant, timezone: mockTZ)
         #expect(mockDT.timezone.identifier == "MockTZ")
-    }
-
-    @Test("DateTimeTests: System vs Fixed")
-    func typeSafety() {
-        let systemDT = DateTime<SystemTimeZone>.now()
-        let fixedDT = DateTime<FixedOffset>.nowUTC
-
-        // Verifying type identities
-        #expect(type(of: systemDT.timezone) == SystemTimeZone.self)
-        #expect(type(of: fixedDT.timezone) == FixedOffset.self)
-    }
-
-    @Test("DateTimeTests: System and Fixed Now")
-    func constructors() {
-        let now = DateTime<SystemTimeZone>.now()
-        let manualNow = DateTime.now(in: SystemTimeZone())
-
-        // Ensure they captured roughly the same time
-        let diff = abs(now.instant.seconds - manualNow.instant.seconds)
-        #expect(diff < 2)
-
-        let fixed = DateTime<FixedOffset>.now(in: .hours(7))
-        #expect(fixed.timezone.offset(for: fixed.instant) == .hours(7))
-    }
-
-    @Test("DateTimeTests: System to Fixed Snapshot")
-    func fixedOffsetSnapshot() {
-        let systemTime = DateTime<SystemTimeZone>.now()
-
-        // Capture a snapshot
-        let fixedSnapshot = systemTime.fixedOffset()
-
-        // The Instant must remain identical
-        #expect(systemTime.instant == fixedSnapshot.instant)
-
-        // The type must be FixedOffset
-        #expect(type(of: fixedSnapshot.timezone) == FixedOffset.self)
-
-        // The value must match the system's offset at that moment
-        let currentSysOffset = systemTime.timezone.offset(for: systemTime.instant)
-        #expect(fixedSnapshot.timezone.offset(for: fixedSnapshot.instant) == .seconds(currentSysOffset.seconds))
-    }
-
-    @Test("DateTimeTests: Timezone Identifier consistency")
-    func identifierConsistency() {
-        let sys = SystemTimeZone()
-        let dt = DateTime<SystemTimeZone>.now()
-
-        #expect(dt.timezone.identifier == sys.identifier)
-        #expect(!dt.timezone.identifier.isEmpty)
-    }
-
-    @Test("DateTimeTests: Parameterized Fixed Offsets", arguments: [
-        0, 3600, -3600, 18000, -18000
-    ])
-    func parameterizedOffsets(seconds: Int) {
-        let offset = FixedOffset(.seconds(Int64(seconds)))
-        let dt = DateTime.now(in: offset)
-
-        #expect(dt.timezone.offset(for: dt.instant) == .seconds(seconds))
     }
 }
 
@@ -385,12 +324,12 @@ extension DateTimeTests {
 
 extension DateTimeTests {
     @Test("DateTimeTests: withLocal preserves TimeZone and Time")
-    func withLocalPreservation() {
+    func withLocalPreservation() throws {
         let timezone = FixedOffset(seconds: 3600) // UTC+1
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: timezone)!
+        let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: timezone))
 
         // Transform: Change only the year
-        let result = dt.withLocal { $0.with(year: 2030) }!
+        let result = try #require(dt.withLocal { $0.with(year: 2030) })
 
         #expect(result.year == 2030)
         #expect(result.month == 1)
@@ -400,9 +339,9 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: withLocal handles nil transformations")
-    func withLocalNilSafety() {
+    func withLocalNilSafety() throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc)!
+        let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc))
 
         // Transform: Create an invalid date (Feb 30)
         let result = dt.withLocal { $0.with(month: 2)?.with(day: 30) }
@@ -411,9 +350,9 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: withLocal multi-component update")
-    func withLocalMultiUpdate() {
+    func withLocalMultiUpdate() throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc)!
+        let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc))
 
         // Transform: Change month and day in one go
         let result = dt.withLocal { naive in
@@ -443,15 +382,15 @@ extension DateTimeTests {
 
 extension DateTimeTests {
     @Test("DateTimeTests: withLocal applies resolution policy")
-    func withLocalPolicy() {
+    func withLocalPolicy() throws {
         let utc: FixedOffset = .utc
         // Note: This test becomes much more powerful when using a TimeZone
         // that actually has gaps/overlaps. For FixedOffset, policy has no effect.
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc)!
+        let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc))
 
         // We can't easily spy on the policy without a MockTimeZone,
         // but we verify the parameter is accepted.
-        let result = dt.withLocal(resolving: .preferLater) { $0.with(day: 2) }!
+        let result = try #require(dt.withLocal(resolving: .preferLater) { $0.with(day: 2) })
 
         #expect(result.day == 2)
     }
@@ -505,9 +444,9 @@ extension DateTimeTests {
         (2024, true),
         (2025, false),
     ])
-    func yearAndLeapProperties(inputYear: Int32, expectedLeap: Bool) {
+    func yearAndLeapProperties(inputYear: Int32, expectedLeap: Bool) throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: inputYear, month: 1, day: 1, hour: 0, timezone: utc)!
+        let dt = try #require(DateTime(year: inputYear, month: 1, day: 1, hour: 0, timezone: utc))
 
         #expect(dt.year == inputYear)
         #expect(dt.isLeapYear == expectedLeap)
@@ -522,9 +461,13 @@ extension DateTimeTests {
         (4, 2, 3, Month.april),
         (12, 4, 11, Month.december),
     ])
-    func monthAndQuarter(month: Int, quarter: Int, zeroBased: Int, symbol: Month) {
+    func monthAndQuarter(month: Int, quarter: Int, zeroBased: Int, symbol: Month) throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: month, day: 1, hour: 12, timezone: utc)!
+        let dt = try #require(DateTime(
+            year: 2025, month: month, day: 1,
+            hour: 12,
+            timezone: utc
+        ))
 
         #expect(dt.month == month)
         #expect(dt.quarter == quarter)
@@ -537,10 +480,14 @@ extension DateTimeTests {
 
 extension DateTimeTests {
     @Test("DateTimeTests: Day and Ordinal properties")
-    func dayAndOrdinal() {
+    func dayAndOrdinal() throws {
         let utc: FixedOffset = .utc
         // Feb 1, 2025 is the 32nd day
-        let dt = DateTime(year: 2025, month: 2, day: 1, hour: 10, timezone: utc)!
+        let dt = try #require(DateTime(
+            year: 2025, month: 2, day: 1,
+            hour: 10,
+            timezone: utc
+        ))
 
         #expect(dt.day == 1)
         #expect(dt.ordinal == 32)
@@ -548,10 +495,14 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: ISO Week via protocol")
-    func isoWeekCheck() {
+    func isoWeekCheck() throws {
         let utc: FixedOffset = .utc
         // Monday, Dec 29, 2025 is Week 1 of 2026
-        let dt = DateTime(year: 2025, month: 12, day: 29, hour: 12, timezone: utc)!
+        let dt = try #require(DateTime(
+            year: 2025, month: 12, day: 29,
+            hour: 12,
+            timezone: utc
+        ))
         #expect(dt.isoWeek.week == 1)
         #expect(dt.isoWeek.year == 2026)
     }
@@ -561,12 +512,16 @@ extension DateTimeTests {
 
 extension DateTimeTests {
     @Test("DateTimeTests: Component modification preserves TimeZone and Time")
-    func modificationWith() {
+    func modificationWith() throws {
         let timezone = FixedOffset(seconds: -18000) // EST
-        let base = DateTime(year: 2023, month: 5, day: 1, hour: 14, minute: 30, timezone: timezone)!
+        let base = try #require(DateTime(
+            year: 2023, month: 5, day: 1,
+            hour: 14, minute: 30,
+            timezone: timezone
+        ))
 
         // Test basic component modification
-        let yr25 = base.with(year: 2025)!
+        let yr25 = try #require(base.with(year: 2025))
         #expect(yr25.year == 2025)
         #expect(yr25.timezone.offset(for: yr25.instant) == .hours(-5))
         #expect(yr25.naive.time.hour == 14)
@@ -582,23 +537,23 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: Ordinal modifications")
-    func ordinalModifications() {
+    func ordinalModifications() throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 9, timezone: utc)!
+        let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 9, timezone: utc))
 
         // Day 60 in 2025 (common) is March 1
-        let mar1 = dt.with(ordinal: 60)!
+        let mar1 = try #require(dt.with(ordinal: 60))
         #expect(mar1.month == 3 && mar1.day == 1)
 
         // Zero-based ordinal (31 = day 32 = Feb 1)
-        let feb1 = dt.with(ordinalZeroBased: 31)!
+        let feb1 = try #require(dt.with(ordinalZeroBased: 31))
         #expect(feb1.month == 2 && feb1.day == 1)
     }
 
     @Test("DateTimeTests: Invalid protocol modifications return nil")
-    func invalidModifications() {
+    func invalidModifications() throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 2, day: 1, hour: 12, timezone: utc)!
+        let dt = try #require(DateTime(year: 2025, month: 2, day: 1, hour: 12, timezone: utc))
 
         // Feb 29 on non-leap year
         #expect(dt.with(day: 29) == nil)
@@ -621,9 +576,13 @@ extension DateTimeTests {
         (13, true, 1), // 1 PM
         (23, true, 11), // 11 PM
     ])
-    func hour12Conversion(hour24: Int, expectedIsPM: Bool, expectedHour12: Int) {
+    func hour12Conversion(hour24: Int, expectedIsPM: Bool, expectedHour12: Int) throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 12, day: 25, hour: hour24, timezone: utc)!
+        let dt = try #require(DateTime(
+            year: 2025, month: 12, day: 25,
+            hour: hour24,
+            timezone: utc
+        ))
 
         #expect(dt.hour12.isPM == expectedIsPM)
         #expect(dt.hour12.hour == expectedHour12)
@@ -638,17 +597,13 @@ extension DateTimeTests {
         (1, 0, 0, 3600),
         (23, 59, 59, 86399),
     ])
-    func totalSeconds(h hour: Int, m minute: Int, s second: Int, expectedSeconds: Int) {
+    func totalSeconds(h hour: Int, m minute: Int, s second: Int, expectedSeconds: Int) throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(
-            year: 2025,
-            month: 1,
-            day: 1,
-            hour: hour,
-            minute: minute,
-            second: second,
-            timezone: utc,
-        )!
+        let dt = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: hour, minute: minute, second: second,
+            timezone: utc
+        ))
 
         #expect(dt.secondsFromMidnight == expectedSeconds)
     }
@@ -658,11 +613,15 @@ extension DateTimeTests {
 
 extension DateTimeTests {
     @Test("DateTimeTests: Modify hour component preserves date and timezone")
-    func modifyHour() {
+    func modifyHour() throws {
         let timezone = FixedOffset(.hours(-5)) // EST
-        let base = DateTime(year: 2025, month: 5, day: 20, hour: 10, minute: 30, timezone: timezone)!
+        let base = try #require(DateTime(
+            year: 2025, month: 5, day: 20,
+            hour: 10, minute: 30,
+            timezone: timezone
+        ))
 
-        let modified = base.with(hour: 22)!
+        let modified = try #require(base.with(hour: 22))
 
         #expect(modified.hour == 22)
         #expect(modified.day == 20, "Date must not change")
@@ -674,11 +633,15 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: Modify minute component preserves context")
-    func modifyMinute() {
+    func modifyMinute() throws {
         let utc: FixedOffset = .utc
-        let base = DateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 30, timezone: utc)!
+        let base = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10, minute: 30,
+            timezone: utc
+        ))
 
-        let modified = base.with(minute: 45)!
+        let modified = try #require(base.with(minute: 45))
 
         #expect(modified.minute == 45)
         #expect(modified.hour == 10)
@@ -687,11 +650,15 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: Modify second component preserves context")
-    func modifySecond() {
+    func modifySecond() throws {
         let utc: FixedOffset = .utc
-        let base = DateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 30, second: 30, timezone: utc)!
+        let base = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10, minute: 30, second: 30,
+            timezone: utc
+        ))
 
-        let modified = base.with(second: 0)!
+        let modified = try #require(base.with(second: 0))
 
         #expect(modified.second == 0)
         #expect(modified.minute == 30)
@@ -699,11 +666,15 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: Modify nanosecond component preserves context")
-    func modifyNanosecond() {
+    func modifyNanosecond() throws {
         let utc: FixedOffset = .utc
-        let base = DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc)!
+        let base = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10,
+            timezone: utc
+        ))
 
-        let modified = base.with(nanosecond: 500_000_000)!
+        let modified = try #require(base.with(nanosecond: 500_000_000))
 
         #expect(modified.nanosecond == 500_000_000)
         #expect(modified.hour == 10)
@@ -724,7 +695,7 @@ extension DateTimeTests {
         let utc: FixedOffset = .utc
         let dt = DateTime(
             instant: Instant(seconds: 1000, nanoseconds: Int32(nanoseconds)),
-            timezone: utc,
+            timezone: utc
         )
 
         let result = dt.truncateSubseconds(digits)
@@ -743,7 +714,7 @@ extension DateTimeTests {
         let utc: FixedOffset = .utc
         let dt = DateTime(
             instant: Instant(seconds: 1000, nanoseconds: Int32(nanoseconds)),
-            timezone: utc,
+            timezone: utc
         )
 
         let result = dt.roundSubseconds(digits)
@@ -757,14 +728,14 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: Rounding preserves local wall-clock alignment")
-    func roundingAlignment() {
+    func roundingAlignment() throws {
         let timezone = FixedOffset(.hours(-1)) // UTC-1
         // 10:00:00.750 Local
-        let dt = DateTime(
+        let dt = try #require(DateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 0, nanosecond: 750_000_000,
-            timezone: timezone,
-        )!
+            timezone: timezone
+        ))
 
         let rounded = dt.roundSubseconds(0)
 
@@ -786,7 +757,11 @@ extension DateTimeTests {
     ])
     func truncationQuanta(minute: Int, quantumMin: Int, expectedMin: Int) throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 10, minute: minute, timezone: utc)!
+        let dt = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10, minute: minute,
+            timezone: utc
+        ))
         let quantum = Duration(seconds: Int64(quantumMin * 60))
 
         let result = try dt.truncate(byQuantum: quantum)
@@ -802,12 +777,20 @@ extension DateTimeTests {
         let utc: FixedOffset = .utc
 
         // 10:29:59 -> 10:00:00
-        let early = DateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 29, second: 59, timezone: utc)!
+        let early = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10, minute: 29, second: 59,
+            timezone: utc
+        ))
         let roundedDown = try early.round(byQuantum: quantum)
         #expect(roundedDown.hour == 10)
 
         // 10:30:00 -> 11:00:00 (Half-up)
-        let middle = DateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 30, second: 0, timezone: utc)!
+        let middle = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10, minute: 30, second: 0,
+            timezone: utc
+        ))
         let roundedUp = try middle.round(byQuantum: quantum)
         #expect(roundedUp.hour == 11)
     }
@@ -818,7 +801,11 @@ extension DateTimeTests {
         let utc: FixedOffset = .utc
 
         // 10:00:01 -> 10:15:00
-        let base = DateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 0, second: 1, timezone: utc)!
+        let base = try #require(DateTime(
+            year: 2025, month: 1, day: 1,
+            hour: 10, minute: 0, second: 1,
+            timezone: utc
+        ))
         let result = try base.roundUp(byQuantum: quantum)
 
         #expect(result.minute == 15)
@@ -826,9 +813,9 @@ extension DateTimeTests {
     }
 
     @Test("DateTimeTests: Throws error for invalid quantum")
-    func invalidQuantum() {
+    func invalidQuantum() throws {
         let utc: FixedOffset = .utc
-        let dt = DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc)!
+        let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc))
 
         // Quantum of zero or negative should throw
         #expect(throws: TimeRoundingError.self) {

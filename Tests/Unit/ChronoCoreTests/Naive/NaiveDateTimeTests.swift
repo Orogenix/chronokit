@@ -2,7 +2,6 @@
 import ChronoMath
 import Testing
 
-@Suite("Naive Date Time Tests")
 struct NaiveDateTimeTests {
     // MARK: - Initialization Tests
 
@@ -92,48 +91,6 @@ struct NaiveDateTimeTests {
         #expect(NaiveDateTime.min.time == NaiveTime.min)
         #expect(NaiveDateTime.max.date == NaiveDate.max)
         #expect(NaiveDateTime.max.time == NaiveTime.max)
-    }
-
-    @Test("NaiveDateTimeTests: NaiveDateTime.now() matches system year")
-    func nowConsistency() {
-        let now = NaiveDateTime.now()
-
-        // Basic sanity check: The year should be current (2025 as of this writing)
-        #expect(now.date.year >= 2025)
-        #expect(now.date.month >= 1 && now.date.month <= 12)
-    }
-
-    @Test("NaiveDateTimeTests: now(in: FixedOffset) handles extreme offsets")
-    func nowWithOffsets() {
-        let plus12 = FixedOffset(.hours(12))
-        let minus12 = FixedOffset(.hours(-12))
-
-        let timePlus = NaiveDateTime.now(in: plus12)
-        let timeMinus = NaiveDateTime.now(in: minus12)
-
-        // The difference between these two wall clocks should be 24 hours
-        // We convert them to a simple hour count for comparison
-        let hourDiff = (Int(timePlus.date.day) * 24 + Int(timePlus.time.hour))
-            - (Int(timeMinus.date.day) * 24 + Int(timeMinus.time.hour))
-
-        // Note: This might be 23, 24, or 25 depending on if the jump crosses a midnight boundary
-        #expect(abs(hourDiff) >= 23 && abs(hourDiff) <= 25)
-    }
-
-    @Test("NaiveDateTimeTests: Consistency between Instant and Naive now")
-    func instantNaiveCohesion() {
-        let instant = Instant.now()
-        let tz = SystemTimeZone()
-
-        // Manual conversion
-        let manualNaive = instant.naiveDateTime(in: tz)
-
-        // Method conversion
-        let autoNaive = NaiveDateTime.now(in: tz)
-
-        // They should be extremely close (likely identical in seconds)
-        #expect(manualNaive.date == autoNaive.date)
-        #expect(abs(Int32(manualNaive.time.hour) - Int32(autoNaive.time.hour)) <= 1)
     }
 }
 

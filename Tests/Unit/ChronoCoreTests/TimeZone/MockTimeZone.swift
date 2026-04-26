@@ -9,7 +9,7 @@ struct MockTimeZone: TimeZoneProtocol {
     }
 
     func offset(for _: NaiveDateTime) -> LocalOffset {
-        .unique(.seconds(offset))
+        .unique(.standard(.seconds(offset)))
     }
 }
 
@@ -42,22 +42,14 @@ struct MockAmbiguousTimeZone: TimeZoneProtocol {
     let earlierOffset: Int
     let laterOffset: Int
 
-    init(
-        earlierOffset: Int,
-        laterOffset: Int,
-    ) {
-        self.earlierOffset = earlierOffset
-        self.laterOffset = laterOffset
-    }
-
     func offset(for _: Instant) -> Duration {
         .seconds(earlierOffset)
     }
 
     func offset(for _: NaiveDateTime) -> LocalOffset {
         .ambiguous(
-            earlier: .seconds(earlierOffset),
-            later: .seconds(laterOffset),
+            earlier: .dst(.seconds(earlierOffset)),
+            later: .dst(.seconds(laterOffset))
         )
     }
 }

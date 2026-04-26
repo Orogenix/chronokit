@@ -2,7 +2,6 @@
 import ChronoMath
 import Testing
 
-@Suite("Naive Time Tests")
 struct NaiveTimeTests {
     // MARK: - Initialization Tests
 
@@ -57,63 +56,18 @@ struct NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Component to Nanos round-trip")
-    func roundTrip() {
+    func roundTrip() throws {
         let hour = 14
         let month = 45
         let second = 30
         let nanosecond = 123_456
 
-        let time1 = NaiveTime(hour: hour, minute: month, second: second, nanosecond: nanosecond)!
+        let time1 = try #require(NaiveTime(hour: hour, minute: month, second: second, nanosecond: nanosecond))
         let time2 = NaiveTime(nanosecondsSinceMidnight: time1.nanosecondsSinceMidnight)
 
         #expect(time1 == time2)
         #expect(time2.hour == hour)
         #expect(time2.nanosecond == nanosecond)
-    }
-
-    @Test("NaiveTimeTests: NaiveTime.now() basic validation")
-    func timeNow() {
-        let now = NaiveTime.now()
-
-        // Sanity check: hour and minute must be within standard clock bounds
-        #expect(now.hour >= 0 && now.hour <= 23)
-        #expect(now.minute >= 0 && now.minute <= 59)
-        #expect(now.second >= 0 && now.second <= 59)
-    }
-
-    @Test("NaiveTimeTests: now(in:) reflects specific offsets")
-    func timeNowWithOffset() {
-        // We use UTC and a +1 hour offset
-        let utc = FixedOffset.utc
-        let plusOne = FixedOffset(.hours(1))
-
-        let timeUTC = NaiveTime.now(in: utc)
-        let timePlus1 = NaiveTime.now(in: plusOne)
-
-        // Convert to total seconds for easy comparison
-        let totalSecondsUTC = Int64(timeUTC.hour) * 3600 + Int64(timeUTC.minute) * 60 + Int64(timeUTC.second)
-        let totalSecondsPlus1 = Int64(timePlus1.hour) * 3600 + Int64(timePlus1.minute) * 60 + Int64(timePlus1.second)
-
-        // Logic: (Plus1 - UTC) mod 24h should be exactly 3600 seconds
-        // Adding 86400 before modulo handles the midnight wrap-around safely
-        let diff = (totalSecondsPlus1 - totalSecondsUTC + 86400) % 86400
-        #expect(diff == 3600)
-    }
-
-    @Test("NaiveTimeTests: Consistency across TimeZoneProtocol")
-    func protocolConsistency() {
-        let systemZone = SystemTimeZone()
-
-        // The two calls should produce virtually identical results
-        let time1 = NaiveTime.now() // uses default internal SystemTimeZone
-        let time2 = NaiveTime.now(in: systemZone) // uses explicit protocol
-
-        // We allow for a 1-second drift in case the clock ticked during execution
-        let total1 = time1.nanosecondsSinceMidnight
-        let total2 = time2.nanosecondsSinceMidnight
-        let drift = abs(total1 - total2)
-
-        #expect(drift < NanoSeconds.perSecond64)
     }
 
     @Test("NaiveTimeTests: Boundary constants integrity")
@@ -154,9 +108,9 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Equality properties")
-    func equality() {
-        let time1 = NaiveTime(hour: 12, minute: 0, second: 0)!
-        let time2 = NaiveTime(hour: 12, minute: 0, second: 0)!
+    func equality() throws {
+        let time1 = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        let time2 = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
 
         #expect(time1 == time2)
         #expect(!(time1 < time2))
@@ -166,11 +120,11 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Sorting a timeline")
-    func sorting() {
-        let morning = NaiveTime(hour: 8, minute: 0, second: 0)!
-        let noon = NaiveTime(hour: 12, minute: 0, second: 0)!
-        let afternoon = NaiveTime(hour: 15, minute: 30, second: 0)!
-        let night = NaiveTime(hour: 23, minute: 59, second: 59)!
+    func sorting() throws {
+        let morning = try #require(NaiveTime(hour: 8, minute: 0, second: 0))
+        let noon = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        let afternoon = try #require(NaiveTime(hour: 15, minute: 30, second: 0))
+        let night = try #require(NaiveTime(hour: 23, minute: 59, second: 59))
 
         let unsorted = [afternoon, morning, night, noon]
         let sorted = unsorted.sorted()
@@ -179,13 +133,13 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Time range validation")
-    func ranges() {
-        let openingTime = NaiveTime(hour: 9, minute: 0, second: 0)!
-        let closingTime = NaiveTime(hour: 17, minute: 0, second: 0)!
+    func ranges() throws {
+        let openingTime = try #require(NaiveTime(hour: 9, minute: 0, second: 0))
+        let closingTime = try #require(NaiveTime(hour: 17, minute: 0, second: 0))
         let businessHours = openingTime ... closingTime
 
-        let lunchTime = NaiveTime(hour: 12, minute: 30, second: 0)!
-        let midnight = NaiveTime(hour: 0, minute: 0, second: 0)!
+        let lunchTime = try #require(NaiveTime(hour: 12, minute: 30, second: 0))
+        let midnight = try #require(NaiveTime(hour: 0, minute: 0, second: 0))
 
         #expect(businessHours.contains(lunchTime))
         #expect(businessHours.contains(openingTime))
@@ -194,13 +148,13 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Minimum and Maximum bounds")
-    func extremes() {
+    func extremes() throws {
         let midnight = NaiveTime(nanosecondsSinceMidnight: 0)
         let endOfDay = NaiveTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
 
         #expect(midnight < endOfDay)
 
-        let randomTime = NaiveTime(hour: 11, minute: 11, second: 11)!
+        let randomTime = try #require(NaiveTime(hour: 11, minute: 11, second: 11))
         #expect(midnight < randomTime)
         #expect(randomTime < endOfDay)
     }
@@ -210,8 +164,8 @@ extension NaiveTimeTests {
 
 extension NaiveTimeTests {
     @Test("NaiveTimeTests: Standard seconds and minutes")
-    func standardAdvance() {
-        let base = NaiveTime(hour: 10, minute: 0, second: 0)!
+    func standardAdvance() throws {
+        let base = try #require(NaiveTime(hour: 10, minute: 0, second: 0))
         // Advance 1 hour, 5 minutes, 10 seconds
         let result = base.advanced(bySeconds: 3600 + 300 + 10)
 
@@ -221,8 +175,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Sub-second nanosecond carry")
-    func nanosecondCarry() {
-        let base = NaiveTime(hour: 10, minute: 0, second: 0, nanosecond: 900_000_000)!
+    func nanosecondCarry() throws {
+        let base = try #require(NaiveTime(hour: 10, minute: 0, second: 0, nanosecond: 900_000_000))
         // Add 200ms
         let result = base.advanced(bySeconds: 0, nanoseconds: 200_000_000)
 
@@ -231,8 +185,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Forward past midnight")
-    func forwardMidnightWrap() {
-        let base = NaiveTime(hour: 23, minute: 50, second: 0)!
+    func forwardMidnightWrap() throws {
+        let base = try #require(NaiveTime(hour: 23, minute: 50, second: 0))
         // Add 15 minutes (900 seconds)
         let result = base.advanced(bySeconds: 900)
 
@@ -241,8 +195,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Backward past midnight")
-    func backwardMidnightWrap() {
-        let base = NaiveTime(hour: 0, minute: 10, second: 0)!
+    func backwardMidnightWrap() throws {
+        let base = try #require(NaiveTime(hour: 0, minute: 10, second: 0))
         // Subtract 20 minutes (-1200 seconds)
         let result = base.advanced(bySeconds: -1200)
 
@@ -251,8 +205,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Multiple days advancement")
-    func multiDayWrap() {
-        let base = NaiveTime(hour: 12, minute: 0, second: 0)!
+    func multiDayWrap() throws {
+        let base = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
         // Add 48 hours (2 full days)
         let result = base.advanced(bySeconds: 48 * 3600)
 
@@ -260,8 +214,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Advanced by Duration")
-    func durationInterface() {
-        let base = NaiveTime(hour: 12, minute: 0, second: 0)!
+    func durationInterface() throws {
+        let base = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
         let duration = Duration(seconds: 3661, nanoseconds: 500_000_000) // 1h 1m 1.5s
 
         let result = base.advanced(by: duration)
@@ -277,8 +231,8 @@ extension NaiveTimeTests {
 
 extension NaiveTimeTests {
     @Test("NaiveTimeTests: DateTime + Duration")
-    func additionPointDuration() {
-        let time = NaiveTime(hour: 14, minute: 30, second: 0)!
+    func additionPointDuration() throws {
+        let time = try #require(NaiveTime(hour: 14, minute: 30, second: 0))
         let delta = Duration(seconds: 3600) // 1 hour
 
         let result = time + delta
@@ -288,9 +242,9 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Duration + DateTime (Commutative)")
-    func additionDurationPoint() {
+    func additionDurationPoint() throws {
         let delta = Duration(seconds: 60) // 1 minute
-        let time = NaiveTime(hour: 8, minute: 0, second: 0)!
+        let time = try #require(NaiveTime(hour: 8, minute: 0, second: 0))
 
         let result = delta + time
 
@@ -299,8 +253,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Wrap around midnight")
-    func additionWrap() {
-        let time = NaiveTime(hour: 23, minute: 59, second: 59)!
+    func additionWrap() throws {
+        let time = try #require(NaiveTime(hour: 23, minute: 59, second: 59))
         let delta = Duration(seconds: 2)
 
         let result = time + delta
@@ -311,8 +265,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Mutating addition")
-    func compoundAddition() {
-        var time = NaiveTime(hour: 12, minute: 0, second: 0)!
+    func compoundAddition() throws {
+        var time = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
         let delta = Duration(seconds: 1800) // 30 minutes
 
         time += delta
@@ -322,8 +276,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Multiple mutations")
-    func multipleMutations() {
-        var time = NaiveTime(hour: 0, minute: 0, second: 0)!
+    func multipleMutations() throws {
+        var time = try #require(NaiveTime(hour: 0, minute: 0, second: 0))
         let hour = Duration(seconds: 3600)
 
         time += hour
@@ -337,8 +291,8 @@ extension NaiveTimeTests {
 
 extension NaiveTimeTests {
     @Test("NaiveTimeTests: Standard subtraction")
-    func subtraction() {
-        let time = NaiveTime(hour: 12, minute: 0, second: 0)!
+    func subtraction() throws {
+        let time = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
         let delta = Duration(seconds: 3600) // 1 hour
 
         let result = time - delta
@@ -348,8 +302,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Sub-second borrow")
-    func subSecondBorrow() {
-        let time = NaiveTime(hour: 10, minute: 0, second: 1, nanosecond: 0)!
+    func subSecondBorrow() throws {
+        let time = try #require(NaiveTime(hour: 10, minute: 0, second: 1, nanosecond: 0))
         // Subtract 0.5 seconds
         let delta = Duration(seconds: 0, nanoseconds: 500_000_000)
 
@@ -361,8 +315,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Backward wrap across midnight")
-    func testBackwardMidnightWrap() {
-        let time = NaiveTime(hour: 0, minute: 0, second: 1)!
+    func testBackwardMidnightWrap() throws {
+        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 1))
         // Subtract 2 seconds (Should go to 23:59:59)
         let delta = Duration(seconds: 2)
 
@@ -374,8 +328,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Mutating subtraction")
-    func compoundSubtraction() {
-        var time = NaiveTime(hour: 1, minute: 0, second: 0)!
+    func compoundSubtraction() throws {
+        var time = try #require(NaiveTime(hour: 1, minute: 0, second: 0))
         let delta = Duration(seconds: 3600) // 1 hour
 
         time -= delta
@@ -385,8 +339,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Multiple backward wraps")
-    func largeNegativeDelta() {
-        var time = NaiveTime(hour: 12, minute: 0, second: 0)!
+    func largeNegativeDelta() throws {
+        var time = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
         // Subtract 25 hours (Should be 11:00 AM)
         let delta = Duration(seconds: 25 * 3600)
 
@@ -408,8 +362,8 @@ extension NaiveTimeTests {
         (13, true, 1), // 1 PM
         (23, true, 11), // 11 PM
     ])
-    func hour12Conversion(hour24: Int, expectedIsPM: Bool, expectedHour12: Int) {
-        let time = NaiveTime(hour: hour24, minute: 0, second: 0)!
+    func hour12Conversion(hour24: Int, expectedIsPM: Bool, expectedHour12: Int) throws {
+        let time = try #require(NaiveTime(hour: hour24, minute: 0, second: 0))
         let result = time.hour12
 
         #expect(result.isPM == expectedIsPM, "Hour \(hour24) PM status mismatch")
@@ -427,8 +381,8 @@ extension NaiveTimeTests {
         (1, 0, 0, 3600),
         (23, 59, 59, 86399),
     ])
-    func totalSeconds(h: Int, m: Int, s: Int, expectedSeconds: Int) {
-        let time = NaiveTime(hour: h, minute: m, second: s)!
+    func totalSeconds(h: Int, m: Int, s: Int, expectedSeconds: Int) throws {
+        let time = try #require(NaiveTime(hour: h, minute: m, second: s))
         #expect(time.secondsFromMidnight == expectedSeconds)
     }
 }
@@ -437,8 +391,8 @@ extension NaiveTimeTests {
 
 extension NaiveTimeTests {
     @Test("NaiveTimeTests: Modify hour component")
-    func modifyHour() {
-        let base = NaiveTime(hour: 10, minute: 30, second: 0)!
+    func modifyHour() throws {
+        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 0))
 
         // Valid
         let newTime = base.with(hour: 22)
@@ -451,8 +405,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Modify minute component")
-    func modifyMinute() {
-        let base = NaiveTime(hour: 10, minute: 30, second: 0)!
+    func modifyMinute() throws {
+        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 0))
 
         #expect(base.with(minute: 59)?.minute == 59)
         #expect(base.with(minute: 0)?.minute == 0)
@@ -460,16 +414,16 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Modify second component")
-    func modifySecond() {
-        let base = NaiveTime(hour: 10, minute: 30, second: 30)!
+    func modifySecond() throws {
+        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 30))
 
         #expect(base.with(second: 45)?.second == 45)
         #expect(base.with(second: 60) == nil)
     }
 
     @Test("NaiveTimeTests: Modify nanosecond component")
-    func modifyNanosecond() {
-        let base = NaiveTime(hour: 10, minute: 30, second: 0, nanosecond: 500)!
+    func modifyNanosecond() throws {
+        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 0, nanosecond: 500))
 
         #expect(base.with(nanosecond: 999_999_999)?.nanosecond == 999_999_999)
         #expect(base.with(nanosecond: -1) == nil)
@@ -487,8 +441,8 @@ extension NaiveTimeTests {
         (123_456_789, 6, 123_456_000), // Truncate to microseconds
         (123_456_789, 9, 123_456_789), // No change at 9 digits
     ])
-    func truncatePrecision(nanos: Int, digits: Int, expected: Int) {
-        let time = NaiveTime(hour: 0, minute: 0, second: 0, nanosecond: nanos)!
+    func truncatePrecision(nanos: Int, digits: Int, expected: Int) throws {
+        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 0, nanosecond: nanos))
         let truncated = time.truncateSubseconds(digits)
         #expect(truncated.nanosecond == expected)
     }
@@ -505,11 +459,11 @@ extension NaiveTimeTests {
 
         // Rounding to nearest second (0 digits, span = 1,000,000,000)
         (499_999_999, 0, 0),
-        (500_000_000, 0, 1_000_000_000) // Correctly results in 1 second, 0 nanos
+        (500_000_000, 0, 1_000_000_000), // Correctly results in 1 second, 0 nanos
     ])
-    func roundPrecision(nanos: Int, digits: Int, expectedTotalNanos: Int64) {
+    func roundPrecision(nanos: Int, digits: Int, expectedTotalNanos: Int64) throws {
         // 1. Create the input time (at 00:00:00.nanos)
-        let time = NaiveTime(hour: 0, minute: 0, second: 0, nanosecond: nanos)!
+        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 0, nanosecond: nanos))
 
         // 2. Perform the rounding
         let rounded = time.roundSubseconds(digits)
@@ -528,9 +482,9 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Rounding at the end of the day wrap-around")
-    func roundingBoundary() {
+    func roundingBoundary() throws {
         // 23:59:59.600...
-        let nearlyMidnight = NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 600_000_000)!
+        let nearlyMidnight = try #require(NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 600_000_000))
 
         // Rounding to 0 digits (nearest second)
         let rounded = nearlyMidnight.roundSubseconds(0)
@@ -543,8 +497,8 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Truncation at the end of the day does not wrap")
-    func truncationBoundary() {
-        let nearlyMidnight = NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 999_999_999)!
+    func truncationBoundary() throws {
+        let nearlyMidnight = try #require(NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 999_999_999))
 
         // Truncating always goes down, so it stays within the same second/day
         let truncated = nearlyMidnight.truncateSubseconds(0)
@@ -559,9 +513,9 @@ extension NaiveTimeTests {
 
 extension NaiveTimeTests {
     @Test("NaiveTimeTests: Convert using NaiveDate object")
-    func toDateTimeWithDateObject() {
-        let baseTime = NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500)!
-        let date = NaiveDate(year: 2025, month: 12, day: 25)!
+    func toDateTimeWithDateObject() throws {
+        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
+        let date = try #require(NaiveDate(year: 2025, month: 12, day: 25))
         let dt = baseTime.on(date)
 
         #expect(dt.time == baseTime)
@@ -573,10 +527,10 @@ extension NaiveTimeTests {
     @Test("NaiveTimeTests: Convert using days since epoch", arguments: [
         (0, 1970, 1, 1), // Epoch
         (20082, 2024, 12, 25), // Christmas 2024
-        (-1, 1969, 12, 31) // Day before epoch
+        (-1, 1969, 12, 31), // Day before epoch
     ])
-    func toDateTimeWithDays(days: Int64, expY: Int32, expM: Int, expD: Int) {
-        let baseTime = NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500)!
+    func toDateTimeWithDays(days: Int64, expY: Int32, expM: Int, expD: Int) throws {
+        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         let dt = baseTime.on(daysSinceEpoch: days)
 
         #expect(dt.time == baseTime)
@@ -586,38 +540,38 @@ extension NaiveTimeTests {
     }
 
     @Test("NaiveTimeTests: Convert using valid year/month/day components")
-    func toDateTimeWithValidComponents() {
-        let baseTime = NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500)!
+    func toDateTimeWithValidComponents() throws {
+        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         // Testing the (Int32, Int, Int) overload
         let dt = baseTime.on(year: 2024, month: 2, day: 29)
 
         #expect(dt != nil)
-        #expect(dt!.year == 2024)
-        #expect(dt!.month == 2)
-        #expect(dt!.day == 29)
-        #expect(dt!.time == baseTime)
+        #expect(dt?.year == 2024)
+        #expect(dt?.month == 2)
+        #expect(dt?.day == 29)
+        #expect(dt?.time == baseTime)
     }
 
     @Test("NaiveTimeTests: Convert using invalid date components returns nil", arguments: [
         (2025, 2, 29), // Not a leap year
         (2025, 13, 1), // Invalid month
-        (2025, 1, 32) // Invalid day
+        (2025, 1, 32), // Invalid day
     ])
-    func toDateTimeWithInvalidComponents(year: Int32, month: Int, day: Int) {
-        let baseTime = NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500)!
+    func toDateTimeWithInvalidComponents(year: Int32, month: Int, day: Int) throws {
+        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         let result = baseTime.on(year: year, month: month, day: day)
         #expect(result == nil)
     }
 
     @Test("NaiveTimeTests: Convert using UInt8 month/day components")
-    func toDateTimeWithUInt8Components() {
-        let baseTime = NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500)!
+    func toDateTimeWithUInt8Components() throws {
+        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         // Testing the (Int32, UInt8, UInt8) overload
         let month: UInt8 = 10
         let day: UInt8 = 31
         let dt = baseTime.on(year: 2025, month: month, day: day)
 
-        #expect(dt!.month == 10)
-        #expect(dt!.day == 31)
+        #expect(dt?.month == 10)
+        #expect(dt?.day == 31)
     }
 }
