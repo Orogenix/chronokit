@@ -15,7 +15,7 @@ struct DateTimeParserTests {
         #expect(dt == nil)
     }
 
-    @Test("DateTimeParserTests: RFC 3339 Correctly captures local time and offset", arguments: [
+    @Test("DateTimeParserTests: RFC 3339 Correctly captures plain time and offset", arguments: [
         ("2025-12-29T10:00:00Z", 10, 0),
         ("2025-12-29T10:00:00+07:00", 10, 25200),
         ("2025-12-29T10:00:00-05:00", 10, -18000),

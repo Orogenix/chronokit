@@ -484,15 +484,15 @@ extension InstantTests {
     }
 }
 
-// MARK: - Naive Conversion Tests
+// MARK: - Plain Conversion Tests
 
 extension InstantTests {
-    @Test("InstantTests: Convert UTC 0 to NaiveDateTime")
+    @Test("InstantTests: Convert UTC 0 to PlainDateTime")
     func epochConversion() {
         let epoch = Instant(seconds: 0, nanoseconds: 0)
         let utc = MockTimeZone(offset: 0)
 
-        let result = epoch.naiveDateTime(in: utc)
+        let result = epoch.plainDateTime(in: utc)
 
         #expect(result.year == 1970)
         #expect(result.month == 1)
@@ -515,7 +515,7 @@ extension InstantTests {
         let instant = Instant(seconds: seconds, nanoseconds: 0)
         let tz = MockTimeZone(offset: offset)
 
-        let result = instant.naiveDateTime(in: tz)
+        let result = instant.plainDateTime(in: tz)
 
         #expect(result.year == 1970)
         #expect(result.month == 1)
@@ -540,7 +540,7 @@ extension InstantTests {
         let instant = Instant(seconds: seconds, nanoseconds: 0)
         let tz = MockTimeZone(offset: offset)
 
-        let result = instant.naiveDateTime(in: tz)
+        let result = instant.plainDateTime(in: tz)
 
         #expect(result.year == expY)
         #expect(result.month == expM)
@@ -553,7 +553,7 @@ extension InstantTests {
         let instant = Instant(seconds: 100, nanoseconds: 123_456_789)
         let tz = MockTimeZone(offset: 3600)
 
-        let result = instant.naiveDateTime(in: tz)
+        let result = instant.plainDateTime(in: tz)
 
         #expect(result.nanosecond == 123_456_789)
     }

@@ -2,14 +2,14 @@
 import ChronoMath
 import Testing
 
-struct NaiveDateTimeTests {
+struct PlainDateTimeTests {
     // MARK: - Initialization Tests
 
-    @Test("NaiveDateTimeTests: Initialize from existing NaiveDate and NaiveTime object")
+    @Test("PlainDateTimeTests: Initialize from existing PlainDate and PlainTime object")
     func componentInit() {
-        let date = NaiveDate(year: 2025, month: 12, day: 25)!
-        let time = NaiveTime(hour: 10, minute: 30, second: 0)!
-        let dateTime = NaiveDateTime(date: date, time: time)
+        let date = PlainDate(year: 2025, month: 12, day: 25)!
+        let time = PlainTime(hour: 10, minute: 30, second: 0)!
+        let dateTime = PlainDateTime(date: date, time: time)
 
         #expect(dateTime.date == date)
         #expect(dateTime.time == time)
@@ -22,7 +22,7 @@ struct NaiveDateTimeTests {
         #expect(dateTime.time.nanosecond == 0)
     }
 
-    @Test("NaiveDateTimeTests: Initialize from raw components (Failable)", arguments: [
+    @Test("PlainDateTimeTests: Initialize from raw components (Failable)", arguments: [
         (2025, 1, 1, 0, 0, 0, 0),
         (2024, 2, 29, 23, 59, 59, 999_999_999), // Leap year boundary
         (1970, 1, 1, 12, 0, 0, 0)
@@ -37,7 +37,7 @@ struct NaiveDateTimeTests {
         second: Int,
         nanosecond: Int,
     ) {
-        let dateTime = NaiveDateTime(
+        let dateTime = PlainDateTime(
             year: year,
             month: month,
             day: day,
@@ -57,7 +57,7 @@ struct NaiveDateTimeTests {
         #expect(dateTime!.time.nanosecond == nanosecond)
     }
 
-    @Test("NaiveDateTimeTests: Raw initialization returns nil for invalid components", arguments: [
+    @Test("PlainDateTimeTests: Raw initialization returns nil for invalid components", arguments: [
         (2025, 2, 29, 12, 0, 0, 0), // Invalid Date (not leap year)
         (2025, 1, 1, 24, 0, 0, 0), // Invalid Time (24h)
         (2025, 13, 1, 12, 0, 0, 0), // Invalid Month
@@ -73,7 +73,7 @@ struct NaiveDateTimeTests {
         second: Int,
         nanosecond: Int,
     ) {
-        let dateTime = NaiveDateTime(
+        let dateTime = PlainDateTime(
             year: year,
             month: month,
             day: day,
@@ -85,49 +85,49 @@ struct NaiveDateTimeTests {
         #expect(dateTime == nil)
     }
 
-    @Test("NaiveDateTimeTests: Boundary constants")
+    @Test("PlainDateTimeTests: Boundary constants")
     func boundaries() {
-        #expect(NaiveDateTime.min.date == NaiveDate.min)
-        #expect(NaiveDateTime.min.time == NaiveTime.min)
-        #expect(NaiveDateTime.max.date == NaiveDate.max)
-        #expect(NaiveDateTime.max.time == NaiveTime.max)
+        #expect(PlainDateTime.min.date == PlainDate.min)
+        #expect(PlainDateTime.min.time == PlainTime.min)
+        #expect(PlainDateTime.max.date == PlainDate.max)
+        #expect(PlainDateTime.max.time == PlainTime.max)
     }
 }
 
 // MARK: - Comparison Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Comparing same date, different times")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Comparing same date, different times")
     func sameDateDifferentTimes() {
-        let date = NaiveDate(year: 2025, month: 6, day: 15)!
-        let morning = NaiveTime(hour: 8, minute: 0, second: 0)!
-        let evening = NaiveTime(hour: 20, minute: 0, second: 0)!
+        let date = PlainDate(year: 2025, month: 6, day: 15)!
+        let morning = PlainTime(hour: 8, minute: 0, second: 0)!
+        let evening = PlainTime(hour: 20, minute: 0, second: 0)!
 
-        let dt1 = NaiveDateTime(date: date, time: morning)
-        let dt2 = NaiveDateTime(date: date, time: evening)
+        let dt1 = PlainDateTime(date: date, time: morning)
+        let dt2 = PlainDateTime(date: date, time: evening)
 
         #expect(dt1 < dt2, "Earlier time on same day should be lesser")
         #expect(dt2 > dt1, "Later time on same day should be greater")
     }
 
-    @Test("NaiveDateTimeTests: Comparing different dates (Date priority)")
+    @Test("PlainDateTimeTests: Comparing different dates (Date priority)")
     func differentDates() {
-        let jan1 = NaiveDate(year: 2025, month: 1, day: 1)!
-        let jan2 = NaiveDate(year: 2025, month: 1, day: 2)!
+        let jan1 = PlainDate(year: 2025, month: 1, day: 1)!
+        let jan2 = PlainDate(year: 2025, month: 1, day: 2)!
 
         // Late night on Jan 1st
-        let dt1 = NaiveDateTime(date: jan1, time: NaiveTime(hour: 23, minute: 59, second: 59)!)
+        let dt1 = PlainDateTime(date: jan1, time: PlainTime(hour: 23, minute: 59, second: 59)!)
         // Early morning on Jan 2nd
-        let dt2 = NaiveDateTime(date: jan2, time: NaiveTime(hour: 0, minute: 0, second: 1)!)
+        let dt2 = PlainDateTime(date: jan2, time: PlainTime(hour: 0, minute: 0, second: 1)!)
 
         #expect(dt1 < dt2, "Even with a later time, the earlier date must be lesser")
         #expect(dt2 > dt1)
     }
 
-    @Test("NaiveDateTimeTests: Comparing identity equality")
+    @Test("PlainDateTimeTests: Comparing identity equality")
     func equalityComparison() {
-        let dt1 = NaiveDateTime(year: 2025, month: 12, day: 25, hour: 12, minute: 0, second: 0)!
-        let dt2 = NaiveDateTime(year: 2025, month: 12, day: 25, hour: 12, minute: 0, second: 0)!
+        let dt1 = PlainDateTime(year: 2025, month: 12, day: 25, hour: 12, minute: 0, second: 0)!
+        let dt2 = PlainDateTime(year: 2025, month: 12, day: 25, hour: 12, minute: 0, second: 0)!
 
         #expect(!(dt1 < dt2), "Equal values should not be less than each other")
         #expect(!(dt1 > dt2), "Equal values should not be greater than each other")
@@ -135,11 +135,11 @@ extension NaiveDateTimeTests {
         #expect(dt1 >= dt2)
     }
 
-    @Test("NaiveDateTimeTests: Sorting across multiple years and times")
+    @Test("PlainDateTimeTests: Sorting across multiple years and times")
     func complexSorting() {
-        let dt1 = NaiveDateTime(year: 2024, month: 12, day: 31, hour: 23, minute: 59, second: 0)!
-        let dt2 = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
-        let dt3 = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt1 = PlainDateTime(year: 2024, month: 12, day: 31, hour: 23, minute: 59, second: 0)!
+        let dt2 = PlainDateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
+        let dt3 = PlainDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
 
         let unsorted = [dt3, dt1, dt2]
         let sorted = unsorted.sorted()
@@ -147,25 +147,25 @@ extension NaiveDateTimeTests {
         #expect(sorted == [dt1, dt2, dt3])
     }
 
-    @Test("NaiveDateTimeTests: Extreme boundaries")
+    @Test("PlainDateTimeTests: Extreme boundaries")
     func boundaryComparisons() {
-        let minDate = NaiveDate.min
-        let maxDate = NaiveDate.max
-        let minTime = NaiveTime(nanosecondsSinceMidnight: 0)
-        let maxTime = NaiveTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
+        let minDate = PlainDate.min
+        let maxDate = PlainDate.max
+        let minTime = PlainTime(nanosecondsSinceMidnight: 0)
+        let maxTime = PlainTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
 
-        let startOfTime = NaiveDateTime(date: minDate, time: minTime)
-        let endOfTime = NaiveDateTime(date: maxDate, time: maxTime)
+        let startOfTime = PlainDateTime(date: minDate, time: minTime)
+        let endOfTime = PlainDateTime(date: maxDate, time: maxTime)
 
         #expect(startOfTime < endOfTime)
     }
 
-    @Test("NaiveDateTimeTests: Equality and Hashable conformance")
+    @Test("PlainDateTimeTests: Equality and Hashable conformance")
     func equality() {
-        let dt1 = NaiveDateTime(year: 2025, month: 5, day: 1, hour: 12, minute: 0, second: 0)!
-        let dt2 = NaiveDateTime(year: 2025, month: 5, day: 1, hour: 12, minute: 0, second: 0)!
-        let dt3 = NaiveDateTime(year: 2025, month: 5, day: 2, hour: 12, minute: 0, second: 0)! // Different day
-        let dt4 = NaiveDateTime(year: 2025, month: 5, day: 1, hour: 13, minute: 0, second: 0)! // Different hour
+        let dt1 = PlainDateTime(year: 2025, month: 5, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt2 = PlainDateTime(year: 2025, month: 5, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt3 = PlainDateTime(year: 2025, month: 5, day: 2, hour: 12, minute: 0, second: 0)! // Different day
+        let dt4 = PlainDateTime(year: 2025, month: 5, day: 1, hour: 13, minute: 0, second: 0)! // Different hour
 
         #expect(dt1 == dt2)
         #expect(dt1 != dt3)
@@ -177,12 +177,12 @@ extension NaiveDateTimeTests {
 
 // MARK: - Arithmetic Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Within the same day")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Within the same day")
     func standardAdvance() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 10, minute: 0, second: 0)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 10, minute: 0, second: 0)!,
         )
         // Add 1 hour and 30 minutes
         let result = base.advanced(bySeconds: 3600 + 1800)
@@ -192,11 +192,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.minute == 30)
     }
 
-    @Test("NaiveDateTimeTests: Forward across midnight")
+    @Test("PlainDateTimeTests: Forward across midnight")
     func forwardRollover() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 23, minute: 59, second: 50)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 23, minute: 59, second: 50)!,
         )
         // Add 20 seconds
         let result = base.advanced(bySeconds: 20)
@@ -207,11 +207,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.second == 10)
     }
 
-    @Test("NaiveDateTimeTests: Backward across midnight")
+    @Test("PlainDateTimeTests: Backward across midnight")
     func backwardRollover() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 2)!,
-            time: NaiveTime(hour: 0, minute: 0, second: 10)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 2)!,
+            time: PlainTime(hour: 0, minute: 0, second: 10)!,
         )
         // Subtract 20 seconds
         let result = base.advanced(bySeconds: -20)
@@ -222,11 +222,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.second == 50)
     }
 
-    @Test("NaiveDateTimeTests: Multi-day leap year jump")
+    @Test("PlainDateTimeTests: Multi-day leap year jump")
     func leapYearMultiDay() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2024, month: 2, day: 28)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2024, month: 2, day: 28)!,
+            time: PlainTime(hour: 12, minute: 0, second: 0)!,
         )
         // Add 48 hours (2 days)
         let result = base.advanced(bySeconds: 2 * 86400)
@@ -237,11 +237,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.hour == 12)
     }
 
-    @Test("NaiveDateTimeTests: Nanosecond overflow to days")
+    @Test("PlainDateTimeTests: Nanosecond overflow to days")
     func nanoOverflow() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 900_000_000)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 23, minute: 59, second: 59, nanosecond: 900_000_000)!,
         )
         // Add 200ms
         let result = base.advanced(bySeconds: 0, nanoseconds: 200_000_000)
@@ -251,11 +251,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.nanosecond == 100_000_000)
     }
 
-    @Test("NaiveDateTimeTests: Advanced by Duration")
+    @Test("PlainDateTimeTests: Advanced by Duration")
     func durationInterface() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 12, minute: 0, second: 0)!,
         )
         let duration = Duration(seconds: 86400 + 3600, nanoseconds: 0) // 1 day, 1 hour
 
@@ -268,12 +268,12 @@ extension NaiveDateTimeTests {
 
 // MARK: - Addition Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: NaiveDateTime + Duration")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: PlainDateTime + Duration")
     func dateTimePlusDuration() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 6, day: 1)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 6, day: 1)!,
+            time: PlainTime(hour: 12, minute: 0, second: 0)!,
         )
         let delta = Duration(seconds: 3600) // 1 hour
 
@@ -283,12 +283,12 @@ extension NaiveDateTimeTests {
         #expect(result.date.day == 1)
     }
 
-    @Test("NaiveDateTimeTests: Duration + NaiveDateTime (Commutative)")
+    @Test("PlainDateTimeTests: Duration + PlainDateTime (Commutative)")
     func durationPlusDateTime() {
         let delta = Duration(seconds: 86400) // 1 day
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 12, day: 31)!,
-            time: NaiveTime(hour: 10, minute: 0, second: 0)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 12, day: 31)!,
+            time: PlainTime(hour: 10, minute: 0, second: 0)!,
         )
 
         // Tests the (Duration, Self) overload
@@ -300,11 +300,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.hour == 10)
     }
 
-    @Test("NaiveDateTimeTests: Sub-second overflow via Duration")
+    @Test("PlainDateTimeTests: Sub-second overflow via Duration")
     func subSecondAddition() {
-        let base = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 500_000_000)!,
+        let base = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 23, minute: 59, second: 59, nanosecond: 500_000_000)!,
         )
         let delta = Duration(seconds: 0, nanoseconds: 600_000_000) // 0.6s
 
@@ -317,11 +317,11 @@ extension NaiveDateTimeTests {
         #expect(result.time.nanosecond == 100_000_000)
     }
 
-    @Test("NaiveDateTimeTests: In-place mutation")
+    @Test("PlainDateTimeTests: In-place mutation")
     func compoundAddition() {
-        var dt = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 1)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
+        var dt = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 1)!,
+            time: PlainTime(hour: 12, minute: 0, second: 0)!,
         )
         let delta = Duration(seconds: 7200) // 2 hours
 
@@ -333,11 +333,11 @@ extension NaiveDateTimeTests {
         #expect(dt.date.day == 2)
     }
 
-    @Test("NaiveDateTimeTests: Multiple chain rollovers")
+    @Test("PlainDateTimeTests: Multiple chain rollovers")
     func multipleMutations() {
-        var dt = NaiveDateTime(
-            date: NaiveDate(year: 1999, month: 12, day: 31)!,
-            time: NaiveTime(hour: 23, minute: 0, second: 0)!,
+        var dt = PlainDateTime(
+            date: PlainDate(year: 1999, month: 12, day: 31)!,
+            time: PlainTime(hour: 23, minute: 0, second: 0)!,
         )
 
         dt += Duration(seconds: 3600) // Should hit midnight
@@ -349,7 +349,7 @@ extension NaiveDateTimeTests {
         #expect(dt.time.hour == 1)
     }
 
-    @Test("NaiveDateTimeTests: Basic addition and month-end clamping", arguments: [
+    @Test("PlainDateTimeTests: Basic addition and month-end clamping", arguments: [
         // Jan 1 + 1 month 5 days = Feb 6
         (year: 2025, month: 1, day: 1, h: 10, im: 1, id: 5, expectedDay: 6, expectedMonth: 2),
         // Jan 31 + 1 month = Feb 28 (Clamping)
@@ -370,9 +370,9 @@ extension NaiveDateTimeTests {
         expectedDay: Int,
         expectedMonth: Int,
     ) {
-        let date = NaiveDate(year: year, month: month, day: day)!
-        let time = NaiveTime(hour: hour, minute: 0, second: 0)!
-        let dt = NaiveDateTime(date: date, time: time)
+        let date = PlainDate(year: year, month: month, day: day)!
+        let time = PlainTime(hour: hour, minute: 0, second: 0)!
+        let dt = PlainDateTime(date: date, time: time)
 
         let interval = CalendarInterval(month: intervalMonth, day: intervalDay, nanosecond: 0)
         let result = dt + interval
@@ -381,7 +381,7 @@ extension NaiveDateTimeTests {
         #expect(result.date.day == expectedDay)
     }
 
-    @Test("NaiveDateTimeTests: Midnight boundary overflows", arguments: [
+    @Test("PlainDateTimeTests: Midnight boundary overflows", arguments: [
         // 23:00 + 2 hours = Next day 01:00
         (h: 23, addH: 2, expectedDayOffset: 1, expectedHour: 1),
         // 01:00 - 2 hours = Previous day 23:00
@@ -392,9 +392,9 @@ extension NaiveDateTimeTests {
         (h: 12, addH: -25, expectedDayOffset: -1, expectedHour: 11)
     ])
     func midnightOverflow(h: Int, addH: Int64, expectedDayOffset: Int64, expectedHour: Int) {
-        let baseDate = NaiveDate(year: 2025, month: 6, day: 15)! // Mid-month to avoid month overflow
-        let baseTime = NaiveTime(hour: h, minute: 0, second: 0)!
-        let dt = NaiveDateTime(date: baseDate, time: baseTime)
+        let baseDate = PlainDate(year: 2025, month: 6, day: 15)! // Mid-month to avoid month overflow
+        let baseTime = PlainTime(hour: h, minute: 0, second: 0)!
+        let dt = PlainDateTime(date: baseDate, time: baseTime)
 
         let interval = CalendarInterval.hours(addH)
         let result = dt + interval
@@ -403,12 +403,12 @@ extension NaiveDateTimeTests {
         #expect(result.time.hour == expectedHour)
     }
 
-    @Test("NaiveDateTimeTests: Complex multi-component interval")
+    @Test("PlainDateTimeTests: Complex multi-component interval")
     func complexInterval() {
         // Start: 2025-01-31 23:00:00
-        let dt = NaiveDateTime(
-            date: NaiveDate(year: 2025, month: 1, day: 31)!,
-            time: NaiveTime(hour: 23, minute: 0, second: 0)!,
+        let dt = PlainDateTime(
+            date: PlainDate(year: 2025, month: 1, day: 31)!,
+            time: PlainTime(hour: 23, minute: 0, second: 0)!,
         )
 
         // Interval: 1 month and 2 hours
@@ -426,11 +426,11 @@ extension NaiveDateTimeTests {
 
 // MARK: - Substraction Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Same day, positive and negative")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Same day, positive and negative")
     func distanceWithinDay() {
-        let dt1 = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
-        let dt2 = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 0, second: 0)!
+        let dt1 = PlainDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt2 = PlainDateTime(year: 2025, month: 1, day: 1, hour: 10, minute: 0, second: 0)!
 
         let diff = dt1 - dt2
         #expect(diff.seconds == 7200) // 2 hours
@@ -440,14 +440,14 @@ extension NaiveDateTimeTests {
         #expect(negativeDiff.seconds == -7200) // Normalized: -2 hours is -7200s.
     }
 
-    @Test("NaiveDateTimeTests: Normalized nanoseconds (Borrowing from seconds)")
+    @Test("PlainDateTimeTests: Normalized nanoseconds (Borrowing from seconds)")
     func distanceNormalization() {
-        let dt1 = NaiveDateTime(
+        let dt1 = PlainDateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 1,
             nanosecond: 100_000_000,
         )! // 1.1s
-        let dt2 = NaiveDateTime(
+        let dt2 = PlainDateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 1,
             nanosecond: 900_000_000,
@@ -460,18 +460,18 @@ extension NaiveDateTimeTests {
         #expect(diff.nanoseconds == 200_000_000)
     }
 
-    @Test("NaiveDateTimeTests: Across day boundaries")
+    @Test("PlainDateTimeTests: Across day boundaries")
     func distanceAcrossDays() {
-        let jan2 = NaiveDateTime(year: 2025, month: 1, day: 2, hour: 1, minute: 0, second: 0)!
-        let jan1 = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 23, minute: 0, second: 0)!
+        let jan2 = PlainDateTime(year: 2025, month: 1, day: 2, hour: 1, minute: 0, second: 0)!
+        let jan1 = PlainDateTime(year: 2025, month: 1, day: 1, hour: 23, minute: 0, second: 0)!
 
         let diff = jan2 - jan1
         #expect(diff.seconds == 7200) // 2 hours apart
     }
 
-    @Test("NaiveDateTimeTests: Subtract duration across midnight")
+    @Test("PlainDateTimeTests: Subtract duration across midnight")
     func subtractDurationAcrossMidnight() {
-        let dt = NaiveDateTime(year: 2025, month: 1, day: 2, hour: 0, minute: 30, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: 1, day: 2, hour: 0, minute: 30, second: 0)!
         let delta = Duration(seconds: 3600) // 1 hour
 
         let result = dt - delta
@@ -481,9 +481,9 @@ extension NaiveDateTimeTests {
         #expect(result.time.minute == 30)
     }
 
-    @Test("NaiveDateTimeTests: Subtract duration across year boundary")
+    @Test("PlainDateTimeTests: Subtract duration across year boundary")
     func subtractDurationAcrossYear() {
-        let dt = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
         let delta = Duration(seconds: 1)
 
         let result = dt - delta
@@ -496,9 +496,9 @@ extension NaiveDateTimeTests {
         #expect(result.time.second == 59)
     }
 
-    @Test("NaiveDateTimeTests: Mutating subtraction")
+    @Test("PlainDateTimeTests: Mutating subtraction")
     func compoundSubtraction() {
-        var dt = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
+        var dt = PlainDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
         dt -= Duration(seconds: 86400) // 1 day
 
         #expect(dt.date.day == 31)
@@ -506,7 +506,7 @@ extension NaiveDateTimeTests {
         #expect(dt.time.hour == 12)
     }
 
-    @Test("NaiveDateTimeTests: Calendar Subtraction (Month/Day Clamping)", arguments: [
+    @Test("PlainDateTimeTests: Calendar Subtraction (Month/Day Clamping)", arguments: [
         // Mar 31 - 1 month = Feb 28 (Clamping)
         (y: 2025, m: 3, d: 31, subM: 1, subD: 0, expM: 2, expD: 28),
         // Mar 31 2024 - 1 month = Feb 29 (Leap Clamping)
@@ -526,9 +526,9 @@ extension NaiveDateTimeTests {
         expM: Int,
         expD: Int,
     ) {
-        let dt = NaiveDateTime(
-            date: NaiveDate(year: y, month: m, day: d)!,
-            time: NaiveTime(hour: 12, minute: 0, second: 0)!,
+        let dt = PlainDateTime(
+            date: PlainDate(year: y, month: m, day: d)!,
+            time: PlainTime(hour: 12, minute: 0, second: 0)!,
         )
 
         let interval = CalendarInterval(month: subM, day: subD, nanosecond: 0)
@@ -538,7 +538,7 @@ extension NaiveDateTimeTests {
         #expect(result.date.day == expD)
     }
 
-    @Test("NaiveDateTimeTests: Time Subtraction (Midnight Underflow)", arguments: [
+    @Test("PlainDateTimeTests: Time Subtraction (Midnight Underflow)", arguments: [
         // 01:00 AM - 2 hours = 23:00 (Previous Day)
         (h: 1, subH: 2, expDayOffset: -1, expH: 23),
         // 12:00 PM - 24 hours = 12:00 PM (Previous Day)
@@ -549,9 +549,9 @@ extension NaiveDateTimeTests {
         (h: 0, subH: 0, expDayOffset: -1, expH: 23)
     ])
     func timeSubtraction(h: Int, subH: Int64, expDayOffset: Int64, expH: Int) {
-        let baseDate = NaiveDate(year: 2025, month: 6, day: 15)!
-        let baseTime = NaiveTime(hour: h, minute: 0, second: 0)!
-        let dt = NaiveDateTime(date: baseDate, time: baseTime)
+        let baseDate = PlainDate(year: 2025, month: 6, day: 15)!
+        let baseTime = PlainTime(hour: h, minute: 0, second: 0)!
+        let dt = PlainDateTime(date: baseDate, time: baseTime)
 
         // Use the specific nanosecond case for the last argument
         let interval = subH == 0 && h == 0
@@ -567,49 +567,49 @@ extension NaiveDateTimeTests {
 
 // MARK: - Era and Year Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Year CE calculation", arguments: [
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Year CE calculation", arguments: [
         (2025, true, 2025),
         (1, true, 1),
         (0, false, 1),
         (-1, false, 2),
     ])
     func yearCE(inputYear: Int32, expectedIsCE: Bool, expectedYear: UInt32) {
-        let dt = NaiveDateTime(year: inputYear, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: inputYear, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
         #expect(dt.yearCE.isCE == expectedIsCE)
         #expect(dt.yearCE.year == expectedYear)
     }
 
-    @Test("NaiveDateTimeTests: Leap year property", arguments: [
+    @Test("PlainDateTimeTests: Leap year property", arguments: [
         (2024, true),
         (2000, true),
         (2100, false),
         (2023, false)
     ])
     func leapYear(year: Int32, expected: Bool) {
-        let dt = NaiveDateTime(year: year, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: year, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
         #expect(dt.isLeapYear == expected)
     }
 }
 
 // MARK: - Quarter Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Quarter calculation", arguments: [
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Quarter calculation", arguments: [
         (1, 1), (4, 2), (7, 3), (10, 4),
     ])
     func quarters(month: Int, expectedQuarter: Int) {
-        let dt = NaiveDateTime(year: 2025, month: month, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: month, day: 1, hour: 12, minute: 0, second: 0)!
         #expect(dt.quarter == expectedQuarter)
     }
 }
 
 // MARK: - Month Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Month zero-based properties")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Month zero-based properties")
     func monthProperties() {
-        let dt = NaiveDateTime(year: 2025, month: 12, day: 25, hour: 10, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: 12, day: 25, hour: 10, minute: 0, second: 0)!
         #expect(dt.month == 12)
         #expect(dt.monthZeroBased == 11)
         #expect(dt.monthSymbol == .december)
@@ -618,18 +618,18 @@ extension NaiveDateTimeTests {
 
 // MARK: - Weekday Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: ISO Week Consistency")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: ISO Week Consistency")
     func isoWeekCheck() {
         // Monday, Dec 29, 2025 is Week 1 of 2026
-        let dt = NaiveDateTime(year: 2025, month: 12, day: 29, hour: 23, minute: 59, second: 59)!
+        let dt = PlainDateTime(year: 2025, month: 12, day: 29, hour: 23, minute: 59, second: 59)!
         #expect(dt.isoWeek.week == 1)
         #expect(dt.isoWeek.year == 2026)
     }
 
-    @Test("NaiveDateTimeTests: Weekday symbol check")
+    @Test("PlainDateTimeTests: Weekday symbol check")
     func weekdaySymbol() {
-        let dt = NaiveDateTime(year: 2025, month: 12, day: 26, hour: 12, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: 12, day: 26, hour: 12, minute: 0, second: 0)!
         // Dec 26, 2025 is Friday (usually 5 or 6 depending on your Weekday enum start)
         #expect(dt.weekdaySymbol != nil)
         #expect(dt.weekdaySymbol?.rawValue == dt.weekday)
@@ -638,30 +638,30 @@ extension NaiveDateTimeTests {
 
 // MARK: - Day and Epoch Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Unix Epoch Alignment")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Unix Epoch Alignment")
     func unixEpoch() {
-        let dt = NaiveDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
         #expect(dt.daysSinceUnixEpoch == 0)
     }
 
-    @Test("NaiveDateTimeTests: Days in month", arguments: [
+    @Test("PlainDateTimeTests: Days in month", arguments: [
         (2024, 2, 29),
         (2025, 2, 28)
     ])
     func daysInMonth(year: Int32, month: Int, expectedDays: Int) {
-        let dt = NaiveDateTime(year: year, month: month, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: year, month: month, day: 1, hour: 12, minute: 0, second: 0)!
         #expect(dt.daysInMonth == expectedDays)
     }
 }
 
 // MARK: - Modification Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Modify date components preserves time")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Modify date components preserves time")
     func modificationWith() {
-        let originalTime = NaiveTime(hour: 14, minute: 30, second: 15)!
-        let base = NaiveDateTime(date: NaiveDate(year: 2023, month: 5, day: 1)!, time: originalTime)
+        let originalTime = PlainTime(hour: 14, minute: 30, second: 15)!
+        let base = PlainDateTime(date: PlainDate(year: 2023, month: 5, day: 1)!, time: originalTime)
 
         #expect(base.with(year: 2025)?.year == 2025)
         #expect(base.with(month: 10)?.month == 10)
@@ -675,9 +675,9 @@ extension NaiveDateTimeTests {
         #expect(modified?.time == originalTime)
     }
 
-    @Test("NaiveDateTimeTests: Ordinal modifications")
+    @Test("PlainDateTimeTests: Ordinal modifications")
     func ordinalModifications() {
-        let dt = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
 
         // Day 60 in 2025 (common) is March 1
         let mar1 = dt.with(ordinal: 60)
@@ -689,9 +689,9 @@ extension NaiveDateTimeTests {
         #expect(feb1?.month == 2 && feb1?.day == 1)
     }
 
-    @Test("NaiveDateTimeTests: Invalid date modifications return nil")
+    @Test("PlainDateTimeTests: Invalid date modifications return nil")
     func invalidModifications() {
-        let dt = NaiveDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2025, month: 1, day: 1, hour: 12, minute: 0, second: 0)!
 
         // Feb 29 on non-leap year
         let feb = dt.with(month: 2)!
@@ -704,8 +704,8 @@ extension NaiveDateTimeTests {
 
 // MARK: - 12-Hour Clock Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: 12-hour clock conversion", arguments: [
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: 12-hour clock conversion", arguments: [
         (0, false, 12), // Midnight
         (1, false, 1), // 1 AM
         (12, true, 12), // Noon
@@ -713,9 +713,9 @@ extension NaiveDateTimeTests {
         (23, true, 11), // 11 PM
     ])
     func hour12Conversion(hour24: Int, expectedIsPM: Bool, expectedHour12: Int) {
-        let date = NaiveDate(year: 2025, month: 12, day: 25)!
-        let time = NaiveTime(hour: hour24, minute: 0, second: 0)!
-        let dt = NaiveDateTime(date: date, time: time)
+        let date = PlainDate(year: 2025, month: 12, day: 25)!
+        let time = PlainTime(hour: hour24, minute: 0, second: 0)!
+        let dt = PlainDateTime(date: date, time: time)
 
         #expect(dt.hour12.isPM == expectedIsPM)
         #expect(dt.hour12.hour == expectedHour12)
@@ -724,14 +724,14 @@ extension NaiveDateTimeTests {
 
 // MARK: - Seconds Calculation Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Total seconds from midnight", arguments: [
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Total seconds from midnight", arguments: [
         (0, 0, 0, 0),
         (1, 0, 0, 3600),
         (23, 59, 59, 86399),
     ])
     func totalSeconds(h hour: Int, m minute: Int, s second: Int, expectedSeconds: Int) {
-        let dt = NaiveDateTime(
+        let dt = PlainDateTime(
             year: 2025,
             month: 1,
             day: 1,
@@ -745,11 +745,11 @@ extension NaiveDateTimeTests {
 
 // MARK: - Time Modification (Date Preservation)
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Modify hour component preserves date")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Modify hour component preserves date")
     func modifyHour() {
-        let originalDate = NaiveDate(year: 2025, month: 5, day: 20)!
-        let base = NaiveDateTime(date: originalDate, time: NaiveTime(hour: 10, minute: 30, second: 0)!)
+        let originalDate = PlainDate(year: 2025, month: 5, day: 20)!
+        let base = PlainDateTime(date: originalDate, time: PlainTime(hour: 10, minute: 30, second: 0)!)
 
         let modified = base.with(hour: 22)
 
@@ -759,10 +759,10 @@ extension NaiveDateTimeTests {
         #expect(base.with(hour: 24) == nil)
     }
 
-    @Test("NaiveDateTimeTests: Modify minute component preserves date")
+    @Test("PlainDateTimeTests: Modify minute component preserves date")
     func modifyMinute() {
-        let originalDate = NaiveDate(year: 2025, month: 1, day: 1)!
-        let base = NaiveDateTime(date: originalDate, time: NaiveTime(hour: 10, minute: 30, second: 0)!)
+        let originalDate = PlainDate(year: 2025, month: 1, day: 1)!
+        let base = PlainDateTime(date: originalDate, time: PlainTime(hour: 10, minute: 30, second: 0)!)
 
         let modified = base.with(minute: 45)
 
@@ -771,10 +771,10 @@ extension NaiveDateTimeTests {
         #expect(base.with(minute: 60) == nil)
     }
 
-    @Test("NaiveDateTimeTests: Modify second component preserves date")
+    @Test("PlainDateTimeTests: Modify second component preserves date")
     func modifySecond() {
-        let originalDate = NaiveDate(year: 2025, month: 1, day: 1)!
-        let base = NaiveDateTime(date: originalDate, time: NaiveTime(hour: 10, minute: 30, second: 30)!)
+        let originalDate = PlainDate(year: 2025, month: 1, day: 1)!
+        let base = PlainDateTime(date: originalDate, time: PlainTime(hour: 10, minute: 30, second: 30)!)
 
         let modified = base.with(second: 0)
 
@@ -783,10 +783,10 @@ extension NaiveDateTimeTests {
         #expect(base.with(second: -1) == nil)
     }
 
-    @Test("NaiveDateTimeTests: Modify nanosecond component preserves date")
+    @Test("PlainDateTimeTests: Modify nanosecond component preserves date")
     func modifyNanosecond() {
-        let originalDate = NaiveDate(year: 2025, month: 1, day: 1)!
-        let base = NaiveDateTime(date: originalDate, time: NaiveTime(hour: 10, minute: 0, second: 0, nanosecond: 500)!)
+        let originalDate = PlainDate(year: 2025, month: 1, day: 1)!
+        let base = PlainDateTime(date: originalDate, time: PlainTime(hour: 10, minute: 0, second: 0, nanosecond: 500)!)
 
         let modified = base.with(nanosecond: 123_456_789)
 
@@ -798,14 +798,14 @@ extension NaiveDateTimeTests {
 
 // MARK: - Subsecond Rounding Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Truncate subseconds", arguments: [
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Truncate subseconds", arguments: [
         (123_456_789, 0, 0), // To whole second
         (123_456_789, 3, 123_000_000), // To milliseconds
         (123_456_789, 6, 123_456_000), // To microseconds
     ])
     func truncateSubseconds(nanos: Int, digits: Int, expectedNanos: Int) {
-        let dt = NaiveDateTime(
+        let dt = PlainDateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 0,
             nanosecond: nanos,
@@ -816,14 +816,14 @@ extension NaiveDateTimeTests {
         #expect(truncated.nanosecond == expectedNanos)
     }
 
-    @Test("NaiveDateTimeTests: Round subseconds (Half-Up)", arguments: [
+    @Test("PlainDateTimeTests: Round subseconds (Half-Up)", arguments: [
         (123_400_000, 3, 123_000_000, 0), // Down
         (123_500_000, 3, 124_000_000, 0), // Midpoint Up
         (499_999_999, 0, 0, 0), // Down to 0 seconds
         (500_000_000, 0, 0, 1) // Up to 1 second
     ])
     func roundSubseconds(nanos: Int, digits: Int, expectedNanos: Int, expectedSec: Int) {
-        let dt = NaiveDateTime(
+        let dt = PlainDateTime(
             year: 2025, month: 1, day: 1,
             hour: 0, minute: 0, second: 0,
             nanosecond: nanos,
@@ -834,9 +834,9 @@ extension NaiveDateTimeTests {
         #expect(rounded.nanosecond == expectedNanos)
     }
 
-    @Test("NaiveDateTimeTests: Truncation at end of day stays on same date")
+    @Test("PlainDateTimeTests: Truncation at end of day stays on same date")
     func truncationAtEndDay() {
-        let endOfDay = NaiveDateTime(
+        let endOfDay = PlainDateTime(
             year: 2025, month: 1, day: 1,
             hour: 23, minute: 59, second: 59,
             nanosecond: 999_999_999,
@@ -849,10 +849,10 @@ extension NaiveDateTimeTests {
         #expect(truncated.nanosecond == 0)
     }
 
-    @Test("NaiveDateTimeTests: Rounding up at end of day increments date")
+    @Test("PlainDateTimeTests: Rounding up at end of day increments date")
     func roundingAtEndDay() {
         // 2025-12-31 at 23:59:59.600
-        let endOfYear = NaiveDateTime(
+        let endOfYear = PlainDateTime(
             year: 2025, month: 12, day: 31,
             hour: 23, minute: 59, second: 59,
             nanosecond: 600_000_000,
@@ -870,9 +870,9 @@ extension NaiveDateTimeTests {
         #expect(rounded.nanosecond == 0)
     }
 
-    @Test("NaiveDateTimeTests: Rounding precision at 9 digits is a no-op")
+    @Test("PlainDateTimeTests: Rounding precision at 9 digits is a no-op")
     func maxPrecision() {
-        let dt = NaiveDateTime(
+        let dt = PlainDateTime(
             year: 2025, month: 1, day: 1,
             hour: 12, minute: 0, second: 0,
             nanosecond: 123,
@@ -885,11 +885,11 @@ extension NaiveDateTimeTests {
 
 // MARK: - Instant Conversion Tests
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: toInstantUTC conversion")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: toInstantUTC conversion")
     func toInstantUTC() {
         // Unix Epoch: 1970-01-01 00:00:00
-        let epoch = NaiveDateTime(
+        let epoch = PlainDateTime(
             year: 1970, month: 1, day: 1,
             hour: 0, minute: 0, second: 0,
         )!
@@ -899,7 +899,7 @@ extension NaiveDateTimeTests {
         #expect(instant.nanoseconds == 0)
 
         // Random date: 2025-12-25 15:30:45.123
-        let dt = NaiveDateTime(
+        let dt = PlainDateTime(
             year: 2025, month: 12, day: 25,
             hour: 15, minute: 30, second: 45,
             nanosecond: 123_000_000,
@@ -915,13 +915,13 @@ extension NaiveDateTimeTests {
 
     // MARK: - Fixed Offset Conversion
 
-    @Test("NaiveDateTimeTests: toInstant with FixedOffset", arguments: [
+    @Test("PlainDateTimeTests: toInstant with FixedOffset", arguments: [
         (0, 0), // UTC
-        (7 * 3600, -25200), // UTC+7 (Local is ahead, so UTC is 7 hours behind)
-        (-5 * 3600, 18000) // UTC-5 (Local is behind, so UTC is 5 hours ahead)
+        (7 * 3600, -25200), // UTC+7 (Plain is ahead, so UTC is 7 hours behind)
+        (-5 * 3600, 18000) // UTC-5 (Plain is behind, so UTC is 5 hours ahead)
     ])
     func toInstantWithOffset(offsetSeconds: Int, expectedInstantSeconds: Int64) {
-        let dt = NaiveDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)!
         let offset = FixedOffset(seconds: offsetSeconds)
 
         let instant = dt.instant(offset: offset)
@@ -930,11 +930,11 @@ extension NaiveDateTimeTests {
 
     // MARK: - TimeZone and DST Conversion
 
-    @Test("NaiveDateTimeTests: toInstant with complex TimeZone policy")
+    @Test("PlainDateTimeTests: toInstant with complex TimeZone policy")
     func toInstantWithTimeZone() {
         // Mock a timezone that has a gap (Spring Forward) or overlap (Fall Back)
         // For this test, assume a simple timezone protocol implementation
-        let dt = NaiveDateTime(year: 2024, month: 3, day: 10, hour: 10, minute: 0, second: 0)!
+        let dt = PlainDateTime(year: 2024, month: 3, day: 10, hour: 10, minute: 0, second: 0)!
         let mockTZ = MockTimeZone(offset: 3600) // UTC+1
 
         // Policy: .earlier
@@ -946,9 +946,9 @@ extension NaiveDateTimeTests {
         #expect(instant?.seconds == Int64(expectedSeconds))
     }
 
-    @Test("NaiveDateTimeTests: returns nil when DST policy fails to resolve")
+    @Test("PlainDateTimeTests: returns nil when DST policy fails to resolve")
     func toInstantNilResolution() {
-        let dt = NaiveDateTime(year: 2024, month: 3, day: 10, hour: 2, minute: 30, second: 0)!
+        let dt = PlainDateTime(year: 2024, month: 3, day: 10, hour: 2, minute: 30, second: 0)!
         let invalidMockTZ = MockInvalidTimeZone() // Always fails to resolve
 
         let instant = dt.instant(in: invalidMockTZ, resolving: .preferEarlier)
@@ -958,11 +958,11 @@ extension NaiveDateTimeTests {
 
 // MARK: - Date Time Conversion
 
-extension NaiveDateTimeTests {
-    @Test("NaiveDateTimeTests: Convert to DateTime<UTC>")
+extension PlainDateTimeTests {
+    @Test("PlainDateTimeTests: Convert to DateTime<UTC>")
     func toDateTimeUTC() {
-        let naive = NaiveDateTime(year: 2025, month: 12, day: 25, hour: 15, minute: 30, second: 0)!
-        let zonedUTC = naive.dateTimeUTC
+        let plain = PlainDateTime(year: 2025, month: 12, day: 25, hour: 15, minute: 30, second: 0)!
+        let zonedUTC = plain.dateTimeUTC
 
         // The components should match exactly because UTC has 0 offset
         #expect(zonedUTC.year == 2025)
@@ -971,30 +971,30 @@ extension NaiveDateTimeTests {
         #expect(zonedUTC.hour == 15)
     }
 
-    @Test("NaiveDateTimeTests: Convert to DateTime with FixedOffset", arguments: [
+    @Test("PlainDateTimeTests: Convert to DateTime with FixedOffset", arguments: [
         7 * 3600, // UTC+7
         -5 * 3600, // UTC-5
         0 // UTC+0
     ])
     func toDateTimeWithOffset(offsetSeconds: Int) {
-        let naive = NaiveDateTime(year: 2025, month: 6, day: 1, hour: 10, minute: 0, second: 0)!
+        let plain = PlainDateTime(year: 2025, month: 6, day: 1, hour: 10, minute: 0, second: 0)!
         let offset = FixedOffset(seconds: offsetSeconds)
 
-        let zoned = naive.dateTime(offset: offset)
+        let zoned = plain.dateTime(offset: offset)
 
-        // A conversion from Naive to Zoned via its own offset
+        // A conversion from Plain to Zoned via its own offset
         // should result in the same "wall clock" time.
         #expect(zoned.hour == 10)
         #expect(zoned.minute == 0)
         #expect(zoned.timezone.duration.seconds == offsetSeconds)
     }
 
-    @Test("NaiveDateTimeTests: Convert using complex TimeZoneProtocol")
+    @Test("PlainDateTimeTests: Convert using complex TimeZoneProtocol")
     func toDateTimeWithTimeZone() {
-        let naive = NaiveDateTime(year: 2024, month: 3, day: 10, hour: 10, minute: 0, second: 0)!
+        let plain = PlainDateTime(year: 2024, month: 3, day: 10, hour: 10, minute: 0, second: 0)!
         let mockTZ = MockTimeZone(offset: 3600) // UTC+1
 
-        guard let zoned = naive.dateTime(timezone: mockTZ) else {
+        guard let zoned = plain.dateTime(timezone: mockTZ) else {
             Issue.record("DateTime conversion failed")
             return
         }
@@ -1002,17 +1002,17 @@ extension NaiveDateTimeTests {
         #expect(zoned.hour == 10)
         #expect(zoned.year == 2024)
         #expect(
-            zoned.timestamp == naive.instantUTC.timestamp - 3600,
-            "The underlying instant should shift correctly (10:00 local at +1 is 09:00 UTC)",
+            zoned.timestamp == plain.instantUTC.timestamp - 3600,
+            "The underlying instant should shift correctly (10:00 plain at +1 is 09:00 UTC)",
         )
     }
 
-    @Test("NaiveDateTimeTests: returns nil if TimeZone cannot resolve the local time")
+    @Test("PlainDateTimeTests: returns nil if TimeZone cannot resolve the plain time")
     func toDateTimeNilResolution() {
-        let naive = NaiveDateTime(year: 2024, month: 3, day: 10, hour: 2, minute: 30, second: 0)!
+        let plain = PlainDateTime(year: 2024, month: 3, day: 10, hour: 2, minute: 30, second: 0)!
         let invalidTZ = MockInvalidTimeZone() // Mocking a DST gap where 2:30 doesn't exist
 
-        let zoned = naive.dateTime(timezone: invalidTZ)
+        let zoned = plain.dateTime(timezone: invalidTZ)
 
         #expect(zoned == nil)
     }

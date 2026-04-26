@@ -2,16 +2,16 @@
 import ChronoMath
 import Testing
 
-struct NaiveTimeTests {
-    // MARK: - Initialization Tests
+// MARK: - Initialization Tests
 
-    @Test("NaiveTimeTests: Initialize from valid components", arguments: [
+struct PlainTimeTests {
+    @Test("PlainTimeTests: Initialize from valid components", arguments: [
         (0, 0, 0, 0), // Midnight
         (12, 30, 15, 500_000), // Mid-day
         (23, 59, 59, 999_999_999), // Last nanosecond
     ])
     func validComponentInit(h: Int, m: Int, s: Int, n: Int) {
-        let time = NaiveTime(hour: h, minute: m, second: s, nanosecond: n)
+        let time = PlainTime(hour: h, minute: m, second: s, nanosecond: n)
         #expect(time != nil)
         #expect(time?.hour == h)
         #expect(time?.minute == m)
@@ -19,7 +19,7 @@ struct NaiveTimeTests {
         #expect(time?.nanosecond == n)
     }
 
-    @Test("NaiveTimeTests: Initialize from invalid components returns nil", arguments: [
+    @Test("PlainTimeTests: Initialize from invalid components returns nil", arguments: [
         (24, 0, 0, 0), // Invalid hour
         (-1, 0, 0, 0), // Negative hour
         (12, 60, 0, 0), // Invalid minute
@@ -27,14 +27,14 @@ struct NaiveTimeTests {
         (12, 0, 0, Int(1_000_000_000)) // Invalid nanosecond (1s)
     ])
     func invalidComponentInit(h: Int, m: Int, s: Int, n: Int) {
-        #expect(NaiveTime(hour: h, minute: m, second: s, nanosecond: n) == nil)
+        #expect(PlainTime(hour: h, minute: m, second: s, nanosecond: n) == nil)
     }
 
-    @Test("NaiveTimeTests: Initialize from nanoseconds since midnight")
+    @Test("PlainTimeTests: Initialize from nanoseconds since midnight")
     func nanosSinceMidnightInit() {
         // 1 hour, 1 minute, 1 second, 1 nanosecond
         let totalNanos: Int64 = NanoSeconds.perHour64 + NanoSeconds.perMinute64 + NanoSeconds.perSecond64 + 1
-        let time = NaiveTime(nanosecondsSinceMidnight: totalNanos)
+        let time = PlainTime(nanosecondsSinceMidnight: totalNanos)
 
         #expect(time.hour == 1)
         #expect(time.minute == 1)
@@ -43,38 +43,38 @@ struct NaiveTimeTests {
         #expect(time.nanosecondsSinceMidnight == totalNanos)
     }
 
-    @Test("NaiveTimeTests: Boundary nanoseconds")
+    @Test("PlainTimeTests: Boundary nanoseconds")
     func nanosBoundaries() {
-        let midnight = NaiveTime(nanosecondsSinceMidnight: 0)
+        let midnight = PlainTime(nanosecondsSinceMidnight: 0)
         #expect(midnight.hour == 0)
 
-        let lastNano = NaiveTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
+        let lastNano = PlainTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
         #expect(lastNano.hour == 23)
         #expect(lastNano.minute == 59)
         #expect(lastNano.second == 59)
         #expect(lastNano.nanosecond == 999_999_999)
     }
 
-    @Test("NaiveTimeTests: Component to Nanos round-trip")
+    @Test("PlainTimeTests: Component to Nanos round-trip")
     func roundTrip() throws {
         let hour = 14
         let month = 45
         let second = 30
         let nanosecond = 123_456
 
-        let time1 = try #require(NaiveTime(hour: hour, minute: month, second: second, nanosecond: nanosecond))
-        let time2 = NaiveTime(nanosecondsSinceMidnight: time1.nanosecondsSinceMidnight)
+        let time1 = try #require(PlainTime(hour: hour, minute: month, second: second, nanosecond: nanosecond))
+        let time2 = PlainTime(nanosecondsSinceMidnight: time1.nanosecondsSinceMidnight)
 
         #expect(time1 == time2)
         #expect(time2.hour == hour)
         #expect(time2.nanosecond == nanosecond)
     }
 
-    @Test("NaiveTimeTests: Boundary constants integrity")
+    @Test("PlainTimeTests: Boundary constants integrity")
     func boundaries() {
         // Ensure constants can be initialized without crashing
-        let minTime = NaiveTime.min
-        let maxTime = NaiveTime.max
+        let minTime = PlainTime.min
+        let maxTime = PlainTime.max
 
         #expect(minTime.nanosecondsSinceMidnight == 0)
         #expect(maxTime.nanosecondsSinceMidnight == NanoSeconds.perDay64 - 1)
@@ -88,18 +88,18 @@ struct NaiveTimeTests {
 
 // MARK: - Comparison Tests
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Strict inequality across time boundaries", arguments: [
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Strict inequality across time boundaries", arguments: [
         // Different Hours
-        (NaiveTime(hour: 9, minute: 59, second: 59)!, NaiveTime(hour: 10, minute: 0, second: 0)!),
+        (PlainTime(hour: 9, minute: 59, second: 59)!, PlainTime(hour: 10, minute: 0, second: 0)!),
         // Different Minutes
-        (NaiveTime(hour: 14, minute: 30, second: 59)!, NaiveTime(hour: 14, minute: 31, second: 0)!),
+        (PlainTime(hour: 14, minute: 30, second: 59)!, PlainTime(hour: 14, minute: 31, second: 0)!),
         // Different Seconds
-        (NaiveTime(hour: 23, minute: 59, second: 58)!, NaiveTime(hour: 23, minute: 59, second: 59)!),
+        (PlainTime(hour: 23, minute: 59, second: 58)!, PlainTime(hour: 23, minute: 59, second: 59)!),
         // Single Nanosecond difference
-        (NaiveTime(nanosecondsSinceMidnight: 100), NaiveTime(nanosecondsSinceMidnight: 101)),
+        (PlainTime(nanosecondsSinceMidnight: 100), PlainTime(nanosecondsSinceMidnight: 101)),
     ])
-    func chronologicalOrder(earlier lhs: NaiveTime, later rhs: NaiveTime) {
+    func chronologicalOrder(earlier lhs: PlainTime, later rhs: PlainTime) {
         #expect(lhs < rhs)
         #expect(rhs > lhs)
         #expect(lhs <= rhs)
@@ -107,10 +107,10 @@ extension NaiveTimeTests {
         #expect(lhs != rhs)
     }
 
-    @Test("NaiveTimeTests: Equality properties")
+    @Test("PlainTimeTests: Equality properties")
     func equality() throws {
-        let time1 = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
-        let time2 = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        let time1 = try #require(PlainTime(hour: 12, minute: 0, second: 0))
+        let time2 = try #require(PlainTime(hour: 12, minute: 0, second: 0))
 
         #expect(time1 == time2)
         #expect(!(time1 < time2))
@@ -119,12 +119,12 @@ extension NaiveTimeTests {
         #expect(time1 >= time2)
     }
 
-    @Test("NaiveTimeTests: Sorting a timeline")
+    @Test("PlainTimeTests: Sorting a timeline")
     func sorting() throws {
-        let morning = try #require(NaiveTime(hour: 8, minute: 0, second: 0))
-        let noon = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
-        let afternoon = try #require(NaiveTime(hour: 15, minute: 30, second: 0))
-        let night = try #require(NaiveTime(hour: 23, minute: 59, second: 59))
+        let morning = try #require(PlainTime(hour: 8, minute: 0, second: 0))
+        let noon = try #require(PlainTime(hour: 12, minute: 0, second: 0))
+        let afternoon = try #require(PlainTime(hour: 15, minute: 30, second: 0))
+        let night = try #require(PlainTime(hour: 23, minute: 59, second: 59))
 
         let unsorted = [afternoon, morning, night, noon]
         let sorted = unsorted.sorted()
@@ -132,14 +132,14 @@ extension NaiveTimeTests {
         #expect(sorted == [morning, noon, afternoon, night])
     }
 
-    @Test("NaiveTimeTests: Time range validation")
+    @Test("PlainTimeTests: Time range validation")
     func ranges() throws {
-        let openingTime = try #require(NaiveTime(hour: 9, minute: 0, second: 0))
-        let closingTime = try #require(NaiveTime(hour: 17, minute: 0, second: 0))
+        let openingTime = try #require(PlainTime(hour: 9, minute: 0, second: 0))
+        let closingTime = try #require(PlainTime(hour: 17, minute: 0, second: 0))
         let businessHours = openingTime ... closingTime
 
-        let lunchTime = try #require(NaiveTime(hour: 12, minute: 30, second: 0))
-        let midnight = try #require(NaiveTime(hour: 0, minute: 0, second: 0))
+        let lunchTime = try #require(PlainTime(hour: 12, minute: 30, second: 0))
+        let midnight = try #require(PlainTime(hour: 0, minute: 0, second: 0))
 
         #expect(businessHours.contains(lunchTime))
         #expect(businessHours.contains(openingTime))
@@ -147,14 +147,14 @@ extension NaiveTimeTests {
         #expect(!businessHours.contains(midnight))
     }
 
-    @Test("NaiveTimeTests: Minimum and Maximum bounds")
+    @Test("PlainTimeTests: Minimum and Maximum bounds")
     func extremes() throws {
-        let midnight = NaiveTime(nanosecondsSinceMidnight: 0)
-        let endOfDay = NaiveTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
+        let midnight = PlainTime(nanosecondsSinceMidnight: 0)
+        let endOfDay = PlainTime(nanosecondsSinceMidnight: NanoSeconds.perDay64 - 1)
 
         #expect(midnight < endOfDay)
 
-        let randomTime = try #require(NaiveTime(hour: 11, minute: 11, second: 11))
+        let randomTime = try #require(PlainTime(hour: 11, minute: 11, second: 11))
         #expect(midnight < randomTime)
         #expect(randomTime < endOfDay)
     }
@@ -162,10 +162,10 @@ extension NaiveTimeTests {
 
 // MARK: - Arithmetic
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Standard seconds and minutes")
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Standard seconds and minutes")
     func standardAdvance() throws {
-        let base = try #require(NaiveTime(hour: 10, minute: 0, second: 0))
+        let base = try #require(PlainTime(hour: 10, minute: 0, second: 0))
         // Advance 1 hour, 5 minutes, 10 seconds
         let result = base.advanced(bySeconds: 3600 + 300 + 10)
 
@@ -174,9 +174,9 @@ extension NaiveTimeTests {
         #expect(result.second == 10)
     }
 
-    @Test("NaiveTimeTests: Sub-second nanosecond carry")
+    @Test("PlainTimeTests: Sub-second nanosecond carry")
     func nanosecondCarry() throws {
-        let base = try #require(NaiveTime(hour: 10, minute: 0, second: 0, nanosecond: 900_000_000))
+        let base = try #require(PlainTime(hour: 10, minute: 0, second: 0, nanosecond: 900_000_000))
         // Add 200ms
         let result = base.advanced(bySeconds: 0, nanoseconds: 200_000_000)
 
@@ -184,9 +184,9 @@ extension NaiveTimeTests {
         #expect(result.nanosecond == 100_000_000)
     }
 
-    @Test("NaiveTimeTests: Forward past midnight")
+    @Test("PlainTimeTests: Forward past midnight")
     func forwardMidnightWrap() throws {
-        let base = try #require(NaiveTime(hour: 23, minute: 50, second: 0))
+        let base = try #require(PlainTime(hour: 23, minute: 50, second: 0))
         // Add 15 minutes (900 seconds)
         let result = base.advanced(bySeconds: 900)
 
@@ -194,9 +194,9 @@ extension NaiveTimeTests {
         #expect(result.minute == 5)
     }
 
-    @Test("NaiveTimeTests: Backward past midnight")
+    @Test("PlainTimeTests: Backward past midnight")
     func backwardMidnightWrap() throws {
-        let base = try #require(NaiveTime(hour: 0, minute: 10, second: 0))
+        let base = try #require(PlainTime(hour: 0, minute: 10, second: 0))
         // Subtract 20 minutes (-1200 seconds)
         let result = base.advanced(bySeconds: -1200)
 
@@ -204,18 +204,18 @@ extension NaiveTimeTests {
         #expect(result.minute == 50)
     }
 
-    @Test("NaiveTimeTests: Multiple days advancement")
+    @Test("PlainTimeTests: Multiple days advancement")
     func multiDayWrap() throws {
-        let base = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        let base = try #require(PlainTime(hour: 12, minute: 0, second: 0))
         // Add 48 hours (2 full days)
         let result = base.advanced(bySeconds: 48 * 3600)
 
         #expect(result.hour == 12, "Should wrap back to exactly the same time")
     }
 
-    @Test("NaiveTimeTests: Advanced by Duration")
+    @Test("PlainTimeTests: Advanced by Duration")
     func durationInterface() throws {
-        let base = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        let base = try #require(PlainTime(hour: 12, minute: 0, second: 0))
         let duration = Duration(seconds: 3661, nanoseconds: 500_000_000) // 1h 1m 1.5s
 
         let result = base.advanced(by: duration)
@@ -229,10 +229,10 @@ extension NaiveTimeTests {
 
 // MARK: - Addition
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: DateTime + Duration")
+extension PlainTimeTests {
+    @Test("PlainTimeTests: DateTime + Duration")
     func additionPointDuration() throws {
-        let time = try #require(NaiveTime(hour: 14, minute: 30, second: 0))
+        let time = try #require(PlainTime(hour: 14, minute: 30, second: 0))
         let delta = Duration(seconds: 3600) // 1 hour
 
         let result = time + delta
@@ -241,10 +241,10 @@ extension NaiveTimeTests {
         #expect(result.minute == 30)
     }
 
-    @Test("NaiveTimeTests: Duration + DateTime (Commutative)")
+    @Test("PlainTimeTests: Duration + DateTime (Commutative)")
     func additionDurationPoint() throws {
         let delta = Duration(seconds: 60) // 1 minute
-        let time = try #require(NaiveTime(hour: 8, minute: 0, second: 0))
+        let time = try #require(PlainTime(hour: 8, minute: 0, second: 0))
 
         let result = delta + time
 
@@ -252,9 +252,9 @@ extension NaiveTimeTests {
         #expect(result.minute == 1)
     }
 
-    @Test("NaiveTimeTests: Wrap around midnight")
+    @Test("PlainTimeTests: Wrap around midnight")
     func additionWrap() throws {
-        let time = try #require(NaiveTime(hour: 23, minute: 59, second: 59))
+        let time = try #require(PlainTime(hour: 23, minute: 59, second: 59))
         let delta = Duration(seconds: 2)
 
         let result = time + delta
@@ -264,9 +264,9 @@ extension NaiveTimeTests {
         #expect(result.second == 1)
     }
 
-    @Test("NaiveTimeTests: Mutating addition")
+    @Test("PlainTimeTests: Mutating addition")
     func compoundAddition() throws {
-        var time = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        var time = try #require(PlainTime(hour: 12, minute: 0, second: 0))
         let delta = Duration(seconds: 1800) // 30 minutes
 
         time += delta
@@ -275,9 +275,9 @@ extension NaiveTimeTests {
         #expect(time.minute == 30)
     }
 
-    @Test("NaiveTimeTests: Multiple mutations")
+    @Test("PlainTimeTests: Multiple mutations")
     func multipleMutations() throws {
-        var time = try #require(NaiveTime(hour: 0, minute: 0, second: 0))
+        var time = try #require(PlainTime(hour: 0, minute: 0, second: 0))
         let hour = Duration(seconds: 3600)
 
         time += hour
@@ -289,10 +289,10 @@ extension NaiveTimeTests {
 
 // MARK: - Substraction
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Standard subtraction")
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Standard subtraction")
     func subtraction() throws {
-        let time = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        let time = try #require(PlainTime(hour: 12, minute: 0, second: 0))
         let delta = Duration(seconds: 3600) // 1 hour
 
         let result = time - delta
@@ -301,9 +301,9 @@ extension NaiveTimeTests {
         #expect(result.minute == 0)
     }
 
-    @Test("NaiveTimeTests: Sub-second borrow")
+    @Test("PlainTimeTests: Sub-second borrow")
     func subSecondBorrow() throws {
-        let time = try #require(NaiveTime(hour: 10, minute: 0, second: 1, nanosecond: 0))
+        let time = try #require(PlainTime(hour: 10, minute: 0, second: 1, nanosecond: 0))
         // Subtract 0.5 seconds
         let delta = Duration(seconds: 0, nanoseconds: 500_000_000)
 
@@ -314,9 +314,9 @@ extension NaiveTimeTests {
         #expect(result.nanosecond == 500_000_000)
     }
 
-    @Test("NaiveTimeTests: Backward wrap across midnight")
+    @Test("PlainTimeTests: Backward wrap across midnight")
     func testBackwardMidnightWrap() throws {
-        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 1))
+        let time = try #require(PlainTime(hour: 0, minute: 0, second: 1))
         // Subtract 2 seconds (Should go to 23:59:59)
         let delta = Duration(seconds: 2)
 
@@ -327,9 +327,9 @@ extension NaiveTimeTests {
         #expect(result.second == 59)
     }
 
-    @Test("NaiveTimeTests: Mutating subtraction")
+    @Test("PlainTimeTests: Mutating subtraction")
     func compoundSubtraction() throws {
-        var time = try #require(NaiveTime(hour: 1, minute: 0, second: 0))
+        var time = try #require(PlainTime(hour: 1, minute: 0, second: 0))
         let delta = Duration(seconds: 3600) // 1 hour
 
         time -= delta
@@ -338,9 +338,9 @@ extension NaiveTimeTests {
         #expect(time.minute == 0)
     }
 
-    @Test("NaiveTimeTests: Multiple backward wraps")
+    @Test("PlainTimeTests: Multiple backward wraps")
     func largeNegativeDelta() throws {
-        var time = try #require(NaiveTime(hour: 12, minute: 0, second: 0))
+        var time = try #require(PlainTime(hour: 12, minute: 0, second: 0))
         // Subtract 25 hours (Should be 11:00 AM)
         let delta = Duration(seconds: 25 * 3600)
 
@@ -353,8 +353,8 @@ extension NaiveTimeTests {
 
 // MARK: - 12-Hour Clock Tests
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: 12-hour clock conversion", arguments: [
+extension PlainTimeTests {
+    @Test("PlainTimeTests: 12-hour clock conversion", arguments: [
         (0, false, 12), // Midnight
         (1, false, 1), // 1 AM
         (11, false, 11), // 11 AM
@@ -363,7 +363,7 @@ extension NaiveTimeTests {
         (23, true, 11), // 11 PM
     ])
     func hour12Conversion(hour24: Int, expectedIsPM: Bool, expectedHour12: Int) throws {
-        let time = try #require(NaiveTime(hour: hour24, minute: 0, second: 0))
+        let time = try #require(PlainTime(hour: hour24, minute: 0, second: 0))
         let result = time.hour12
 
         #expect(result.isPM == expectedIsPM, "Hour \(hour24) PM status mismatch")
@@ -373,8 +373,8 @@ extension NaiveTimeTests {
 
 // MARK: - Seconds Calculation Tests
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Total seconds from midnight", arguments: [
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Total seconds from midnight", arguments: [
         (0, 0, 0, 0),
         (0, 0, 1, 1),
         (0, 1, 0, 60),
@@ -382,17 +382,17 @@ extension NaiveTimeTests {
         (23, 59, 59, 86399),
     ])
     func totalSeconds(h: Int, m: Int, s: Int, expectedSeconds: Int) throws {
-        let time = try #require(NaiveTime(hour: h, minute: m, second: s))
+        let time = try #require(PlainTime(hour: h, minute: m, second: s))
         #expect(time.secondsFromMidnight == expectedSeconds)
     }
 }
 
 // MARK: - Modification (with...) Tests
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Modify hour component")
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Modify hour component")
     func modifyHour() throws {
-        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 0))
+        let base = try #require(PlainTime(hour: 10, minute: 30, second: 0))
 
         // Valid
         let newTime = base.with(hour: 22)
@@ -404,26 +404,26 @@ extension NaiveTimeTests {
         #expect(base.with(hour: -1) == nil)
     }
 
-    @Test("NaiveTimeTests: Modify minute component")
+    @Test("PlainTimeTests: Modify minute component")
     func modifyMinute() throws {
-        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 0))
+        let base = try #require(PlainTime(hour: 10, minute: 30, second: 0))
 
         #expect(base.with(minute: 59)?.minute == 59)
         #expect(base.with(minute: 0)?.minute == 0)
         #expect(base.with(minute: 60) == nil)
     }
 
-    @Test("NaiveTimeTests: Modify second component")
+    @Test("PlainTimeTests: Modify second component")
     func modifySecond() throws {
-        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 30))
+        let base = try #require(PlainTime(hour: 10, minute: 30, second: 30))
 
         #expect(base.with(second: 45)?.second == 45)
         #expect(base.with(second: 60) == nil)
     }
 
-    @Test("NaiveTimeTests: Modify nanosecond component")
+    @Test("PlainTimeTests: Modify nanosecond component")
     func modifyNanosecond() throws {
-        let base = try #require(NaiveTime(hour: 10, minute: 30, second: 0, nanosecond: 500))
+        let base = try #require(PlainTime(hour: 10, minute: 30, second: 0, nanosecond: 500))
 
         #expect(base.with(nanosecond: 999_999_999)?.nanosecond == 999_999_999)
         #expect(base.with(nanosecond: -1) == nil)
@@ -433,8 +433,8 @@ extension NaiveTimeTests {
 
 // MARK: - Rounding Tests
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Truncate subseconds", arguments: [
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Truncate subseconds", arguments: [
         // (Original Nanos, Digits, Expected Nanos)
         (123_456_789, 0, 0), // Truncate to whole second
         (123_456_789, 3, 123_000_000), // Truncate to milliseconds
@@ -442,12 +442,12 @@ extension NaiveTimeTests {
         (123_456_789, 9, 123_456_789), // No change at 9 digits
     ])
     func truncatePrecision(nanos: Int, digits: Int, expected: Int) throws {
-        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 0, nanosecond: nanos))
+        let time = try #require(PlainTime(hour: 0, minute: 0, second: 0, nanosecond: nanos))
         let truncated = time.truncateSubseconds(digits)
         #expect(truncated.nanosecond == expected)
     }
 
-    @Test("NaiveTimeTests: Round subseconds (Half-Up)", arguments: [
+    @Test("PlainTimeTests: Round subseconds (Half-Up)", arguments: [
         // Rounding to Milliseconds (3 digits, span = 1,000,000)
         (123_400_000, 3, 123_000_000),
         (123_500_000, 3, 124_000_000),
@@ -463,14 +463,14 @@ extension NaiveTimeTests {
     ])
     func roundPrecision(nanos: Int, digits: Int, expectedTotalNanos: Int64) throws {
         // 1. Create the input time (at 00:00:00.nanos)
-        let time = try #require(NaiveTime(hour: 0, minute: 0, second: 0, nanosecond: nanos))
+        let time = try #require(PlainTime(hour: 0, minute: 0, second: 0, nanosecond: nanos))
 
         // 2. Perform the rounding
         let rounded = time.roundSubseconds(digits)
 
         // 3. Create the expected time using the total nanoseconds
         // This allows 1,000,000,000 to correctly become 00:00:01.000000000
-        let expectedTime = NaiveTime(nanosecondsSinceMidnight: expectedTotalNanos)
+        let expectedTime = PlainTime(nanosecondsSinceMidnight: expectedTotalNanos)
 
         #expect(rounded == expectedTime)
 
@@ -481,10 +481,10 @@ extension NaiveTimeTests {
         }
     }
 
-    @Test("NaiveTimeTests: Rounding at the end of the day wrap-around")
+    @Test("PlainTimeTests: Rounding at the end of the day wrap-around")
     func roundingBoundary() throws {
         // 23:59:59.600...
-        let nearlyMidnight = try #require(NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 600_000_000))
+        let nearlyMidnight = try #require(PlainTime(hour: 23, minute: 59, second: 59, nanosecond: 600_000_000))
 
         // Rounding to 0 digits (nearest second)
         let rounded = nearlyMidnight.roundSubseconds(0)
@@ -496,9 +496,9 @@ extension NaiveTimeTests {
         #expect(rounded.second == 0)
     }
 
-    @Test("NaiveTimeTests: Truncation at the end of the day does not wrap")
+    @Test("PlainTimeTests: Truncation at the end of the day does not wrap")
     func truncationBoundary() throws {
-        let nearlyMidnight = try #require(NaiveTime(hour: 23, minute: 59, second: 59, nanosecond: 999_999_999))
+        let nearlyMidnight = try #require(PlainTime(hour: 23, minute: 59, second: 59, nanosecond: 999_999_999))
 
         // Truncating always goes down, so it stays within the same second/day
         let truncated = nearlyMidnight.truncateSubseconds(0)
@@ -509,13 +509,13 @@ extension NaiveTimeTests {
     }
 }
 
-// MARK: - Naive Date Time Conversion
+// MARK: - Plain Date Time Conversion
 
-extension NaiveTimeTests {
-    @Test("NaiveTimeTests: Convert using NaiveDate object")
+extension PlainTimeTests {
+    @Test("PlainTimeTests: Convert using PlainDate object")
     func toDateTimeWithDateObject() throws {
-        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
-        let date = try #require(NaiveDate(year: 2025, month: 12, day: 25))
+        let baseTime = try #require(PlainTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
+        let date = try #require(PlainDate(year: 2025, month: 12, day: 25))
         let dt = baseTime.on(date)
 
         #expect(dt.time == baseTime)
@@ -524,13 +524,13 @@ extension NaiveTimeTests {
         #expect(dt.hour == 14)
     }
 
-    @Test("NaiveTimeTests: Convert using days since epoch", arguments: [
+    @Test("PlainTimeTests: Convert using days since epoch", arguments: [
         (0, 1970, 1, 1), // Epoch
         (20082, 2024, 12, 25), // Christmas 2024
         (-1, 1969, 12, 31), // Day before epoch
     ])
     func toDateTimeWithDays(days: Int64, expY: Int32, expM: Int, expD: Int) throws {
-        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
+        let baseTime = try #require(PlainTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         let dt = baseTime.on(daysSinceEpoch: days)
 
         #expect(dt.time == baseTime)
@@ -539,9 +539,9 @@ extension NaiveTimeTests {
         #expect(dt.day == expD)
     }
 
-    @Test("NaiveTimeTests: Convert using valid year/month/day components")
+    @Test("PlainTimeTests: Convert using valid year/month/day components")
     func toDateTimeWithValidComponents() throws {
-        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
+        let baseTime = try #require(PlainTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         // Testing the (Int32, Int, Int) overload
         let dt = baseTime.on(year: 2024, month: 2, day: 29)
 
@@ -552,20 +552,20 @@ extension NaiveTimeTests {
         #expect(dt?.time == baseTime)
     }
 
-    @Test("NaiveTimeTests: Convert using invalid date components returns nil", arguments: [
+    @Test("PlainTimeTests: Convert using invalid date components returns nil", arguments: [
         (2025, 2, 29), // Not a leap year
         (2025, 13, 1), // Invalid month
         (2025, 1, 32), // Invalid day
     ])
     func toDateTimeWithInvalidComponents(year: Int32, month: Int, day: Int) throws {
-        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
+        let baseTime = try #require(PlainTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         let result = baseTime.on(year: year, month: month, day: day)
         #expect(result == nil)
     }
 
-    @Test("NaiveTimeTests: Convert using UInt8 month/day components")
+    @Test("PlainTimeTests: Convert using UInt8 month/day components")
     func toDateTimeWithUInt8Components() throws {
-        let baseTime = try #require(NaiveTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
+        let baseTime = try #require(PlainTime(hour: 14, minute: 15, second: 30, nanosecond: 500))
         // Testing the (Int32, UInt8, UInt8) overload
         let month: UInt8 = 10
         let day: UInt8 = 31

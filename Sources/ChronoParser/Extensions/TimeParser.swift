@@ -1,6 +1,6 @@
 import ChronoCore
 
-public extension NaiveTime {
+public extension PlainTime {
     @inlinable
     init?(rfc3339 string: String) {
         var input = string

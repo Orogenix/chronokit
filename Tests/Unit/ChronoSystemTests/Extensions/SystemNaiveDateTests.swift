@@ -3,12 +3,12 @@ import ChronoMath
 @testable import ChronoSystem
 import Testing
 
-struct SystemNaiveDateTests {
+struct SystemPlainDateTests {
     // MARK: - Initialization Tests
 
-    @Test("SystemNaiveDateTests: NaiveDate.now() basic validation")
+    @Test("SystemPlainDateTests: PlainDate.now() basic validation")
     func dateNow() {
-        let date: NaiveDate = .now()
+        let date: PlainDate = .now()
 
         // Sanity check: Should be a realistic year in the current era
         #expect(date.year >= 2025)
@@ -16,14 +16,14 @@ struct SystemNaiveDateTests {
         #expect(date.day >= 1 && date.day <= ChronoMath.lastDayOfMonth(Int64(date.year), UInt8(date.month)))
     }
 
-    @Test("SystemNaiveDateTests: now(in:) respects large offsets (Midnight Crossing)")
+    @Test("SystemPlainDateTests: now(in:) respects large offsets (Midnight Crossing)")
     func dateNowWithOffset() {
         // We pick two opposite extreme offsets
         let plus14 = FixedOffset(.hours(14))
         let minus12 = FixedOffset(.hours(-12))
 
-        let datePlus: NaiveDate = .now(in: plus14)
-        let dateMinus: NaiveDate = .now(in: minus12)
+        let datePlus: PlainDate = .now(in: plus14)
+        let dateMinus: PlainDate = .now(in: minus12)
 
         // Logic: The date in the furthest east zone (+14) must be equal to
         // or up to 2 days ahead of the furthest west zone (-12),
@@ -32,36 +32,36 @@ struct SystemNaiveDateTests {
         #expect(dayDiff >= 0 && dayDiff <= 2)
     }
 
-    @Test("SystemNaiveDateTests: Consistency between NaiveDate.now() and NaiveDate.now(in:)")
+    @Test("SystemPlainDateTests: Consistency between PlainDate.now() and PlainDate.now(in:)")
     func defaultConsistency() {
         // This test ensures that the parameterless .now()
         // is indeed calling the .now(in: SystemTimeZone()) implementation.
-        let date1 = NaiveDate.now()
-        let date2 = NaiveDate.now(in: SystemTimeZone())
+        let date1 = PlainDate.now()
+        let date2 = PlainDate.now(in: SystemTimeZone())
 
         #expect(date1 == date2, "Default .now() should match SystemTimeZone implementation")
     }
 
-    @Test("SystemNaiveDateTests: Contract alignment with NaiveDateTime")
+    @Test("SystemPlainDateTests: Contract alignment with PlainDateTime")
     func contractWithDateTime() {
-        // Prove that NaiveDate.now(in:) is strictly derived
-        // from the NaiveDateTime.now(in:)'s date component.
+        // Prove that PlainDate.now(in:) is strictly derived
+        // from the PlainDateTime.now(in:)'s date component.
         let tz = FixedOffset.utc
-        let date = NaiveDate.now(in: tz)
-        let dateTime = NaiveDateTime.now(in: tz)
+        let date = PlainDate.now(in: tz)
+        let dateTime = PlainDateTime.now(in: tz)
 
-        #expect(date == dateTime.date, "NaiveDate.now(in:) must match NaiveDateTime's date component")
+        #expect(date == dateTime.date, "PlainDate.now(in:) must match PlainDateTime's date component")
         #expect(date.year == dateTime.date.year)
         #expect(date.month == dateTime.date.month)
         #expect(date.day == dateTime.date.day)
     }
 
-    @Test("SystemNaiveDateTests: Protocol Generic Compatibility")
+    @Test("SystemPlainDateTests: Protocol Generic Compatibility")
     func protocolCompatibility() {
         // Verifying that the 'some TimeZoneProtocol' constraint
         // accepts our types correctly.
         let tz = FixedOffset.hours(5)
-        let date = NaiveDate.now(in: tz)
+        let date = PlainDate.now(in: tz)
 
         // Ensure the date is valid for this specific timezone
         // This implicitly tests that the generic constraint works

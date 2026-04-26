@@ -2,20 +2,11 @@ import Benchmark
 import ChronoKit
 import Foundation
 
-// func main() {
-//     let date = DateTime.now()
-//     print("Today: \(date)")
-//     runArithmeticBenchmark()
-//     runCivilDateBenchmark()
-// }
-//
-// main()
-
 let benchmarks: @Sendable () -> Void = {
     // Setup shared test data
-    let date = NaiveDate(year: 2025, month: 12, day: 31)!
-    let time = NaiveTime(hour: 23, minute: 59, second: 58, nanosecond: 123_456_789)!
-    let dt = NaiveDateTime(date: date, time: time)
+    let date = PlainDate(year: 2025, month: 12, day: 31)!
+    let time = PlainTime(hour: 23, minute: 59, second: 58, nanosecond: 123_456_789)!
+    let dt = PlainDateTime(date: date, time: time)
 
     // Setup Foundation comparison
     let foundationDate = Date()
@@ -24,7 +15,7 @@ let benchmarks: @Sendable () -> Void = {
 
     // --- GROUP 1: String Serialization ---
 
-    Benchmark("ChronoKit: NaiveDateTime.description") { benchmark in
+    Benchmark("ChronoKit: PlainDateTime.description") { benchmark in
         for _ in benchmark.scaledIterations {
             blackHole(dt.description)
         }
@@ -40,14 +31,9 @@ let benchmarks: @Sendable () -> Void = {
     // This simulates writing directly into a network packet buffer.
 
     Benchmark("ChronoKit: Write to Raw Buffer (Zero-Alloc)") { benchmark in
-        // Allocate once outside the loop to measure writing speed only
-        let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: 32, alignment: 1)
-        let formatter: ChronoFormatter = .iso8601(digits: 9, includeOffset: false, useZulu: false)
-        defer { buffer.deallocate() }
-
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
-            let written = formatter.format(date: date, time: time, to: buffer)
+            let written = dt.rfc3339()
             blackHole(written)
         }
         benchmark.stopMeasurement()

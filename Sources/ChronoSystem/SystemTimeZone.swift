@@ -50,10 +50,10 @@ public struct SystemTimeZone: TimeZoneProtocol {
         return .seconds(lt.tm_gmtoff)
     }
 
-    public func offset(for local: NaiveDateTime) -> LocalOffset {
-        let rawInstant = local.instant(offset: .utc)
+    public func offset(for plain: PlainDateTime) -> PlainOffset {
+        let rawInstant = plain.instant(offset: .utc)
         let systemOffset = offset(for: rawInstant)
-        let correctedInstant = local.instant(offset: FixedOffset(systemOffset))
+        let correctedInstant = plain.instant(offset: FixedOffset(systemOffset))
         let finalOffset = offset(for: correctedInstant)
         return .unique(.standard(finalOffset))
     }

@@ -3,13 +3,13 @@ import ChronoMath
 
 public extension Instant {
     @inlinable
-    func naiveDateTime(
+    func plainDateTime(
         in name: String,
         provider: (any TimeZoneProvider)? = nil
-    ) throws -> NaiveDateTime {
+    ) throws -> PlainDateTime {
         let tzProvider = provider ?? IANAProvider.shared
         let timezone = try tzProvider.getTimeZone(named: name)
-        return naiveDateTime(in: timezone)
+        return plainDateTime(in: timezone)
     }
 
     @inlinable

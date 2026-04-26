@@ -23,7 +23,7 @@ public struct DateTime<TZ: TimeZoneProtocol>: Sendable {
         timezone: TZ
     ) {
         guard
-            let naiveLocal = NaiveDateTime(
+            let plainDateTime = PlainDateTime(
                 year: year,
                 month: month,
                 day: day,
@@ -32,7 +32,7 @@ public struct DateTime<TZ: TimeZoneProtocol>: Sendable {
                 second: second,
                 nanosecond: nanosecond
             ),
-            let utcInstant = naiveLocal.instant(in: timezone)
+            let utcInstant = plainDateTime.instant(in: timezone)
         else { return nil }
 
         self.init(instant: utcInstant, timezone: timezone)
@@ -164,67 +164,67 @@ public extension DateTime {
 extension DateTime: DateProtocol {
     @inlinable
     public var year: Int32 {
-        naive.date.year
+        plain.date.year
     }
 
     @inlinable
     public var month: Int {
-        naive.date.month
+        plain.date.month
     }
 
     @inlinable
     public var day: Int {
-        naive.date.day
+        plain.date.day
     }
 
     @inlinable
     public var ordinal: Int {
-        naive.date.ordinal
+        plain.date.ordinal
     }
 
     @inlinable
     public var weekday: Int {
-        naive.date.weekday
+        plain.date.weekday
     }
 
     @inlinable
     public func with(year: Int32) -> Self? {
-        withLocal { $0.with(year: year) }
+        withPlain { $0.with(year: year) }
     }
 
     @inlinable
     public func with(month: Int) -> Self? {
-        withLocal { $0.with(month: month) }
+        withPlain { $0.with(month: month) }
     }
 
     @inlinable
     public func with(monthZeroBased value: Int) -> Self? {
-        withLocal { $0.with(monthZeroBased: value) }
+        withPlain { $0.with(monthZeroBased: value) }
     }
 
     @inlinable
     public func with(monthSymbol value: Month) -> DateTime<TZ>? {
-        withLocal { $0.with(monthSymbol: value) }
+        withPlain { $0.with(monthSymbol: value) }
     }
 
     @inlinable
     public func with(day: Int) -> Self? {
-        withLocal { $0.with(day: day) }
+        withPlain { $0.with(day: day) }
     }
 
     @inlinable
     public func with(dayZeroBased value: Int) -> Self? {
-        withLocal { $0.with(dayZeroBased: value) }
+        withPlain { $0.with(dayZeroBased: value) }
     }
 
     @inlinable
     public func with(ordinal: Int) -> Self? {
-        withLocal { $0.with(ordinal: ordinal) }
+        withPlain { $0.with(ordinal: ordinal) }
     }
 
     @inlinable
     public func with(ordinalZeroBased value: Int) -> Self? {
-        withLocal { $0.with(ordinalZeroBased: value) }
+        withPlain { $0.with(ordinalZeroBased: value) }
     }
 }
 
@@ -233,42 +233,42 @@ extension DateTime: DateProtocol {
 extension DateTime: TimeProtocol {
     @inlinable
     public var hour: Int {
-        naive.time.hour
+        plain.time.hour
     }
 
     @inlinable
     public var minute: Int {
-        naive.time.minute
+        plain.time.minute
     }
 
     @inlinable
     public var second: Int {
-        naive.time.second
+        plain.time.second
     }
 
     @inlinable
     public var nanosecond: Int {
-        naive.time.nanosecond
+        plain.time.nanosecond
     }
 
     @inlinable
     public func with(hour: Int) -> Self? {
-        withLocal { $0.with(hour: hour) }
+        withPlain { $0.with(hour: hour) }
     }
 
     @inlinable
     public func with(minute: Int) -> Self? {
-        withLocal { $0.with(minute: minute) }
+        withPlain { $0.with(minute: minute) }
     }
 
     @inlinable
     public func with(second: Int) -> Self? {
-        withLocal { $0.with(second: second) }
+        withPlain { $0.with(second: second) }
     }
 
     @inlinable
     public func with(nanosecond: Int) -> Self? {
-        withLocal { $0.with(nanosecond: nanosecond) }
+        withPlain { $0.with(nanosecond: nanosecond) }
     }
 }
 
@@ -322,23 +322,23 @@ extension DateTime: DurationRoundable {
     }
 }
 
-// MARK: - Naive Conversion
+// MARK: - Plain Conversion
 
 extension DateTime {
     /// The 'Wall Clock' view of the time.
     /// This applies the timezone offset to the stored UTC time.
     @inlinable
-    public var naive: NaiveDateTime {
-        instant.naiveDateTime(in: timezone)
+    public var plain: PlainDateTime {
+        instant.plainDateTime(in: timezone)
     }
 
     @usableFromInline
-    func withLocal(
+    func withPlain(
         resolving policy: DSTResolutionPolicy = .preferEarlier,
-        _ transform: (NaiveDateTime) -> NaiveDateTime?
+        _ transform: (PlainDateTime) -> PlainDateTime?
     ) -> Self? {
-        guard let newNaive = transform(naive),
-              let newInstant = newNaive.instant(
+        guard let newPlain = transform(plain),
+              let newInstant = newPlain.instant(
                   in: timezone,
                   resolving: policy
               )

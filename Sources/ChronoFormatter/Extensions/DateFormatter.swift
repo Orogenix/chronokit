@@ -1,7 +1,7 @@
 import ChronoCore
 import ChronoMath
 
-public extension NaiveDate {
+public extension PlainDate {
     @inlinable
     func rfc3339() -> String {
         let capacity = 10
@@ -50,7 +50,7 @@ public extension NaiveDate {
         *,
         deprecated,
         renamed: "rfc5322()",
-        message: "RFC 2822 is obsolete. Use `NaiveDate.rfc5322()` instead (per RFC 5322 Section 3.3)."
+        message: "RFC 2822 is obsolete. Use `PlainDate.rfc5322()` instead (per RFC 5322 Section 3.3)."
     )
     @inlinable
     @inline(__always)
@@ -59,7 +59,7 @@ public extension NaiveDate {
     }
 }
 
-extension NaiveDate {
+extension PlainDate {
     @usableFromInline
     func formatRFC3339(
         into raw: UnsafeMutableRawBufferPointer,
@@ -91,7 +91,7 @@ extension NaiveDate {
     }
 }
 
-extension NaiveDate: CustomStringConvertible {
+extension PlainDate: CustomStringConvertible {
     public var description: String {
         rfc3339()
     }

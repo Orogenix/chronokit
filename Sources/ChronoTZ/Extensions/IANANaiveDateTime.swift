@@ -1,7 +1,7 @@
 import ChronoCore
 import ChronoMath
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     func instant(
         in name: String,

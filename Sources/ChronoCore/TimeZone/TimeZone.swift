@@ -5,11 +5,11 @@ public protocol TimeZoneProtocol: Equatable, Hashable, Sendable {
     /// Returns the offset in Duration from UTC for a specific UTC timestamp.
     func offset(for instant: Instant) -> Duration
 
-    /// Returns the offset in Duration from local date time.
-    func offset(for local: NaiveDateTime) -> LocalOffset
+    /// Returns the offset in Duration from plain date time.
+    func offset(for plain: PlainDateTime) -> PlainOffset
 }
 
-public struct LocalOffsetMetadata: Equatable, Hashable, Sendable {
+public struct PlainOffsetMetadata: Equatable, Hashable, Sendable {
     public let duration: Duration
     public let isDST: Bool
 
@@ -22,7 +22,7 @@ public struct LocalOffsetMetadata: Equatable, Hashable, Sendable {
     }
 }
 
-public extension LocalOffsetMetadata {
+public extension PlainOffsetMetadata {
     static func standard(_ duration: Duration) -> Self {
         Self(duration: duration, isDST: false)
     }
@@ -38,15 +38,15 @@ public enum DSTResolutionPolicy: Equatable, Hashable, Sendable {
     case strict
 }
 
-public enum LocalOffset: Equatable, Hashable, Sendable {
-    case unique(LocalOffsetMetadata)
-    case ambiguous(earlier: LocalOffsetMetadata, later: LocalOffsetMetadata)
+public enum PlainOffset: Equatable, Hashable, Sendable {
+    case unique(PlainOffsetMetadata)
+    case ambiguous(earlier: PlainOffsetMetadata, later: PlainOffsetMetadata)
     case invalid
 }
 
-public extension LocalOffset {
+public extension PlainOffset {
     @inline(__always)
-    func resolve(using policy: DSTResolutionPolicy) -> LocalOffsetMetadata? {
+    func resolve(using policy: DSTResolutionPolicy) -> PlainOffsetMetadata? {
         switch self {
         case let .unique(offset):
             offset

@@ -8,7 +8,7 @@ struct MockTimeZone: TimeZoneProtocol {
         .seconds(offset)
     }
 
-    func offset(for _: NaiveDateTime) -> LocalOffset {
+    func offset(for _: PlainDateTime) -> PlainOffset {
         .unique(.standard(.seconds(offset)))
     }
 }
@@ -20,7 +20,7 @@ struct MockInvalidTimeZone: TimeZoneProtocol {
         .nanoseconds(-1)
     }
 
-    func offset(for _: NaiveDateTime) -> LocalOffset {
+    func offset(for _: PlainDateTime) -> PlainOffset {
         .invalid // Represents a time that doesn't exist (DST Gap)
     }
 }
@@ -32,7 +32,7 @@ struct MockGapTimeZone: TimeZoneProtocol {
         .zero
     }
 
-    func offset(for _: NaiveDateTime) -> LocalOffset {
+    func offset(for _: PlainDateTime) -> PlainOffset {
         .invalid
     }
 }
@@ -46,7 +46,7 @@ struct MockAmbiguousTimeZone: TimeZoneProtocol {
         .seconds(earlierOffset)
     }
 
-    func offset(for _: NaiveDateTime) -> LocalOffset {
+    func offset(for _: PlainDateTime) -> PlainOffset {
         .ambiguous(
             earlier: .dst(.seconds(earlierOffset)),
             later: .dst(.seconds(laterOffset))

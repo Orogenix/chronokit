@@ -12,7 +12,7 @@ struct DateParserTests {
         ("2024-02-29", 2024, 2, 29), // Leap year
     ])
     func validDateInit_rfc3339(input: String, year: Int32, month: Int, day: Int) {
-        let date = NaiveDate(rfc3339: input)
+        let date = PlainDate(rfc3339: input)
         #expect(date != nil)
         #expect(date?.year == year)
         #expect(date?.month == month)
@@ -22,7 +22,7 @@ struct DateParserTests {
     @Test("DateParserTests: RFC 3339 Initializes from full DateTime<TZ>")
     func initFromDateTimeString_rfc3339() {
         let input = "2025-12-29T15:30:45.123Z"
-        #expect(NaiveDate(rfc3339: input) == nil)
+        #expect(PlainDate(rfc3339: input) == nil)
     }
 
     @Test("DateParserTests: RFC 3339 Fails on invalid formatting", arguments: [
@@ -32,7 +32,7 @@ struct DateParserTests {
         "NotADate" // Garbage
     ])
     func invalidFormat_rfc3339(input: String) {
-        #expect(NaiveDate(rfc3339: input) == nil)
+        #expect(PlainDate(rfc3339: input) == nil)
     }
 
     @Test("DateParserTests: RFC 3339 Fails on invalid calendar dates", arguments: [
@@ -41,9 +41,9 @@ struct DateParserTests {
         "2023-02-29" // Not a leap year
     ])
     func invalidCalendar_rfc3339(input: String) {
-        // This ensures the internal NaiveDate(year:month:day:) validation
+        // This ensures the internal PlainDate(year:month:day:) validation
         // or your parseParts validation is working through the init
-        #expect(NaiveDate(rfc3339: input) == nil)
+        #expect(PlainDate(rfc3339: input) == nil)
     }
 }
 
@@ -58,7 +58,7 @@ extension DateParserTests {
         ("29 Feb 2024", 2024, 2, 29), // Leap year
     ])
     func validDateInit_rfc5322(input: String, year: Int32, month: Int, day: Int) {
-        let date = NaiveDate(rfc5322: input)
+        let date = PlainDate(rfc5322: input)
         #expect(date != nil)
         #expect(date?.year == year)
         #expect(date?.month == month)
@@ -71,7 +71,7 @@ extension DateParserTests {
         ("13   Apr   2026", 2026, 4, 13), // Multiple spaces (FWS)
     ])
     func flexibleFormatting_rfc5322(input: String, year: Int32, month: Int, day: Int) {
-        let date = NaiveDate(rfc5322: input)
+        let date = PlainDate(rfc5322: input)
         #expect(date != nil)
         #expect(date?.year == year)
         #expect(date?.month == month)
@@ -86,7 +86,7 @@ extension DateParserTests {
         "13 Apr 26", // 2-digit year (RFC 5322 mandates 4-digit in modern use)
     ])
     func invalidFormat_rfc5322(input: String) {
-        #expect(NaiveDate(rfc5322: input) == nil)
+        #expect(PlainDate(rfc5322: input) == nil)
     }
 }
 
@@ -97,8 +97,8 @@ extension DateParserTests {
     @Test("DateParserTests: RFC 2822 alias yields identical results to RFC 5322")
     func redirectedDeprecation_rfc2822() {
         let date = "Tue, 17 Mar 2026"
-        let modern = NaiveDate(rfc5322: date)
-        let deprecated = NaiveDate(rfc2822: date)
+        let modern = PlainDate(rfc5322: date)
+        let deprecated = PlainDate(rfc2822: date)
         #expect(deprecated != nil)
         #expect(deprecated == modern)
     }

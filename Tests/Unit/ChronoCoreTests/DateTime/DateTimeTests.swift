@@ -37,7 +37,7 @@ struct DateTimeTests {
 // MARK: - Comparison Tests
 
 extension DateTimeTests {
-    @Test("DateTimeTests: Comparison is based on absolute Instant, not local time")
+    @Test("DateTimeTests: Comparison is based on absolute Instant, not plain time")
     func absoluteComparison() {
         // Instant at 12:00:00 UTC
         let instant1 = Instant(seconds: 3600 * 12, nanoseconds: 0)
@@ -320,43 +320,43 @@ extension DateTimeTests {
     }
 }
 
-// MARK: - Local Transformation Tests
+// MARK: - Plain Transformation Tests
 
 extension DateTimeTests {
-    @Test("DateTimeTests: withLocal preserves TimeZone and Time")
-    func withLocalPreservation() throws {
+    @Test("DateTimeTests: withPlain preserves TimeZone and Time")
+    func withPlainPreservation() throws {
         let timezone = FixedOffset(seconds: 3600) // UTC+1
         let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: timezone))
 
         // Transform: Change only the year
-        let result = try #require(dt.withLocal { $0.with(year: 2030) })
+        let result = try #require(dt.withPlain { $0.with(year: 2030) })
 
         #expect(result.year == 2030)
         #expect(result.month == 1)
         #expect(result.day == 1)
-        #expect(result.naive.time.hour == 10)
+        #expect(result.plain.time.hour == 10)
         #expect(result.timezone.offset(for: result.instant) == .hours(1))
     }
 
-    @Test("DateTimeTests: withLocal handles nil transformations")
-    func withLocalNilSafety() throws {
+    @Test("DateTimeTests: withPlain handles nil transformations")
+    func withPlainNilSafety() throws {
         let utc: FixedOffset = .utc
         let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc))
 
         // Transform: Create an invalid date (Feb 30)
-        let result = dt.withLocal { $0.with(month: 2)?.with(day: 30) }
+        let result = dt.withPlain { $0.with(month: 2)?.with(day: 30) }
 
         #expect(result == nil, "Should return nil if the transformation closure returns nil")
     }
 
-    @Test("DateTimeTests: withLocal multi-component update")
-    func withLocalMultiUpdate() throws {
+    @Test("DateTimeTests: withPlain multi-component update")
+    func withPlainMultiUpdate() throws {
         let utc: FixedOffset = .utc
         let dt = try #require(DateTime(year: 2025, month: 1, day: 1, hour: 10, timezone: utc))
 
         // Transform: Change month and day in one go
-        let result = dt.withLocal { naive in
-            naive.with(month: 12)?.with(day: 25)
+        let result = dt.withPlain { plain in
+            plain.with(month: 12)?.with(day: 25)
         }
 
         #expect(result?.month == 12)
@@ -364,8 +364,8 @@ extension DateTimeTests {
         #expect(result?.year == 2025)
     }
 
-    @Test("DateTimeTests: naiveLocal reflects timezone offset")
-    func naiveLocalOffset() {
+    @Test("DateTimeTests: plain reflects timezone offset")
+    func plainOffset() {
         // 12:00 PM UTC
         let instant = Instant(seconds: 43200, nanoseconds: 0)
         let timezone = FixedOffset(seconds: -3600) // UTC-1
@@ -373,16 +373,16 @@ extension DateTimeTests {
         let dt = DateTime(instant: instant, timezone: timezone)
 
         // Wall clock should be 11:00 AM
-        #expect(dt.naive.time.hour == 11)
-        #expect(dt.naive.date.daysSinceEpoch == 0)
+        #expect(dt.plain.time.hour == 11)
+        #expect(dt.plain.date.daysSinceEpoch == 0)
     }
 }
 
 // MARK: - DST Resolution Tests (Mocked)
 
 extension DateTimeTests {
-    @Test("DateTimeTests: withLocal applies resolution policy")
-    func withLocalPolicy() throws {
+    @Test("DateTimeTests: withPlain applies resolution policy")
+    func withPlainPolicy() throws {
         let utc: FixedOffset = .utc
         // Note: This test becomes much more powerful when using a TimeZone
         // that actually has gaps/overlaps. For FixedOffset, policy has no effect.
@@ -390,7 +390,7 @@ extension DateTimeTests {
 
         // We can't easily spy on the policy without a MockTimeZone,
         // but we verify the parameter is accepted.
-        let result = try #require(dt.withLocal(resolving: .preferLater) { $0.with(day: 2) })
+        let result = try #require(dt.withPlain(resolving: .preferLater) { $0.with(day: 2) })
 
         #expect(result.day == 2)
     }
@@ -402,8 +402,8 @@ extension DateTimeTests {
         let dt = DateTime(instant: Instant(seconds: 0, nanoseconds: 0), timezone: gapTZ)
 
         // Try to modify the date. Because the mock says the result is .invalid,
-        // withLocal must return nil.
-        let result = dt.withLocal { $0.with(day: 2) }
+        // withPlain must return nil.
+        let result = dt.withPlain { $0.with(day: 2) }
 
         #expect(result == nil)
     }
@@ -413,12 +413,12 @@ extension DateTimeTests {
         let ambTZ = MockAmbiguousTimeZone(earlierOffset: 7200, laterOffset: 3600)
         let dt = DateTime(instant: Instant(seconds: 0, nanoseconds: 0), timezone: ambTZ)
 
-        // Force the local time to be exactly "Epoch Midnight" (0 seconds from Epoch)
-        let result = dt.withLocal(resolving: .preferEarlier) { _ in
-            NaiveDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)
+        // Force the plain time to be exactly "Epoch Midnight" (0 seconds from Epoch)
+        let result = dt.withPlain(resolving: .preferEarlier) { _ in
+            PlainDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)
         }
 
-        // Local(0) - Offset(7200) = -7200
+        // Plain(0) - Offset(7200) = -7200
         #expect(result?.instant.seconds == -7200)
     }
 
@@ -427,12 +427,12 @@ extension DateTimeTests {
         let ambTZ = MockAmbiguousTimeZone(earlierOffset: 7200, laterOffset: 3600)
         let dt = DateTime(instant: Instant(seconds: 0, nanoseconds: 0), timezone: ambTZ)
 
-        // Force the local time to be exactly "Epoch Midnight"
-        let result = dt.withLocal(resolving: .preferLater) { _ in
-            NaiveDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)
+        // Force the plain time to be exactly "Epoch Midnight"
+        let result = dt.withPlain(resolving: .preferLater) { _ in
+            PlainDateTime(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0)
         }
 
-        // Local(0) - Offset(3600) = -3600
+        // Plain(0) - Offset(3600) = -3600
         #expect(result?.instant.seconds == -3600)
     }
 }
@@ -524,7 +524,7 @@ extension DateTimeTests {
         let yr25 = try #require(base.with(year: 2025))
         #expect(yr25.year == 2025)
         #expect(yr25.timezone.offset(for: yr25.instant) == .hours(-5))
-        #expect(yr25.naive.time.hour == 14)
+        #expect(yr25.plain.time.hour == 14)
 
         // Test month symbols and zero-based
         #expect(base.with(monthSymbol: .august)?.month == 8)
@@ -533,7 +533,7 @@ extension DateTimeTests {
         // Test day modification
         let day25 = base.with(day: 25)
         #expect(day25?.day == 25)
-        #expect(day25?.naive.time.minute == 30)
+        #expect(day25?.plain.time.minute == 30)
     }
 
     @Test("DateTimeTests: Ordinal modifications")
@@ -628,7 +628,7 @@ extension DateTimeTests {
         #expect(modified.minute == 30, "Other time components must persist")
         #expect(modified.timezone.offset(for: modified.instant) == .hours(-5), "Timezone must be preserved")
 
-        // Validation: 24 is out of bounds for NaiveTime
+        // Validation: 24 is out of bounds for PlainTime
         #expect(base.with(hour: 24) == nil)
     }
 
@@ -727,10 +727,10 @@ extension DateTimeTests {
         }
     }
 
-    @Test("DateTimeTests: Rounding preserves local wall-clock alignment")
+    @Test("DateTimeTests: Rounding preserves plain wall-clock alignment")
     func roundingAlignment() throws {
         let timezone = FixedOffset(.hours(-1)) // UTC-1
-        // 10:00:00.750 Local
+        // 10:00:00.750 Plain
         let dt = try #require(DateTime(
             year: 2025, month: 1, day: 1,
             hour: 10, minute: 0, second: 0, nanosecond: 750_000_000,

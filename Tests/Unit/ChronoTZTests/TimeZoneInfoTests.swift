@@ -35,17 +35,17 @@ struct TimeZoneInfoTests {
     }
 }
 
-// MARK: - Local Offset Tests
+// MARK: - Plain Offset Tests
 
 extension TimeZoneInfoTests {
     @Test("TimeZoneInfoTests: Handles empty payload (Default offset)")
-    func localOffsetDefault() throws {
+    func plainOffsetDefault() throws {
         // No transitions/types, should default to 0
         let payload = makePayload(transitions: [], types: [TypeDefinition(offset: 0, isDST: 0)])
         let tz = TimeZoneInfo(identifier: "Empty/Zone", payload: payload)
 
-        let localTime = try #require(NaiveDateTime(year: 2026, month: 4, day: 24, second: 0, nanosecond: 0))
-        let result = tz.offset(for: localTime)
+        let plainTime = try #require(PlainDateTime(year: 2026, month: 4, day: 24, second: 0, nanosecond: 0))
+        let result = tz.offset(for: plainTime)
 
         if case let .unique(metadata) = result {
             #expect(metadata.duration == .seconds(0))
@@ -55,7 +55,7 @@ extension TimeZoneInfoTests {
     }
 
     @Test("TimeZoneInfoTests: Ambiguous for overlapping time (Fall Back)")
-    func localOffsetAmbiguous() throws {
+    func plainOffsetAmbiguous() throws {
         // Setup: Fall back transition at 01:00 UTC
         // Types: 0 = Standard (0s), 1 = DST (3600s)
         let types = [
@@ -74,14 +74,14 @@ extension TimeZoneInfoTests {
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
 
         // Query time: 01:30 AM
-        // This local time exists in both the DST period (00:30 UTC)
+        // This plain time exists in both the DST period (00:30 UTC)
         // and the Standard period (01:30 UTC).
-        let localTime = try #require(NaiveDateTime(
+        let plainTime = try #require(PlainDateTime(
             year: 2026, month: 4, day: 24,
             hour: 1, minute: 30
         ))
 
-        let offset = tz.offset(for: localTime)
+        let offset = tz.offset(for: plainTime)
 
         if case let .ambiguous(earlier, later) = offset {
             #expect(earlier.duration.seconds == 3600) // DST
@@ -92,7 +92,7 @@ extension TimeZoneInfoTests {
     }
 
     @Test("TimeZoneInfoTests: Invalid for non-existent time (Spring Gap)")
-    func localOffsetInvalid() throws {
+    func plainOffsetInvalid() throws {
         // Setup: Spring gap transition at 01:00 UTC
         // Types: 0 = Standard (0s), 1 = DST (3600s)
         let types = [
@@ -111,11 +111,11 @@ extension TimeZoneInfoTests {
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
 
         // Query time: 01:30 AM
-        // This local time doesn't exists in both the DST period (00:30 UTC)
+        // This plain time doesn't exists in both the DST period (00:30 UTC)
         // and the Standard period (01:30 UTC).
-        let localTime = try #require(NaiveDateTime(year: 2026, month: 4, day: 24, hour: 1, minute: 30))
+        let plainTime = try #require(PlainDateTime(year: 2026, month: 4, day: 24, hour: 1, minute: 30))
 
-        let offset = tz.offset(for: localTime)
+        let offset = tz.offset(for: plainTime)
 
         #expect(offset == .invalid, "Expected .invalid, got \(offset)")
     }

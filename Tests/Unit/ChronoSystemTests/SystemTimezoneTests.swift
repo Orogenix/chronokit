@@ -19,24 +19,24 @@ struct SystemTimeZoneTests {
         let instant = Instant(seconds: 1_777_636_800, nanoseconds: 0)
 
         let offset = tz.offset(for: instant)
-        let local = instant.naiveDateTime(in: FixedOffset(offset))
-        let resolvedOffset = tz.offset(for: local)
+        let plain = instant.plainDateTime(in: FixedOffset(offset))
+        let resolvedOffset = tz.offset(for: plain)
 
         if case let .unique(metadata) = resolvedOffset {
             #expect(metadata.duration == offset)
         }
     }
 
-    @Test("SystemTimeZoneTests: Local to Instant mapping via SystemTimeZone")
-    func localToOffsetMapping() throws {
+    @Test("SystemTimeZoneTests: Plain to Instant mapping via SystemTimeZone")
+    func plainToOffsetMapping() throws {
         let tz = SystemTimeZone()
         // Use a known 'safe' date (not near DST changes)
-        let local = try NaiveDateTime(
+        let plain = try PlainDateTime(
             date: #require(.init(year: 2026, month: 6, day: 1)),
             time: #require(.init(hour: 12, minute: 0, second: 0))
         )
 
-        let result = tz.offset(for: local)
+        let result = tz.offset(for: plain)
 
         // On most systems, this should be unique for June
         if case let .unique(metadata) = result {

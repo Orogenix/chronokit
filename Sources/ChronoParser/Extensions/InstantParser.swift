@@ -7,7 +7,7 @@ public extension Instant {
         let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = Self.parsedRFC3339(string)
 
         guard let parsed,
-              let naive = NaiveDateTime(
+              let plain = PlainDateTime(
                   year: Int32(parsed.date.year),
                   month: parsed.date.month,
                   day: parsed.date.day,
@@ -20,7 +20,7 @@ public extension Instant {
 
         let timezone = FixedOffset(.seconds(parsed.offset))
 
-        self = naive.instant(offset: timezone)
+        self = plain.instant(offset: timezone)
     }
 
     @inlinable
@@ -28,7 +28,7 @@ public extension Instant {
         let parsed: (date: ParsedDate, time: ParsedTime, offset: Int)? = Self.parsedRFC5322(string)
 
         guard let parsed,
-              let naive = NaiveDateTime(
+              let plain = PlainDateTime(
                   year: Int32(parsed.date.year),
                   month: parsed.date.month,
                   day: parsed.date.day,
@@ -41,7 +41,7 @@ public extension Instant {
 
         let timezone = FixedOffset(.seconds(parsed.offset))
 
-        self = naive.instant(offset: timezone)
+        self = plain.instant(offset: timezone)
     }
 
     @available(

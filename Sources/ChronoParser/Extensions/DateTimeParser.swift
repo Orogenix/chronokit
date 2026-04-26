@@ -1,7 +1,7 @@
 import ChronoCore
 import ChronoMath
 
-public extension NaiveDateTime {
+public extension PlainDateTime {
     @inlinable
     init?(rfc3339 string: String) {
         var input = string

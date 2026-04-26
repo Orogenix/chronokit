@@ -1,6 +1,6 @@
 import ChronoCore
 
-public extension NaiveTime {
+public extension PlainTime {
     @inlinable
     func rfc3339(digits: Int = 0) -> String {
         let capacity = 8 + (digits > 0 ? 1 + digits : 0)
@@ -45,7 +45,7 @@ public extension NaiveTime {
         *,
         deprecated,
         renamed: "rfc5322()",
-        message: "RFC 2822 is obsolete. Use `NaiveTime.rfc5322()` instead (per RFC 5322 Section 3.3)."
+        message: "RFC 2822 is obsolete. Use `PlainTime.rfc5322()` instead (per RFC 5322 Section 3.3)."
     )
     @inlinable
     @inline(__always)
@@ -54,7 +54,7 @@ public extension NaiveTime {
     }
 }
 
-extension NaiveTime {
+extension PlainTime {
     @usableFromInline
     func formatRFC3339(
         digits: Int,
@@ -74,7 +74,7 @@ extension NaiveTime {
     }
 }
 
-extension NaiveTime: CustomStringConvertible {
+extension PlainTime: CustomStringConvertible {
     public var description: String {
         rfc3339()
     }

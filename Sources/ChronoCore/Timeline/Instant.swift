@@ -221,11 +221,11 @@ extension Instant: DurationRoundable {
     }
 }
 
-// MARK: - Naive Conversion
+// MARK: - Plain Conversion
 
 public extension Instant {
     @inlinable
-    func naiveDateTime(in timezone: some TimeZoneProtocol) -> NaiveDateTime {
+    func plainDateTime(in timezone: some TimeZoneProtocol) -> PlainDateTime {
         let offset = timezone.offset(for: self)
 
         let totalSecs = seconds + offset.seconds
@@ -234,22 +234,22 @@ public extension Instant {
         let extraSecs = floorDiv(totalNanos, NanoSeconds.perSecond64)
         let finalNanos = floorMod(totalNanos, NanoSeconds.perSecond64)
 
-        let localSeconds = totalSecs + extraSecs
+        let plainSeconds = totalSecs + extraSecs
 
-        let days = floorDiv(localSeconds, Seconds.perDay64)
-        let secondsOfDay = floorMod(localSeconds, Seconds.perDay64)
+        let days = floorDiv(plainSeconds, Seconds.perDay64)
+        let secondsOfDay = floorMod(plainSeconds, Seconds.perDay64)
 
         let nanosSinceMidnight = secondsOfDay * NanoSeconds.perSecond64 + finalNanos
 
-        return NaiveDateTime(
-            date: NaiveDate(daysSinceEpoch: days),
-            time: NaiveTime(nanosecondsSinceMidnight: nanosSinceMidnight)
+        return PlainDateTime(
+            date: PlainDate(daysSinceEpoch: days),
+            time: PlainTime(nanosecondsSinceMidnight: nanosSinceMidnight)
         )
     }
 
     @inlinable
-    func naiveDateTimeUTC() -> NaiveDateTime {
-        naiveDateTime(in: FixedOffset.utc)
+    func plainDateTimeUTC() -> PlainDateTime {
+        plainDateTime(in: FixedOffset.utc)
     }
 }
 
