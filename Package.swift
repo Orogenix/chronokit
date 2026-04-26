@@ -79,7 +79,7 @@ let package = Package(
             ],
             path: "Sources/ChronoTZ",
             resources: [
-                .copy("Resources/iana.tzdb"),
+                .process("Resources/iana.tzdb"),
             ]
         ),
 
