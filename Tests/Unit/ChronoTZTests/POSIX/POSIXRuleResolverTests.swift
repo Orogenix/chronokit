@@ -33,7 +33,7 @@ struct POSIXRuleResolverTests {
 
 // MARK: - Edge Case Tests
 
-extension POSIXRuleEngineTests {
+extension POSIXRuleResolverTests {
     @Test("POSIXRuleResolverTests: Handles Southern Hemisphere wrap-around")
     func wrapAroundTransition() throws {
         // Simple rule: DST starts in Oct, ends in March (Southern Hemisphere)
