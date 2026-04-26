@@ -1,9 +1,9 @@
-<div align="center">
-  <br>
-  <strong>ChronoKit</strong><br>
-  <small>High-performance, no-foundation, and zero-dependency date and time primitives for Swift.</small>
-  <br><br>
-</div>
+<h1 align="center">
+  <code>quasar</code>
+</h1>
+<p align="center">
+  High-performance, no-foundation, and zero-dependency date and time primitives for Swift.
+</p>
 
 ChronoKit is designed for systems where runtime efficiency and binary size are critical, providing an alternative to `Foundation` with zero dependencies.
 
