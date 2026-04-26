@@ -18,6 +18,7 @@ package enum ResourceLocator {
         let baseDir = String(path.split(separator: "/").dropLast().joined(separator: "/"))
         let candidate = "\(baseDir)/Resources/\(name)"
 
+        print("✅ Found \(name) at: \(candidate)")
         return access(candidate, F_OK) == 0 ? candidate : nil
 
         // var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
