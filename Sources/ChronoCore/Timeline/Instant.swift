@@ -8,7 +8,7 @@ public struct Instant: Equatable, Hashable, Sendable {
     public init(seconds: Int64, nanoseconds: Int32 = 0) {
         precondition(
             nanoseconds >= 0 && nanoseconds < NanoSeconds.perSecond32,
-            "nanoseconds exceeds supported Instant's fraction range.",
+            "nanoseconds exceeds supported Instant's fraction range."
         )
 
         self.seconds = seconds
@@ -20,11 +20,6 @@ public struct Instant: Equatable, Hashable, Sendable {
 
 public extension Instant {
     static let zero: Self = .init(seconds: 0, nanoseconds: 0)
-
-    @inlinable
-    static func now() -> Self {
-        SystemClock.shared.now()
-    }
 }
 
 // MARK: - Comparability
@@ -79,7 +74,7 @@ public extension Instant {
         let remNanos = floorMod(totalNanos, NanoSeconds.perSecond64)
         return Self(
             seconds: self.seconds + seconds + extraSeconds,
-            nanoseconds: Int32(remNanos),
+            nanoseconds: Int32(remNanos)
         )
     }
 
@@ -87,7 +82,7 @@ public extension Instant {
     func advanced(by duration: Duration) -> Self {
         advanced(
             bySeconds: duration.seconds,
-            nanoseconds: Int64(duration.nanoseconds),
+            nanoseconds: Int64(duration.nanoseconds)
         )
     }
 }
@@ -124,7 +119,7 @@ public extension Instant {
 
         return Duration(
             seconds: secDiff + extraSec,
-            nanoseconds: normalizedNanos,
+            nanoseconds: normalizedNanos
         )
     }
 
@@ -132,7 +127,7 @@ public extension Instant {
     static func - (lhs: Self, rhs: Duration) -> Self {
         lhs.advanced(
             bySeconds: -rhs.seconds,
-            nanoseconds: -Int64(rhs.nanoseconds),
+            nanoseconds: -Int64(rhs.nanoseconds)
         )
     }
 
@@ -248,7 +243,7 @@ public extension Instant {
 
         return NaiveDateTime(
             date: NaiveDate(daysSinceEpoch: days),
-            time: NaiveTime(nanosecondsSinceMidnight: nanosSinceMidnight),
+            time: NaiveTime(nanosecondsSinceMidnight: nanosSinceMidnight)
         )
     }
 

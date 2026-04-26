@@ -5,7 +5,7 @@ public extension NaiveDateTime {
     @inlinable
     func rfc3339(digits: Int = 0, offset: FixedOffset? = nil) -> String {
         let capacity = 48
-        let duration = offset?.offset(for: self).resolve(using: .preferEarlier)
+        let duration = offset?.offset(for: self).resolve(using: .preferEarlier)?.duration
 
         if #available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *) {
             return String(unsafeUninitializedCapacity: capacity) { buffer in
@@ -37,7 +37,7 @@ public extension NaiveDateTime {
     @inlinable
     func rfc5322(offset: FixedOffset? = nil) -> String? {
         let capacity = 32
-        let duration = offset?.offset(for: self).resolve(using: .preferEarlier)
+        let duration = offset?.offset(for: self).resolve(using: .preferEarlier)?.duration
 
         guard let month = Month(rawValue: month) else { return nil }
         let weekday = Weekday(rawValue: weekday)
