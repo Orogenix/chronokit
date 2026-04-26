@@ -5,6 +5,11 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "**/*.swift"
+      - "Makefile"
+      - "Package.swift"
+      - "Package.resolved"
 
 env:
   RUST_TOOLCHAIN: stable
