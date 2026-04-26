@@ -1,0 +1,50 @@
+#if canImport(Darwin)
+    import Darwin
+    import MachO
+#elseif canImport(Glibc)
+    import Glibc
+#elseif canImport(Musl)
+    import Musl
+#else
+    #error("Unsupported platform: Standard C library not found.")
+#endif
+
+package enum ResourceLocator {
+    package static func find(named name: String) -> String? {
+        var info = Dl_info()
+        let symbol = unsafeBitCast(FileSystem.self, to: UnsafeRawPointer.self)
+        guard dladdr(symbol, &info) != 0 else { return nil }
+
+        guard let path = info.dli_fname else { return nil }
+        let libPath = String(cString: path)
+        let libDir = String(libPath.split(separator: "/").dropLast().joined(separator: "/"))
+
+        let candidates = [
+            "\(libDir)/Resources/\(name)", // Standard placement
+            "\(libDir)/../Resources/\(name)", // Common nested bundle
+            "\(libDir)/../../Resources/\(name)", // Deep hierarchy
+        ]
+
+        for path in candidates where access(path, F_OK) == 0 {
+            return path
+        }
+
+        return nil
+    }
+
+    /// Development/Testing: Fallback to the CWD (Project Root).
+    package static func findInProject(named name: String) -> String? {
+        #if DEBUG
+            var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
+            guard getcwd(&buffer, buffer.count) != nil else { return nil }
+
+            let bytes = buffer.prefix { $0 != 0 }.map { UInt8($0) }
+            let root = String(decoding: bytes, as: UTF8.self)
+            let candidate = "\(root)/Sources/ChronoTZ/Resources/\(name)"
+
+            return access(candidate, F_OK) == 0 ? candidate : nil
+        #else
+            return nil
+        #endif
+    }
+}
