@@ -2,7 +2,7 @@ import ChronoMath
 
 public struct NaiveTime: Equatable, Hashable, Sendable {
     @usableFromInline
-    let nanosecondsSinceMidnight: Int64
+    package let nanosecondsSinceMidnight: Int64
 
     public let hour: Int
     public let minute: Int
@@ -25,12 +25,12 @@ public struct NaiveTime: Equatable, Hashable, Sendable {
         let remAfterMinutes = remAfterHours % NanoSeconds.perMinute64
 
         let second = remAfterMinutes / NanoSeconds.perSecond64
-        let nanos = remAfterMinutes % NanoSeconds.perSecond64
+        let nanosecond = remAfterMinutes % NanoSeconds.perSecond64
 
         self.hour = Int(hour)
         self.minute = Int(minute)
         self.second = Int(second)
-        nanosecond = Int(nanos)
+        self.nanosecond = Int(nanosecond)
     }
 
     @inlinable
@@ -52,6 +52,8 @@ public struct NaiveTime: Equatable, Hashable, Sendable {
             + Int64(nanosecond)
     }
 }
+
+// MARK: - Comparability
 
 extension NaiveTime: Comparable {
     @inlinable
@@ -132,6 +134,8 @@ public extension NaiveTime {
     }
 }
 
+// MARK: - Time Protocol
+
 extension NaiveTime: TimeProtocol {
     @inlinable
     public func with(hour: Int) -> Self? {
@@ -153,6 +157,8 @@ extension NaiveTime: TimeProtocol {
         Self(hour: hour, minute: minute, second: second, nanosecond: nanosecond)
     }
 }
+
+// MARK: - Subsecond Rounding
 
 extension NaiveTime: SubsecondRoundable {
     @inlinable
@@ -189,6 +195,8 @@ extension NaiveTime: SubsecondRoundable {
         return Self(nanosecondsSinceMidnight: nanos - deltaDown)
     }
 }
+
+// MARK: - Naive Date Time Conversion
 
 public extension NaiveTime {
     @inlinable
