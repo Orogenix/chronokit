@@ -11,32 +11,20 @@
 
 package enum ResourceLocator {
     package static func find(named name: String) -> String? {
-        // var info = Dl_info()
-        // let symbol = unsafeBitCast(FileSystem.self, to: UnsafeRawPointer.self)
-        // guard dladdr(symbol, &info) != 0 else { return nil }
-        //
-        // guard let path = info.dli_fname else { return nil }
-        // let libPath = String(cString: path)
-        // let libDir = String(libPath.split(separator: "/").dropLast().joined(separator: "/"))
+        var info = Dl_info()
+        let symbol = unsafeBitCast(ResourceLocator.self, to: UnsafeRawPointer.self)
+        dladdr(symbol, &info)
+        let path = String(cString: info.dli_fname)
+        let baseDir = String(path.split(separator: "/").dropLast().joined(separator: "/"))
+        let candidate = "\(baseDir)/Resources/\(name)"
 
-        // let bundleName = "ChronoTZ_ChronoTZ.bundle"
-        //
-        // let candidates = [
-        //     "\(libDir)/\(bundleName)/Resources/\(name)",
-        //     "\(libDir)/\(bundleName)/\(name)",
-        //     "\(libDir)/../Resources/\(name)",
-        //     "\(libDir)/../../Resources/\(name)",
-        // ]
-        //
-        // for path in candidates where access(path, F_OK) == 0 {
-        //     return path
-        // }
+        return access(candidate, F_OK) == 0 ? candidate : nil
 
-        var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
-        guard getcwd(&buffer, buffer.count) != nil else { return nil }
-        let bytes = buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
-        let root = String(decoding: bytes, as: UTF8.self)
-        return search(in: root, for: name)
+        // var buffer = [CChar](repeating: 0, count: Int(PATH_MAX))
+        // guard getcwd(&buffer, buffer.count) != nil else { return nil }
+        // let bytes = buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+        // let root = String(decoding: bytes, as: UTF8.self)
+        // return search(in: root, for: name)
     }
 
     private static func search(in directory: String, for fileName: String) -> String? {
@@ -46,12 +34,14 @@ package enum ResourceLocator {
         while let entry = readdir(dir) {
             let namePtr = entry.pointee.d_name
             let entryName = withUnsafePointer(to: namePtr) {
-                $0.withMemoryRebound(to: CChar.self, capacity: Int(MemoryLayout.size(ofValue: namePtr))) {
+                $0.withMemoryRebound(
+                    to: CChar.self,
+                    capacity: Int(MemoryLayout.size(ofValue: namePtr))
+                ) {
                     String(cString: $0)
                 }
             }
 
-            // Skip self and parent
             if entryName == "." || entryName == ".." { continue }
 
             let fullPath = "\(directory)/\(entryName)"
@@ -60,7 +50,6 @@ package enum ResourceLocator {
             if entryName == fileName {
                 var st = stat()
                 if stat(fullPath, &st) == 0, st.st_mode & S_IFMT == S_IFREG {
-                    print("✅ Found \(fileName) at: \(fullPath)")
                     return fullPath
                 }
             }
