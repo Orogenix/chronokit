@@ -14,9 +14,10 @@ package enum ResourceLocator {
         var info = Dl_info()
         let symbol = unsafeBitCast(ResourceLocator.self, to: UnsafeRawPointer.self)
         dladdr(symbol, &info)
+
         let path = String(cString: info.dli_fname)
         let baseDir = String(path.split(separator: "/").dropLast().joined(separator: "/"))
-        let candidate = "\(baseDir)/Resources/\(name)"
+        let candidate = "/\(baseDir)/Resources/\(name)"
 
         print("✅ Found \(name) at: \(candidate)")
         return access(candidate, F_OK) == 0 ? candidate : nil
