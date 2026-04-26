@@ -19,18 +19,43 @@ package enum ResourceLocator {
         let libPath = String(cString: path)
         let libDir = String(libPath.split(separator: "/").dropLast().joined(separator: "/"))
 
-        let bundleName = "ChronoTZ_ChronoTZ.bundle"
+        if let dir = opendir(libDir) {
+            defer { closedir(dir) }
 
-        let candidates = [
-            "\(libDir)/\(bundleName)/Resources/\(name)",
-            "\(libDir)/\(bundleName)/\(name)",
-            "\(libDir)/../Resources/\(name)",
-            "\(libDir)/../../Resources/\(name)",
-        ]
+            while let entry = readdir(dir) {
+                let namePtr = entry.pointee.d_name
+                let fileName = withUnsafePointer(to: namePtr) {
+                    $0.withMemoryRebound(to: CChar.self, capacity: Int(MemoryLayout.size(ofValue: namePtr))) {
+                        String(cString: $0)
+                    }
+                }
 
-        for path in candidates where access(path, F_OK) == 0 {
-            return path
+                if fileName.hasSuffix(".bundle") {
+                    let candidate = "\(libDir)/\(fileName)/Resources/\(name)"
+                    if access(candidate, F_OK) == 0 {
+                        return candidate
+                    }
+
+                    let altCandidate = "\(libDir)/\(fileName)/\(name)"
+                    if access(altCandidate, F_OK) == 0 {
+                        return altCandidate
+                    }
+                }
+            }
         }
+
+        // let bundleName = "ChronoTZ_ChronoTZ.bundle"
+        //
+        // let candidates = [
+        //     "\(libDir)/\(bundleName)/Resources/\(name)",
+        //     "\(libDir)/\(bundleName)/\(name)",
+        //     "\(libDir)/../Resources/\(name)",
+        //     "\(libDir)/../../Resources/\(name)",
+        // ]
+        //
+        // for path in candidates where access(path, F_OK) == 0 {
+        //     return path
+        // }
 
         return nil
     }
