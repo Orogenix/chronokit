@@ -1,5 +1,6 @@
 import ChronoCore
 @testable import ChronoFormatter
+import ChronoSystem
 import Testing
 
 // MARK: - RFC 3339 Tests
@@ -149,7 +150,7 @@ extension DateTimeFormatterTests {
         }
 
         func offset(for _: NaiveDateTime) -> LocalOffset {
-            return .unique(Duration.seconds(0))
+            return .unique(.standard(.seconds(0)))
         }
     }
 }
