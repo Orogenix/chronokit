@@ -34,9 +34,10 @@ print(datetime) // 2026-04-26T19:00:00Z
 
 ## Supported Standards
 
-| Standard | Description |
-| **RFC 3339** | Date and Time on the Internet (Timestamps) |
-| **RFC 5322** | Internet Message Format |
+| Standard     | Description                                      |
+| ------------ | ------------------------------------------------ |
+| **RFC 3339** | Date and Time on the Internet (Timestamps)       |
+| **RFC 5322** | Internet Message Format                          |
 | **RFC 2822** | Obsolete Internet Message Format (Legacy Bridge) |
 
 ## Performance Philosophy
