@@ -55,7 +55,7 @@ package enum TZDBCodec {
         for _ in 0 ..< transitionCount {
             let time = try reader.readBigEndian(Int64.self)
             let typeIndex = try reader.readByte()
-            transitions.append(Transition(unixTime: time, typeIndex: typeIndex))
+            try transitions.append(Transition(unixTime: time, typeIndex: typeIndex))
         }
 
         var types: [TypeDefinition] = []
@@ -63,7 +63,7 @@ package enum TZDBCodec {
         for _ in 0 ..< typeCount {
             let offsetVal = try reader.readBigEndian(Int32.self)
             let isDST = try reader.readByte()
-            types.append(TypeDefinition(offset: offsetVal, isDST: isDST))
+            try types.append(TypeDefinition(offset: offsetVal, isDST: isDST))
         }
 
         let ruleLength = try reader.readBigEndian(UInt32.self)

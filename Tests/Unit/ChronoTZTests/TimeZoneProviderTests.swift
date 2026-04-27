@@ -69,8 +69,8 @@ extension TimeZoneProviderTests {
         entryName: String
     ) throws {
         // Serialize the payload
-        let types = [TypeDefinition(offset: 0, isDST: 0)]
-        let transitions = [Transition(unixTime: 0, typeIndex: 0)]
+        let types = try [TypeDefinition(offset: 0, isDST: 0)]
+        let transitions = try [Transition(unixTime: 0, typeIndex: 0)]
         let validPayload = TZDataPayload(
             transitionCount: 1,
             typeCount: 1,

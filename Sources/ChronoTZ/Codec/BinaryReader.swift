@@ -72,4 +72,21 @@ extension BinaryReader {
         guard offset + bytes <= capacity else { throw .prematureEOF }
         offset += bytes
     }
+
+    mutating func skipUntil(
+        bytes: [UInt8],
+        failed error: CodecError = .prematureEOF
+    ) throws(CodecError) {
+        let count = bytes.count
+
+        while remainingBytes >= count {
+            let next = try peekBytes(count: count)
+            if next == bytes {
+                return
+            }
+            try skip(bytes: 1)
+        }
+
+        throw error
+    }
 }

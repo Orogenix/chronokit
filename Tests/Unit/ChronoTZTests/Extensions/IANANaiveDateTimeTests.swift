@@ -9,7 +9,7 @@ struct IANAPlainDateTimeTests {
     func instantConversionSuccess() throws {
         let mock = MockTimeZoneProvider()
         let tzName = "UTC"
-        let tz = TimeZoneInfo(identifier: tzName, payload: makePayload())
+        let tz = try TimeZoneInfo(identifier: tzName, payload: TZDataPayload.makePayload())
         mock.insertZones(tzName, tz: tz)
 
         let plainDateTime = try #require(sample, "Sample plain date time should valid")
@@ -22,7 +22,7 @@ struct IANAPlainDateTimeTests {
     func dateTimeConversionSuccess() throws {
         let mock = MockTimeZoneProvider()
         let tzName = "UTC"
-        let tz = TimeZoneInfo(identifier: tzName, payload: makePayload())
+        let tz = try TimeZoneInfo(identifier: tzName, payload: TZDataPayload.makePayload())
         mock.insertZones(tzName, tz: tz)
 
         let plainDateTime = try #require(sample, "Sample plain date time should valid")
@@ -43,23 +43,5 @@ struct IANAPlainDateTimeTests {
         #expect(throws: TimeZoneError.zoneNotFound("Invalid/Zone")) {
             try plainDateTime.dateTime(timezone: "Invalid/Zone", provider: mock)
         }
-    }
-}
-
-// MARK: - Helpers
-
-extension IANAPlainDateTimeTests {
-    private func makePayload(
-        transitions: [Transition] = [],
-        types: [TypeDefinition] = [TypeDefinition(offset: 0, isDST: 0)],
-        posixRule: String? = nil
-    ) -> TZDataPayload {
-        return TZDataPayload(
-            transitionCount: UInt32(transitions.count),
-            typeCount: UInt32(types.count),
-            transitions: transitions,
-            types: types,
-            posixRule: posixRule
-        )
     }
 }

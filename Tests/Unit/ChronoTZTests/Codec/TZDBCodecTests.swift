@@ -4,7 +4,7 @@ import Testing
 struct TZDBCodecTests {
     @Test("TZDBCodecTests: Round-trip encoding and decoding (Complex payload)")
     func roundTripComplex() throws {
-        let original = TZDataPayload(
+        let original = try TZDataPayload(
             transitionCount: 1,
             typeCount: 1,
             transitions: [Transition(unixTime: 1_777_636_800, typeIndex: 1)],

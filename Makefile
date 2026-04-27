@@ -129,8 +129,7 @@ $(ZIC):
 	@echo "Building zic using IANA's Makefile..."
 	@$(MAKE) -C $(TZDB_DIR) zic
 
-compile-tz: 
-	$(ZIC)
+compile-tz: $(ZIC)
 	@mkdir -p $(COMPILED_TZDB)
 	@echo "Compiling IANA source with zic..."
 	@$(ZIC) -d $(COMPILED_TZDB) $(TZ_SOURCE_FILES)
@@ -159,3 +158,4 @@ clean-tz:
 	@echo "Cleaning output artifacts..."
 	@rm -f $(OUT_BIN_TZDB) $(OUT_C_TZDB).c $(OUT_C_TZDB).h $(OUT_SWIFT_TZDB)
 	@rm -rf $(COMPILED_TZDB)
+	@$(MAKE) -C $(TZDB_DIR) clean
