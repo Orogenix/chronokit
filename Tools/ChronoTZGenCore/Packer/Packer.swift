@@ -4,7 +4,7 @@ import ChronoTZ
 package struct Packer {
     package struct Context {
         var blobCache: [[UInt8]: UInt32] = [:]
-        var indexTable: [TZIndexEntry] = []
+        var indexTable: [TZDBIndexEntry] = []
     }
 
     private static let ignoreList: Set<String> = [
@@ -14,16 +14,16 @@ package struct Packer {
     ]
 
     let sourceDir: String
-    let decode: ([UInt8]) throws -> TZDataPayload
-    let encode: (TZDataPayload) throws -> [UInt8]
+    let parse: ([UInt8]) throws -> TZDBDataPayload
+    let encode: (TZDBDataPayload) throws -> [UInt8]
 
     package init(
         sourceDir: String,
-        decode: @escaping ([UInt8]) throws -> TZDataPayload = IANACodec.decode(from:),
-        encode: @escaping (TZDataPayload) throws -> [UInt8] = TZDBCodec.encode(_:)
+        parse: @escaping ([UInt8]) throws -> TZDBDataPayload = TZifParser.parse(from:),
+        encode: @escaping (TZDBDataPayload) throws -> [UInt8] = TZDBCodec.encode(_:)
     ) {
         self.sourceDir = sourceDir
-        self.decode = decode
+        self.parse = parse
         self.encode = encode
     }
 }
@@ -68,15 +68,15 @@ package extension Packer {
         let entries = try scanDirectory(at: sourceDir)
         var ctx = Context()
 
-        let dataStartOffset = UInt32(TZHeader.ianaSize + (entries.count * TZIndexEntry.fixedSize))
+        let dataStartOffset = UInt32(TZDBHeader.ianaSize + (entries.count * TZDBIndexEntry.fixedSize))
         var currentOffset = dataStartOffset
 
         for entry in entries {
             let rawBytes = try readFileBytes(path: entry.path)
 
-            let payload: TZDataPayload
+            let payload: TZDBDataPayload
             do {
-                payload = try decode(rawBytes)
+                payload = try parse(rawBytes)
             } catch {
                 print("Failed to decode: \(entry.path). Error: \(error)")
                 throw PackerError.invalidPayload(path: entry.path)
@@ -93,10 +93,10 @@ package extension Packer {
             let size = UInt32(serialized.count)
 
             if let existingOffset = ctx.blobCache[serialized] {
-                ctx.indexTable.append(TZIndexEntry(name: entry.name, offset: existingOffset, size: size))
+                ctx.indexTable.append(TZDBIndexEntry(name: entry.name, offset: existingOffset, size: size))
             } else {
                 ctx.blobCache[serialized] = currentOffset
-                ctx.indexTable.append(TZIndexEntry(name: entry.name, offset: currentOffset, size: size))
+                ctx.indexTable.append(TZDBIndexEntry(name: entry.name, offset: currentOffset, size: size))
                 currentOffset += size
             }
         }

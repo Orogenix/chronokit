@@ -3,7 +3,7 @@ import ChronoTZ
 
 struct BinaryEmitter {
     private func writeHeader(
-        _ header: TZHeader,
+        _ header: TZDBHeader,
         to fd: Int32
     ) throws {
         try writeBytes(header.magic, to: fd)
@@ -12,7 +12,7 @@ struct BinaryEmitter {
     }
 
     private func writeIndexTable(
-        _ table: [TZIndexEntry],
+        _ table: [TZDBIndexEntry],
         to fd: Int32
     ) throws {
         for entry in table {
@@ -47,7 +47,7 @@ extension BinaryEmitter: Emitter {
         let fd = try FileSystem.openFile(tempPath, mode: .writeCreateTruncate)
         defer { FileSystem.closeFile(fd) }
 
-        let header: TZHeader = .iana(tableSize: ctx.indexTable.count)
+        let header: TZDBHeader = .iana(tableSize: ctx.indexTable.count)
         try writeHeader(header, to: fd)
         try writeIndexTable(ctx.indexTable, to: fd)
         try writeEntries(ctx.blobCache, to: fd)

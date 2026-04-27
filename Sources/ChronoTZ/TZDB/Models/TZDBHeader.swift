@@ -1,4 +1,4 @@
-package struct TZHeader: Equatable, Hashable {
+package struct TZDBHeader: Equatable, Hashable {
     package var magic: FixedMagic
     package var version: UInt32
     package var count: UInt32
@@ -24,7 +24,7 @@ package struct TZHeader: Equatable, Hashable {
     }
 }
 
-package extension TZHeader {
+package extension TZDBHeader {
     static let ianaMagicSize: Int = FixedMagic.size
     static let ianaVersionSize: Int = 4
     static let ianaCountSize: Int = 4

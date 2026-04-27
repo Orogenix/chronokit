@@ -1,19 +1,20 @@
-@testable import ChronoTZ
+@testable import ChronoSystem
+@testable import ChronoTZGenCore
 import Testing
 
 struct IANACodecTests {
     @Test("IANACodecTests: Invalid header throws error")
     func testInvalidHeader() throws {
         let invalidData: [UInt8] = [0x00, 0x00, 0x00, 0x00]
-        #expect(throws: CodecError.invalidHeader) {
-            _ = try IANACodec.decode(from: invalidData)
+        #expect(throws: TZifError.invalidHeader) {
+            _ = try TZifParser.parse(from: invalidData)
         }
     }
 
     @Test("IANACodecTests: Valid payload decoding")
     func decodeSuccess() throws {
         let data = try createMockTZif()
-        let payload = try IANACodec.decode(from: data)
+        let payload = try TZifParser.parse(from: data)
 
         #expect(payload.transitionCount == 1)
         #expect(payload.typeCount == 1)

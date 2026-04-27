@@ -2,10 +2,10 @@ import ChronoCore
 
 public struct TimeZoneInfo: Equatable, Hashable, Sendable, TimeZoneProtocol {
     public let identifier: String
-    let payload: TZDataPayload
+    let payload: TZDBDataPayload
     private let uniqueOffset: Set<Int32>
 
-    package init(identifier: String, payload: TZDataPayload) {
+    package init(identifier: String, payload: TZDBDataPayload) {
         self.identifier = identifier
         self.payload = payload
         uniqueOffset = Set(payload.types.map(\.offset))

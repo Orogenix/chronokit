@@ -1,4 +1,4 @@
-@testable import ChronoTZ
+@testable import ChronoSystem
 import Testing
 
 struct BinaryWriterTests {
@@ -32,7 +32,7 @@ struct BinaryWriterTests {
     func testBufferOverflow() throws {
         // Capacity 2, trying to write 3 bytes
         _ = try withWriter(capacity: 2) { writer in
-            #expect(throws: CodecError.bufferOverflow) {
+            #expect(throws: BinaryError.bufferOverflow) {
                 try writer.writeBytes([0x01, 0x02, 0x03])
             }
         }
@@ -42,7 +42,7 @@ struct BinaryWriterTests {
     func writeBigEndianOverflow() throws {
         // Capacity 2, trying to write UInt32 (4 bytes)
         _ = try withWriter(capacity: 2) { writer in
-            #expect(throws: CodecError.bufferOverflow) {
+            #expect(throws: BinaryError.bufferOverflow) {
                 try writer.writeBigEndian(UInt32(0x01))
             }
         }

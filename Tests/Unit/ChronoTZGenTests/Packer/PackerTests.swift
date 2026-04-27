@@ -23,7 +23,7 @@ struct PackerTests {
         // We "mock" the codec by returning a dummy payload and returning the input bytes as the encoded output
         let packer = Packer(
             sourceDir: sandbox.path,
-            decode: { _ in TZDataPayload(transitionCount: 0, typeCount: 0, transitions: [], types: []) },
+            parse: { _ in TZDBDataPayload(transitionCount: 0, typeCount: 0, transitions: [], types: []) },
             encode: { _ in data }
         )
 

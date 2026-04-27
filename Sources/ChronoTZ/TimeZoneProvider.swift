@@ -53,7 +53,7 @@ extension IANAProvider: TimeZoneProvider {
 
         let buffer = try registry.getPayload(for: entry)
         guard let payload = try? TZDBCodec.decode(from: buffer) else {
-            throw CodecError.corruptionError("Failed to decode: \(name)")
+            throw TZDBError.corruptionError("Failed to decode: \(name)")
         }
 
         return TimeZoneInfo(identifier: name, payload: payload)

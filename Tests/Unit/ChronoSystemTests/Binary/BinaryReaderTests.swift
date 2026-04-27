@@ -1,4 +1,4 @@
-@testable import ChronoTZ
+@testable import ChronoSystem
 import Testing
 
 struct BinaryReaderTests {
@@ -69,7 +69,7 @@ struct BinaryReaderTests {
         let data: [UInt8] = [0x01]
         try withReader(bytes: data) { reader in
             // Try to read 2 bytes from a 1-byte buffer
-            #expect(throws: CodecError.prematureEOF) {
+            #expect(throws: BinaryError.prematureEOF) {
                 _ = try reader.read(UInt16.self)
             }
         }
