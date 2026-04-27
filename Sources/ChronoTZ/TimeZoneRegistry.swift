@@ -24,7 +24,7 @@ extension TimeZoneRegistry {
         let version = try reader.readBigEndian(UInt32.self)
         let count = try reader.readBigEndian(UInt32.self)
         let header = TZHeader(magic: magic, version: version, count: count)
-        guard header.magic == .tzdb else { throw CodecError.invalidHeader }
+        guard header.magic == .tzdb else { throw TZDBError.invalidHeader }
         self.header = header
 
         // Index Entry

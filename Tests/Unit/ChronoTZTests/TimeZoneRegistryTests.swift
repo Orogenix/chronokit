@@ -1,3 +1,4 @@
+@testable import ChronoSystem
 @testable import ChronoTZ
 import Foundation
 import Testing
@@ -11,7 +12,7 @@ struct TimeZoneRegistryTests {
         // Write garbage data
         try Data("GARBAGE".utf8).write(to: tempURL)
 
-        #expect(throws: CodecError.prematureEOF) {
+        #expect(throws: BinaryError.prematureEOF) {
             _ = try TimeZoneRegistry(path: tempURL.path)
         }
     }

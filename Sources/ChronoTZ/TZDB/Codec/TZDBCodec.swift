@@ -1,3 +1,5 @@
+import ChronoSystem
+
 package enum TZDBCodec {
     package static func encode(_ payload: TZDataPayload) throws -> [UInt8] {
         let ruleBytes = Array(payload.posixRule?.utf8 ?? "".utf8)
@@ -11,7 +13,7 @@ package enum TZDBCodec {
         var data = [UInt8](repeating: 0, count: size)
 
         try data.withUnsafeMutableBytes { buffer in
-            guard let baseAddress = buffer.baseAddress else { throw CodecError.memoryAccessFailed }
+            guard let baseAddress = buffer.baseAddress else { throw TZDBError.memoryAccessFailed }
 
             var writer = BinaryWriter(ptr: baseAddress, capacity: buffer.count)
 
@@ -44,7 +46,7 @@ package enum TZDBCodec {
     }
 
     package static func decode(from buffer: UnsafeRawBufferPointer) throws -> TZDataPayload {
-        guard let baseAddress = buffer.baseAddress else { throw CodecError.prematureEOF }
+        guard let baseAddress = buffer.baseAddress else { throw TZDBError.prematureEOF }
         var reader = BinaryReader(ptr: baseAddress, capacity: buffer.count)
 
         let transitionCount = try reader.readBigEndian(UInt32.self)

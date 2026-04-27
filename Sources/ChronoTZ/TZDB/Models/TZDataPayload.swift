@@ -114,7 +114,7 @@ package struct Transition: Equatable, Hashable {
         let minTransitionTime: Int64 = -(1 << 59)
 
         guard unixTime >= minTransitionTime else {
-            throw CodecError.invalidTransitionTime
+            throw TZDBError.invalidTransitionTime
         }
 
         self.unixTime = unixTime
@@ -136,11 +136,11 @@ package struct TypeDefinition: Equatable, Hashable {
         isDST: UInt8
     ) throws {
         guard offset != .min else {
-            throw CodecError.invalidUTOffset
+            throw TZDBError.invalidUTOffset
         }
 
         guard offset >= -89999, offset <= 93599 else {
-            throw CodecError.unsupportedOffsetRange
+            throw TZDBError.unsupportedOffsetRange
         }
 
         self.offset = offset

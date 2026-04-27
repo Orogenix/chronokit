@@ -1,6 +1,9 @@
+import ChronoSystem
+import ChronoTZ
+
 /// An Time Zone Information Format (TZif) parser compliant with RFC 8536.
-package enum IANACodec {
-    /// Decodes a raw byte stream into a structured ``TZDataPayload``.
+package enum TZifParser {
+    /// Parses a raw byte stream into a structured ``TZDataPayload``.
     ///
     /// This decoder is optimized for modern TZif files (Version 2+). It gracefully parses
     /// the legacy Version 1 header and data block, discards them, and synchronizes
@@ -19,13 +22,13 @@ package enum IANACodec {
     ///
     /// - Parameter bytes: A raw `[UInt8]` array containing the TZif file contents.
     /// - Returns: A populated ``TZDataPayload`` containing the parsed transition and type definitions.
-    /// - Throws: ``CodecError`` if the file is truncated, missing magic bytes, or contains malformed data structures.
+    /// - Throws: ``TZifError`` if the file is truncated, missing magic bytes, or contains malformed data structures.
     ///
     /// - Note: This implementation requires a V2+ file. It uses a "sync-to-magic" approach
     ///   to locate the V2 header, ensuring resilience against minor structural variations.
-    package static func decode(from bytes: [UInt8]) throws -> TZDataPayload {
+    package static func parse(from bytes: [UInt8]) throws -> TZDataPayload {
         return try bytes.withUnsafeBufferPointer { buffer in
-            guard let baseAddress = buffer.baseAddress else { throw CodecError.prematureEOF }
+            guard let baseAddress = buffer.baseAddress else { throw TZifError.prematureEOF }
             var reader = BinaryReader(ptr: baseAddress, capacity: buffer.count)
 
             // 'T' = 0x54, 'Z' = 0x5A, 'i' = 0x69, 'f' = 0x66
@@ -46,7 +49,7 @@ package enum IANACodec {
             // +---------------+---------------+---------------+
 
             let magic = try reader.readBytes(count: 4)
-            if magic != tzifMagic { throw CodecError.invalidHeader }
+            if magic != tzifMagic { throw TZifError.invalidHeader }
 
             try reader.skip(bytes: 1) // Version
             try reader.skip(bytes: 15) // Reserved
@@ -104,7 +107,8 @@ package enum IANACodec {
             // |  timecnt (4)  |  typecnt (4)  |  charcnt (4)  |
             // +---------------+---------------+---------------+
 
-            try reader.skipUntil(bytes: tzifMagic, failed: .corruptionError("V2+ header not found"))
+            let foundV2 = try reader.skipUntil(bytes: tzifMagic)
+            guard foundV2 else { throw TZifError.corruptionError("V2+ header not found") }
 
             var skipV2Header = 0
             skipV2Header += 4 // Magic "TZif"
@@ -168,7 +172,7 @@ package enum IANACodec {
                 let typeIndex = transitionsTypeIndices[i]
 
                 guard typeIndex < typeCountV2 else {
-                    throw CodecError.invalidTransitionIndex
+                    throw TZifError.invalidTransitionIndex
                 }
 
                 try transitions.append(Transition(unixTime: unixTime, typeIndex: typeIndex))

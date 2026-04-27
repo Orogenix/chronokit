@@ -14,16 +14,16 @@ package struct Packer {
     ]
 
     let sourceDir: String
-    let decode: ([UInt8]) throws -> TZDataPayload
+    let parse: ([UInt8]) throws -> TZDataPayload
     let encode: (TZDataPayload) throws -> [UInt8]
 
     package init(
         sourceDir: String,
-        decode: @escaping ([UInt8]) throws -> TZDataPayload = IANACodec.decode(from:),
+        parse: @escaping ([UInt8]) throws -> TZDataPayload = TZifParser.parse(from:),
         encode: @escaping (TZDataPayload) throws -> [UInt8] = TZDBCodec.encode(_:)
     ) {
         self.sourceDir = sourceDir
-        self.decode = decode
+        self.parse = parse
         self.encode = encode
     }
 }
@@ -76,7 +76,7 @@ package extension Packer {
 
             let payload: TZDataPayload
             do {
-                payload = try decode(rawBytes)
+                payload = try parse(rawBytes)
             } catch {
                 print("Failed to decode: \(entry.path). Error: \(error)")
                 throw PackerError.invalidPayload(path: entry.path)
