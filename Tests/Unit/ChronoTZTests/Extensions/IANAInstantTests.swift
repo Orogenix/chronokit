@@ -8,9 +8,9 @@ struct IANAInstantTests {
     @Test("IANAInstantTests: PlainDateTime conversion succeeds with valid provider")
     func plainDateTimeSuccess() throws {
         // Create data payload
-        let types = try [TypeDefinition(offset: 0, isDST: 0)]
-        let transitions = try [Transition(unixTime: 1000, typeIndex: 0)]
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let types = try [TZDBTypeDefinition(offset: 0, isDST: 0)]
+        let transitions = try [TZDBTransition(unixTime: 1000, typeIndex: 0)]
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
 
         // Create timezone provider
         let mock = MockTimeZoneProvider()
@@ -24,9 +24,9 @@ struct IANAInstantTests {
     @Test("IANAInstantTests: DateTime conversion succeeds with valid provider")
     func dateTimeSuccess() throws {
         // Create data payload
-        let types = try [TypeDefinition(offset: 0, isDST: 0)]
-        let transitions = try [Transition(unixTime: 1000, typeIndex: 0)]
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let types = try [TZDBTypeDefinition(offset: 0, isDST: 0)]
+        let transitions = try [TZDBTransition(unixTime: 1000, typeIndex: 0)]
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
 
         // Create timezone provider
         let mock = MockTimeZoneProvider()

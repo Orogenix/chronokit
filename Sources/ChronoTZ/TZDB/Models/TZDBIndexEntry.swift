@@ -1,4 +1,4 @@
-package struct TZIndexEntry: Equatable, Hashable {
+package struct TZDBIndexEntry: Equatable, Hashable {
     package var name: FixedName
     package var offset: UInt32
     package var size: UInt32
@@ -24,12 +24,12 @@ package struct TZIndexEntry: Equatable, Hashable {
     }
 }
 
-package extension TZIndexEntry {
+package extension TZDBIndexEntry {
     static let nameSize: Int = FixedName.size
     static let fixedSize: Int = nameSize + 4 + 4
 }
 
-extension TZIndexEntry {
+extension TZDBIndexEntry {
     var nameString: String {
         withUnsafeBytes(of: name) { buffer in
             // Treat the memory as a sequence of UInt8

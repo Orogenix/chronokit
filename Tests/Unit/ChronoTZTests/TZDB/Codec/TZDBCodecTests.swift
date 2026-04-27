@@ -4,11 +4,11 @@ import Testing
 struct TZDBCodecTests {
     @Test("TZDBCodecTests: Round-trip encoding and decoding (Complex payload)")
     func roundTripComplex() throws {
-        let original = try TZDataPayload(
+        let original = try TZDBDataPayload(
             transitionCount: 1,
             typeCount: 1,
-            transitions: [Transition(unixTime: 1_777_636_800, typeIndex: 1)],
-            types: [TypeDefinition(offset: 3600, isDST: 1)],
+            transitions: [TZDBTransition(unixTime: 1_777_636_800, typeIndex: 1)],
+            types: [TZDBTypeDefinition(offset: 3600, isDST: 1)],
             posixRule: "UTC+8"
         )
 
@@ -24,7 +24,7 @@ struct TZDBCodecTests {
 
     @Test("TZDBCodecTests: Round-trip encoding and decoding (Empty/Minimal payload)")
     func roundTripEmpty() throws {
-        let original = TZDataPayload(
+        let original = TZDBDataPayload(
             transitionCount: 0,
             typeCount: 0,
             transitions: [],

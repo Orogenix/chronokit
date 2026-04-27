@@ -15,7 +15,7 @@ struct SwiftEmitterTests {
         let ctx = Packer.Context(
             blobCache: [[0xDE, 0xAD]: 0],
             indexTable: [
-                TZIndexEntry(name: [0x41], offset: 0, size: 2),
+                TZDBIndexEntry(name: [0x41], offset: 0, size: 2),
             ]
         )
 

@@ -3,7 +3,7 @@ import ChronoTZ
 
 /// An Time Zone Information Format (TZif) parser compliant with RFC 8536.
 package enum TZifParser {
-    /// Parses a raw byte stream into a structured ``TZDataPayload``.
+    /// Parses a raw byte stream into a structured ``TZDBDataPayload``.
     ///
     /// This decoder is optimized for modern TZif files (Version 2+). It gracefully parses
     /// the legacy Version 1 header and data block, discards them, and synchronizes
@@ -21,12 +21,12 @@ package enum TZifParser {
     /// | **Footer** | POSIX rules. |
     ///
     /// - Parameter bytes: A raw `[UInt8]` array containing the TZif file contents.
-    /// - Returns: A populated ``TZDataPayload`` containing the parsed transition and type definitions.
+    /// - Returns: A populated ``TZDBDataPayload`` containing the parsed transition and type definitions.
     /// - Throws: ``TZifError`` if the file is truncated, missing magic bytes, or contains malformed data structures.
     ///
     /// - Note: This implementation requires a V2+ file. It uses a "sync-to-magic" approach
     ///   to locate the V2 header, ensuring resilience against minor structural variations.
-    package static func parse(from bytes: [UInt8]) throws -> TZDataPayload {
+    package static func parse(from bytes: [UInt8]) throws -> TZDBDataPayload {
         return try bytes.withUnsafeBufferPointer { buffer in
             guard let baseAddress = buffer.baseAddress else { throw TZifError.prematureEOF }
             var reader = BinaryReader(ptr: baseAddress, capacity: buffer.count)
@@ -165,7 +165,7 @@ package enum TZifParser {
 
             // Transitions zip
 
-            var transitions: [Transition] = []
+            var transitions: [TZDBTransition] = []
             transitions.reserveCapacity(Int(timeCountV2))
             for i in 0 ..< Int(timeCountV2) {
                 let unixTime = transitionsTimes[i]
@@ -175,7 +175,7 @@ package enum TZifParser {
                     throw TZifError.invalidTransitionIndex
                 }
 
-                try transitions.append(Transition(unixTime: unixTime, typeIndex: typeIndex))
+                try transitions.append(TZDBTransition(unixTime: unixTime, typeIndex: typeIndex))
             }
 
             // Local time type records
@@ -186,13 +186,13 @@ package enum TZifParser {
             // |   utoff (4)   | dst | idx |
             // +---------------+-----+-----+
 
-            var types: [TypeDefinition] = []
+            var types: [TZDBTypeDefinition] = []
             types.reserveCapacity(Int(typeCountV2))
             for _ in 0 ..< typeCountV2 {
                 let utoff = try reader.readBigEndian(Int32.self)
                 let isDST = try reader.readByte()
                 try reader.skip(bytes: 1) // Skip abbrind
-                try types.append(TypeDefinition(offset: utoff, isDST: isDST))
+                try types.append(TZDBTypeDefinition(offset: utoff, isDST: isDST))
             }
 
             // Skip trailing data blocks
@@ -225,7 +225,7 @@ package enum TZifParser {
                 }
             }
 
-            return TZDataPayload(
+            return TZDBDataPayload(
                 transitionCount: UInt32(timeCountV2),
                 typeCount: UInt32(typeCountV2),
                 transitions: transitions,

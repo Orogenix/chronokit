@@ -17,7 +17,7 @@ struct CEmitterTests {
 
         let ctx = Packer.Context(
             blobCache: [[0x01, 0x02]: 0],
-            indexTable: [TZIndexEntry(name: [0x41], offset: 0, size: 2)]
+            indexTable: [TZDBIndexEntry(name: [0x41], offset: 0, size: 2)]
         )
 
         try CEmitter().emit(ctx: ctx, to: path)

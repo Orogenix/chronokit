@@ -7,9 +7,9 @@ struct IANADateTimeTests {
     @Test("IANADateTimeTests: Initializer uses injected provider")
     func initializerUsesInjectedProvider() throws {
         // Create data payload
-        let types = try [TypeDefinition(offset: 3600, isDST: 0)]
-        let transitions = try [Transition(unixTime: 1000, typeIndex: 0)]
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let types = try [TZDBTypeDefinition(offset: 3600, isDST: 0)]
+        let transitions = try [TZDBTransition(unixTime: 1000, typeIndex: 0)]
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
 
         // Create timezone provider
         let mock = MockTimeZoneProvider()

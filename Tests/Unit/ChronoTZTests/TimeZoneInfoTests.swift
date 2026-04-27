@@ -7,9 +7,9 @@ import Testing
 struct TimeZoneInfoTests {
     @Test("TimeZoneInfoTests: Historical transition")
     func instantHistoricalOffset() throws {
-        let types = try [TypeDefinition(offset: 3600, isDST: 0)]
-        let transitions = try [Transition(unixTime: 1000, typeIndex: 0)]
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let types = try [TZDBTypeDefinition(offset: 3600, isDST: 0)]
+        let transitions = try [TZDBTransition(unixTime: 1000, typeIndex: 0)]
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
 
         let instant = Instant(seconds: 1500, nanoseconds: 0)
@@ -22,11 +22,11 @@ struct TimeZoneInfoTests {
     func instantBoundaryTransition() throws {
         // Test exactly AT the transition second
         let types = try [
-            TypeDefinition(offset: 0, isDST: 0),
-            TypeDefinition(offset: 3600, isDST: 1),
+            TZDBTypeDefinition(offset: 0, isDST: 0),
+            TZDBTypeDefinition(offset: 3600, isDST: 1),
         ]
-        let transitions = try [Transition(unixTime: 1000, typeIndex: 1)]
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let transitions = try [TZDBTransition(unixTime: 1000, typeIndex: 1)]
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
 
         // At T=1000, should be the new offset (3600)
@@ -41,9 +41,9 @@ extension TimeZoneInfoTests {
     @Test("TimeZoneInfoTests: Handles empty payload (Default offset)")
     func plainOffsetDefault() throws {
         // No transitions/types, should default to 0
-        let payload = try TZDataPayload.makePayload(
+        let payload = try TZDBDataPayload.makePayload(
             transitions: [],
-            types: [TypeDefinition(offset: 0, isDST: 0)]
+            types: [TZDBTypeDefinition(offset: 0, isDST: 0)]
         )
         let tz = TimeZoneInfo(identifier: "Empty/Zone", payload: payload)
 
@@ -62,18 +62,18 @@ extension TimeZoneInfoTests {
         // Setup: Fall back transition at 01:00 UTC
         // Types: 0 = Standard (0s), 1 = DST (3600s)
         let types = try [
-            TypeDefinition(offset: 0, isDST: 0),
-            TypeDefinition(offset: 3600, isDST: 1),
+            TZDBTypeDefinition(offset: 0, isDST: 0),
+            TZDBTypeDefinition(offset: 3600, isDST: 1),
         ]
 
         // Initial state set to DST (Index 1) at start of day,
         // then transition to Standard (Index 0) at 01:00 UTC (1_776_992_400)
         let transitions = try [
-            Transition(unixTime: 1_776_988_800, typeIndex: 1), // 2026-04-24T00:00:00Z
-            Transition(unixTime: 1_776_992_400, typeIndex: 0), // 2026-04-24T01:00:00Z
+            TZDBTransition(unixTime: 1_776_988_800, typeIndex: 1), // 2026-04-24T00:00:00Z
+            TZDBTransition(unixTime: 1_776_992_400, typeIndex: 0), // 2026-04-24T01:00:00Z
         ]
 
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
 
         // Query time: 01:30 AM
@@ -99,18 +99,18 @@ extension TimeZoneInfoTests {
         // Setup: Spring gap transition at 01:00 UTC
         // Types: 0 = Standard (0s), 1 = DST (3600s)
         let types = try [
-            TypeDefinition(offset: 0, isDST: 0),
-            TypeDefinition(offset: 3600, isDST: 1),
+            TZDBTypeDefinition(offset: 0, isDST: 0),
+            TZDBTypeDefinition(offset: 3600, isDST: 1),
         ]
 
         // Initial state set to Standard (Index 0) at start of day,
         // then transition to DST (Index 1) at 01:00 UTC (1_776_992_400)
         let transitions = try [
-            Transition(unixTime: 1_776_988_800, typeIndex: 0), // 2026-04-24T00:00:00Z
-            Transition(unixTime: 1_776_992_400, typeIndex: 1), // 2026-04-24T01:00:00Z
+            TZDBTransition(unixTime: 1_776_988_800, typeIndex: 0), // 2026-04-24T00:00:00Z
+            TZDBTransition(unixTime: 1_776_992_400, typeIndex: 1), // 2026-04-24T01:00:00Z
         ]
 
-        let payload = try TZDataPayload.makePayload(transitions: transitions, types: types)
+        let payload = try TZDBDataPayload.makePayload(transitions: transitions, types: types)
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
 
         // Query time: 01:30 AM
@@ -129,9 +129,9 @@ extension TimeZoneInfoTests {
 extension TimeZoneInfoTests {
     @Test("TimeZoneInfoTests: POSIX Fallback")
     func instantPOSIXFallback() throws {
-        let payload = try TZDataPayload.makePayload(
+        let payload = try TZDBDataPayload.makePayload(
             transitions: [],
-            types: [TypeDefinition(offset: 0, isDST: 0)],
+            types: [TZDBTypeDefinition(offset: 0, isDST: 0)],
             posixRule: "UTC0" // Basic rule
         )
         let tz = TimeZoneInfo(identifier: "Test/Zone", payload: payload)
@@ -146,15 +146,15 @@ extension TimeZoneInfoTests {
     func instantPOSIXFallbackWithDST() throws {
         // Define a last transition in the past (e.g., 2020)
         let lastTransitionTime: Int64 = 1_577_836_800 // Jan 1, 2020
-        let transitions = try [Transition(unixTime: lastTransitionTime, typeIndex: 0)]
-        let types = try [TypeDefinition(offset: -18000, isDST: 0)]
+        let transitions = try [TZDBTransition(unixTime: lastTransitionTime, typeIndex: 0)]
+        let types = try [TZDBTypeDefinition(offset: -18000, isDST: 0)]
 
         // Define a POSIX rule for 2026/2027 (Eastern Time)
         // EST5EDT,M3.2.0,M11.1.0
         // Standard: 5 hours behind UTC, DST: 4 hours behind UTC
         let posixRule = "EST5EDT,M3.2.0,M11.1.0"
 
-        let payload = try TZDataPayload.makePayload(
+        let payload = try TZDBDataPayload.makePayload(
             transitions: transitions,
             types: types, // Standard offset -5h
             posixRule: posixRule

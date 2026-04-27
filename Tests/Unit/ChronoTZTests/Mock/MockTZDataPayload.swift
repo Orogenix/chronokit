@@ -1,13 +1,13 @@
 @testable import ChronoTZ
 
-extension TZDataPayload {
+extension TZDBDataPayload {
     static func makePayload(
-        transitions: [Transition] = [],
-        types: [TypeDefinition] = [],
+        transitions: [TZDBTransition] = [],
+        types: [TZDBTypeDefinition] = [],
         posixRule: String? = nil
     ) throws -> Self {
-        let typeDefinitions = types.isEmpty ? try [TypeDefinition(offset: 0, isDST: 0)] : types
-        return TZDataPayload(
+        let typeDefinitions = types.isEmpty ? try [TZDBTypeDefinition(offset: 0, isDST: 0)] : types
+        return TZDBDataPayload(
             transitionCount: UInt32(transitions.count),
             typeCount: UInt32(types.count),
             transitions: transitions,

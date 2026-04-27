@@ -9,7 +9,7 @@ struct IANAPlainDateTimeTests {
     func instantConversionSuccess() throws {
         let mock = MockTimeZoneProvider()
         let tzName = "UTC"
-        let tz = try TimeZoneInfo(identifier: tzName, payload: TZDataPayload.makePayload())
+        let tz = try TimeZoneInfo(identifier: tzName, payload: TZDBDataPayload.makePayload())
         mock.insertZones(tzName, tz: tz)
 
         let plainDateTime = try #require(sample, "Sample plain date time should valid")
@@ -22,7 +22,7 @@ struct IANAPlainDateTimeTests {
     func dateTimeConversionSuccess() throws {
         let mock = MockTimeZoneProvider()
         let tzName = "UTC"
-        let tz = try TimeZoneInfo(identifier: tzName, payload: TZDataPayload.makePayload())
+        let tz = try TimeZoneInfo(identifier: tzName, payload: TZDBDataPayload.makePayload())
         mock.insertZones(tzName, tz: tz)
 
         let plainDateTime = try #require(sample, "Sample plain date time should valid")

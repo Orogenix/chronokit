@@ -15,7 +15,7 @@ struct BinaryEmitterTests {
         let ctx = Packer.Context(
             blobCache: [[0xDE, 0xAD]: 0],
             indexTable: [
-                TZIndexEntry(name: [0x41, 0x42], offset: 0, size: 10), // Mock entries
+                TZDBIndexEntry(name: [0x41, 0x42], offset: 0, size: 10), // Mock entries
             ]
         )
 

@@ -10,7 +10,7 @@ struct SwiftEmitter {
     }
 
     private func appendHeader(
-        _ header: TZHeader,
+        _ header: TZDBHeader,
         to buffer: inout [UInt8]
     ) {
         appendBytes(header.magic, to: &buffer)
@@ -19,7 +19,7 @@ struct SwiftEmitter {
     }
 
     private func appendIndexTable(
-        _ table: [TZIndexEntry],
+        _ table: [TZDBIndexEntry],
         to buffer: inout [UInt8]
     ) {
         for entry in table {
@@ -73,7 +73,7 @@ extension SwiftEmitter: Emitter {
         try writeString(header, to: fd)
 
         var buffer: [UInt8] = []
-        let tzHeader: TZHeader = .iana(tableSize: ctx.indexTable.count)
+        let tzHeader: TZDBHeader = .iana(tableSize: ctx.indexTable.count)
 
         appendHeader(tzHeader, to: &buffer)
         appendIndexTable(ctx.indexTable, to: &buffer)

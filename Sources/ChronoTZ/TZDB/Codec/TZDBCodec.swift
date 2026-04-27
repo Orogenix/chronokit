@@ -1,12 +1,12 @@
 import ChronoSystem
 
 package enum TZDBCodec {
-    package static func encode(_ payload: TZDataPayload) throws -> [UInt8] {
+    package static func encode(_ payload: TZDBDataPayload) throws -> [UInt8] {
         let ruleBytes = Array(payload.posixRule?.utf8 ?? "".utf8)
         // 8 (counts) + transitions + types + 4 (rule len) + rule bytes
         let size = 8
-            + (payload.transitions.count * Transition.size)
-            + (payload.types.count * TypeDefinition.size)
+            + (payload.transitions.count * TZDBTransition.size)
+            + (payload.types.count * TZDBTypeDefinition.size)
             + 4
             + ruleBytes.count
 
@@ -39,33 +39,33 @@ package enum TZDBCodec {
         return data
     }
 
-    package static func decode(from data: [UInt8]) throws -> TZDataPayload {
+    package static func decode(from data: [UInt8]) throws -> TZDBDataPayload {
         return try data.withUnsafeBufferPointer { buffer in
             try Self.decode(from: UnsafeRawBufferPointer(buffer))
         }
     }
 
-    package static func decode(from buffer: UnsafeRawBufferPointer) throws -> TZDataPayload {
+    package static func decode(from buffer: UnsafeRawBufferPointer) throws -> TZDBDataPayload {
         guard let baseAddress = buffer.baseAddress else { throw TZDBError.prematureEOF }
         var reader = BinaryReader(ptr: baseAddress, capacity: buffer.count)
 
         let transitionCount = try reader.readBigEndian(UInt32.self)
         let typeCount = try reader.readBigEndian(UInt32.self)
 
-        var transitions: [Transition] = []
+        var transitions: [TZDBTransition] = []
         transitions.reserveCapacity(Int(transitionCount))
         for _ in 0 ..< transitionCount {
             let time = try reader.readBigEndian(Int64.self)
             let typeIndex = try reader.readByte()
-            try transitions.append(Transition(unixTime: time, typeIndex: typeIndex))
+            try transitions.append(TZDBTransition(unixTime: time, typeIndex: typeIndex))
         }
 
-        var types: [TypeDefinition] = []
+        var types: [TZDBTypeDefinition] = []
         types.reserveCapacity(Int(typeCount))
         for _ in 0 ..< typeCount {
             let offsetVal = try reader.readBigEndian(Int32.self)
             let isDST = try reader.readByte()
-            try types.append(TypeDefinition(offset: offsetVal, isDST: isDST))
+            try types.append(TZDBTypeDefinition(offset: offsetVal, isDST: isDST))
         }
 
         let ruleLength = try reader.readBigEndian(UInt32.self)
@@ -76,7 +76,7 @@ package enum TZDBCodec {
             posixRule = rawString.isEmpty ? nil : rawString
         }
 
-        return TZDataPayload(
+        return TZDBDataPayload(
             transitionCount: transitionCount,
             typeCount: typeCount,
             transitions: transitions,

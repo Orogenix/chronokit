@@ -1,18 +1,18 @@
-package struct TZDataPayload: Equatable, Hashable {
+package struct TZDBDataPayload: Equatable, Hashable {
     package let transitionCount: UInt32
     package let typeCount: UInt32
-    package let transitions: [Transition]
-    package let types: [TypeDefinition]
+    package let transitions: [TZDBTransition]
+    package let types: [TZDBTypeDefinition]
     package let posixRule: String?
     package let compiledPosixRule: POSIXRule?
-    package let stdType: TypeDefinition?
-    package let dstType: TypeDefinition?
+    package let stdType: TZDBTypeDefinition?
+    package let dstType: TZDBTypeDefinition?
 
     package init(
         transitionCount: UInt32,
         typeCount: UInt32,
-        transitions: [Transition],
-        types: [TypeDefinition],
+        transitions: [TZDBTransition],
+        types: [TZDBTypeDefinition],
         posixRule: String? = nil
     ) {
         self.transitionCount = transitionCount
@@ -25,8 +25,8 @@ package struct TZDataPayload: Equatable, Hashable {
         compiledPosixRule = rule
 
         if let rule {
-            stdType = try? TypeDefinition(offset: rule.stdOffset, isDST: 0)
-            dstType = try? TypeDefinition(offset: rule.dstOffset, isDST: 1)
+            stdType = try? TZDBTypeDefinition(offset: rule.stdOffset, isDST: 0)
+            dstType = try? TZDBTypeDefinition(offset: rule.dstOffset, isDST: 1)
         } else {
             stdType = nil
             dstType = nil
@@ -34,7 +34,7 @@ package struct TZDataPayload: Equatable, Hashable {
     }
 }
 
-extension TZDataPayload {
+extension TZDBDataPayload {
     func resolve(at timestamp: Int64) -> ResolvedOffset {
         // Resolve from transitions
         if let lastTransition = transitions.last,
@@ -98,7 +98,7 @@ extension TZDataPayload {
     }
 }
 
-package struct Transition: Equatable, Hashable {
+package struct TZDBTransition: Equatable, Hashable {
     package let unixTime: Int64
     package let typeIndex: UInt8
 
@@ -122,11 +122,11 @@ package struct Transition: Equatable, Hashable {
     }
 }
 
-extension Transition {
+extension TZDBTransition {
     static let size: Int = 8 + 1
 }
 
-package struct TypeDefinition: Equatable, Hashable {
+package struct TZDBTypeDefinition: Equatable, Hashable {
     package let offset: Int32 // Second from UTC
     package let isDST: UInt8 // Standard = 0; DST = 1
 
@@ -148,13 +148,13 @@ package struct TypeDefinition: Equatable, Hashable {
     }
 }
 
-extension TypeDefinition {
+extension TZDBTypeDefinition {
     static let size: Int = 4 + 1
 }
 
 package enum ResolvedOffset {
-    case unique(TypeDefinition)
-    case ambiguous(earlier: TypeDefinition, later: TypeDefinition)
+    case unique(TZDBTypeDefinition)
+    case ambiguous(earlier: TZDBTypeDefinition, later: TZDBTypeDefinition)
     case gap
     case invalid
 }

@@ -1,16 +1,16 @@
 @testable import ChronoTZ
 import Testing
 
-struct TZDataPayloadTests {
-    @Test("TZDataPayloadTests: findTransitionIndex returns correct index")
+struct TZDBDataPayloadTests {
+    @Test("TZDBDataPayloadTests: findTransitionIndex returns correct index")
     func testFindTransitionIndex() throws {
         // Timeline: 100, 200, 300
         let transitions = try [
-            Transition(unixTime: 100, typeIndex: 0),
-            Transition(unixTime: 200, typeIndex: 1),
-            Transition(unixTime: 300, typeIndex: 2),
+            TZDBTransition(unixTime: 100, typeIndex: 0),
+            TZDBTransition(unixTime: 200, typeIndex: 1),
+            TZDBTransition(unixTime: 300, typeIndex: 2),
         ]
-        let payload = try TZDataPayload.makePayload(
+        let payload = try TZDBDataPayload.makePayload(
             transitions: transitions,
             posixRule: "UTC0"
         )
@@ -31,16 +31,16 @@ struct TZDataPayloadTests {
         #expect(payload.findTransitionIndex(for: 350) == 2)
     }
 
-    @Test("TZDataPayloadTests: findTransitionIndex handles empty transitions")
+    @Test("TZDBDataPayloadTests: findTransitionIndex handles empty transitions")
     func findTransitionIndexEmpty() throws {
-        let payload = try TZDataPayload.makePayload(posixRule: "UTC0")
+        let payload = try TZDBDataPayload.makePayload(posixRule: "UTC0")
         #expect(payload.findTransitionIndex(for: 100) == nil)
     }
 
-    @Test("*Tests TZDataPayloadTests: findTransitionIndex handles single transition")
+    @Test("TZDBDataPayloadTests: findTransitionIndex handles single transition")
     func findTransitionIndexSingle() throws {
-        let payload = try TZDataPayload.makePayload(
-            transitions: [Transition(unixTime: 100, typeIndex: 0)],
+        let payload = try TZDBDataPayload.makePayload(
+            transitions: [TZDBTransition(unixTime: 100, typeIndex: 0)],
             posixRule: "UTC0"
         )
 
@@ -49,10 +49,10 @@ struct TZDataPayloadTests {
         #expect(payload.findTransitionIndex(for: 150) == 0)
     }
 
-    @Test("TZDataPayloadTests: init compiles POSIX rule correctly")
+    @Test("TZDBDataPayloadTests: init compiles POSIX rule correctly")
     func initCompilesPosixRule() {
         let ruleString = "EST5EDT,M3.2.0,M11.1.0"
-        let payload = TZDataPayload(
+        let payload = TZDBDataPayload(
             transitionCount: 0,
             typeCount: 0,
             transitions: [],
