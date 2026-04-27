@@ -1,9 +1,9 @@
-struct BinaryReader {
+package struct BinaryReader {
     private let ptr: UnsafeRawPointer
-    var offset: Int = 0
-    let capacity: Int
+    package var offset: Int = 0
+    package let capacity: Int
 
-    init(
+    package init(
         ptr: UnsafeRawPointer,
         capacity: Int
     ) {
@@ -12,12 +12,12 @@ struct BinaryReader {
     }
 }
 
-extension BinaryReader {
+package extension BinaryReader {
     var remainingBytes: Int {
         capacity - offset
     }
 
-    mutating func readBytes(count: Int) throws(CodecError) -> [UInt8] {
+    mutating func readBytes(count: Int) throws(BinaryError) -> [UInt8] {
         guard offset + count <= capacity else { throw .prematureEOF }
 
         let start = ptr.advanced(by: offset).assumingMemoryBound(to: UInt8.self)
@@ -28,14 +28,14 @@ extension BinaryReader {
         return bytes
     }
 
-    mutating func readByte() throws(CodecError) -> UInt8 {
+    mutating func readByte() throws(BinaryError) -> UInt8 {
         guard offset + 1 <= capacity else { throw .prematureEOF }
         let value = ptr.load(fromByteOffset: offset, as: UInt8.self)
         offset += 1
         return value
     }
 
-    mutating func read<T>(_: T.Type) throws(CodecError) -> T {
+    mutating func read<T>(_: T.Type) throws(BinaryError) -> T {
         let size = MemoryLayout<T>.size
         guard offset + size <= capacity else { throw .prematureEOF }
         let value = ptr.loadUnaligned(fromByteOffset: offset, as: T.self)
@@ -43,12 +43,12 @@ extension BinaryReader {
         return value
     }
 
-    mutating func readBigEndian<T: FixedWidthInteger>(_: T.Type) throws(CodecError) -> T {
+    mutating func readBigEndian<T: FixedWidthInteger>(_: T.Type) throws(BinaryError) -> T {
         let value = try read(T.self)
         return T(bigEndian: value)
     }
 
-    mutating func readString(length: Int) throws(CodecError) -> String {
+    mutating func readString(length: Int) throws(BinaryError) -> String {
         guard offset + length <= capacity else { throw .prematureEOF }
         let start = ptr.advanced(by: offset).assumingMemoryBound(to: UInt8.self)
         let buffer = UnsafeBufferPointer(start: start, count: length)
@@ -57,36 +57,35 @@ extension BinaryReader {
         return value
     }
 
-    mutating func readString(length: UInt32) throws(CodecError) -> String {
+    mutating func readString(length: UInt32) throws(BinaryError) -> String {
         try readString(length: Int(length))
     }
 
-    func peekBytes(count: Int) throws(CodecError) -> [UInt8] {
+    func peekBytes(count: Int) throws(BinaryError) -> [UInt8] {
         guard offset + count <= capacity else { throw .prematureEOF }
         let start = ptr.advanced(by: offset).assumingMemoryBound(to: UInt8.self)
         let buffer = UnsafeBufferPointer(start: start, count: count)
         return Array(buffer)
     }
 
-    mutating func skip(bytes: Int) throws(CodecError) {
+    mutating func skip(bytes: Int) throws(BinaryError) {
         guard offset + bytes <= capacity else { throw .prematureEOF }
         offset += bytes
     }
 
     mutating func skipUntil(
-        bytes: [UInt8],
-        failed error: CodecError = .prematureEOF
-    ) throws(CodecError) {
+        bytes: [UInt8]
+    ) throws(BinaryError) -> Bool {
         let count = bytes.count
 
         while remainingBytes >= count {
             let next = try peekBytes(count: count)
             if next == bytes {
-                return
+                return true
             }
             try skip(bytes: 1)
         }
 
-        throw error
+        return false
     }
 }
